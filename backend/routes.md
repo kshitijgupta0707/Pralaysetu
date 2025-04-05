@@ -46,18 +46,8 @@ This document contains all available routes in the PralaySetu project, categoriz
 {
     "success": true,
     "message": "User created successfully",
-    "user": {
-        "firstName": "John",
-        "lastName": "Singh",
-        "email": "r1@gmail.com",
-        "password": "$2b$10$Ddrt5S6Zb/qafJS10X.apej5HAT/LxQnEP0MU2MHt3vQz5HzO95Dq",
-        "profilePic": "https://cdn-icons-png.flaticon.com/512/149/149071.png",
-        "role": "Responder",
-        "isVerified": true,
-        "_id": "67f0f23a4bf4b22548b68c88",
-        "createdAt": "2025-04-05T09:04:58.786Z",
-        "updatedAt": "2025-04-05T09:04:58.786Z",
-        "__v": 0
+    "user": { 
+
     }
 }
 ```
@@ -112,9 +102,9 @@ This document contains all available routes in the PralaySetu project, categoriz
 - **Body**:
 ```json
 {
-    "token": "dfd",
-    "email": "df",
-    "newPassword": "1234567"
+    "token": "",
+    "email": "",
+    "newPassword": ""
 }
 ```
 - **Response**: 
@@ -136,13 +126,11 @@ This document contains all available routes in the PralaySetu project, categoriz
 - **Body**:
 ```json
 {
-  "disasterType": "flood",
+  "disasterType": "",
   "location": {
-    "latitude": 28.7041,
-    "longitude": 77.1025,
-    "address": "Some Location"
+    
   },
-  "description": "Trapped in house, need help"
+  "description": ""
 }
 ```
 - **Response**: Help request created
