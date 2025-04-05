@@ -1,27 +1,22 @@
-# PralaySetu API Routes Documentation
+# PralaySetu API Documentation
 
-This document contains all available routes in the PralaySetu project, categorized by user roles and their functionalities.
+## 🔐 Authorization & Authentication
 
----
-
-## 🌐 Public Routes
-### 1. User will recieve otp on email
+### 1. Send OTP to Email
 - **Route**: `/api/auth/sendOtp`
 - **Method**: `POST`
 - **Body**:
 ```json
 {
-
-  "email": "dummy@example.com",
-
+  "email": "dummy@example.com"
 }
 ```
-- **Response**: 
+- **Response**:
 ```json
 {
-    "success": true,
-    "message": "Otp sent successfully",
-    "otp": "392399"
+  "success": true,
+  "message": "Otp sent successfully",
+  "otp": "392399"
 }
 ```
 
@@ -34,21 +29,18 @@ This document contains all available routes in the PralaySetu project, categoriz
   "email": "r1@gmail.com",
   "otp": "392399",
   "firstName": "John",
-  "lastName" : "Singh",
+  "lastName": "Singh",
   "password": "123456",
   "role": "Responder",
   "location": "New Delhi, India"
 }
-
 ```
-- **Response**: 
+- **Response**:
 ```json
 {
-    "success": true,
-    "message": "User created successfully",
-    "user": { 
-
-    }
+  "success": true,
+  "message": "User created successfully",
+  "user": { }
 }
 ```
 
@@ -62,134 +54,180 @@ This document contains all available routes in the PralaySetu project, categoriz
   "password": "yourPassword"
 }
 ```
-- **Response**: Recieved JWT token as cookie
+- **Response**: JWT token is received as cookie.
 
----
-### 3. User Login
-- **Route**: `/api/auth/login`
-- **Method**: `POST`
-- **Body**:
-```json
-{
-  "email": "john@example.com",
-  "password": "yourPassword"
-}
-```
-- **Response**: Recieved JWT token as cookie
-
----
-### 4. forgot password
+### 4. Forgot Password
 - **Route**: `/api/auth/forgot-password`
 - **Method**: `POST`
 - **Body**:
 ```json
 {
-  "email": "john@example.com",
+  "email": "john@example.com"
 }
 ```
-- **Response**: 
+- **Response**:
 ```json
 {
-    "success": true,
-    "message": "Reset password link sent to email"
+  "success": true,
+  "message": "Reset password link sent to email"
 }
 ```
 
----
-### 5. Reset password
-- **Route**: `/api/auth/login`
+### 5. Reset Password
+- **Route**: `/api/auth/reset-password`
 - **Method**: `POST`
 - **Body**:
 ```json
 {
-    "token": "",
-    "email": "",
-    "newPassword": ""
+  "token": "",
+  "email": "",
+  "newPassword": ""
 }
 ```
-- **Response**: 
+- **Response**:
 ```json
-{ 
-    "success": true,
-    "message": "Password reset successful" 
- }
+{
+  "success": true,
+  "message": "Password reset successful"
+}
 ```
 
 ---
 
 
-## 👤 User Functionality
+## 📢 Reports
 
-### 1. Create Help Request
+### 1.  Create Report (By any User)
+- **Route**: `/api/reports/createReport`
+- **Method**: `POST`
+- **Body**:
+```json
+{
+  "disasterType": "fire",
+    "location" : {
+        "latitude": 43,
+        "longitude": 1,
+        "address": "Tamil Naidu"
+    },
+    "description" : "everywher fllod"
+
+}
+```
+- **Response**: Report object with success message.
+```json
+{
+  "success": true,
+    "message": "Disaster report submitted",
+    "report": {}
+  }
+```
+
+
+### 2. Get All Reports (Admin)
+- **Route**: `/api/reports/getAllReports`
+- **Method**: `GET`
+- **Response**: Array of Report object with success message
+
+### 3. Get All Verified Reports (All Users)
+- **Route**: `/api/reports/getVerifiedReports`
+- **Method**: `GET`
+- **Response**: Array of Report object with success message
+
+### 4. Verify a Report (Admin)
+- **Route**: `/api/reports/verifyReport`
+- **Method**: `PUT`
+- **Body**:
+```json
+{
+  "reportId": "67f0eaed6c711a3547ab9f25",
+  "status": "verified"
+}
+```
+- **Response**: Updated report object with success message.
+
+---
+
+## 🆘 Help Requests
+
+### 1. Create Help Request (User)
 - **Route**: `/api/help/request`
 - **Method**: `POST`
 - **Body**:
 ```json
 {
-  "disasterType": "",
   "location": {
-    
+    "lat": 28.6139,
+    "lng": 77.2090
   },
-  "description": ""
+  "reason": "",
+  "urgency": "critical"
 }
 ```
-- **Response**: Help request created
+- **Response**: Created help request object.
 
-### 2. View Verified Help Requests
-- **Route**: `/api/help/verified`
+### 2.  Show All Pending Requests (Admin)
+- **Route**: `/api/help/pending`
 - **Method**: `GET`
-- **Response**: List of all verified help requests
 
----
-
-## 🧑‍💼 Admin Functionality
-
-### 1. View All Help Requests
-- **Route**: `/api/help/all`
-- **Method**: `GET`
-- **Response**: All help requests
-
-### 2. Verify or Reject Help Request
+### 3. Verify Request (Admin)
 - **Route**: `/api/help/verify/:id`
 - **Method**: `PUT`
 - **Body**:
 ```json
 {
-  "status": "verified" // or "rejected"
+  "status": "rejected"
 }
 ```
-- **Response**: Updated help request
+- **Response**: Updated help request object.
 
-### 3. View All Incident Reports
-- **Route**: `/api/report/all`
-- **Method**: `GET`
-
----
-
-## 🧑‍🚒 Government / Responder Functionality
-
-### 1. View Assigned Requests
-- **Route**: `/api/help/assigned`
-- **Method**: `GET`
-- **Response**: All help requests assigned to this responder
-
-### 2. Accept / Reject / Complete Request
-- **Route**: `/api/help/update-status/:id`
+### 4.  Assigning Verified Request to Responder (admin)
+- **Route**: `/api/help/assign/:id`
 - **Method**: `PUT`
 - **Body**:
 ```json
 {
-  "status": "accepted" // or "rejected" or "completed"
+  "responderId": "67f0f23a4bf4b22548b68c88"
 }
 ```
-- **Response**: Status updated
+- **Response**: Assigned help request.
+
+### 5. Get All Verified Requests (admin)
+- **Route**: `/api/help/verified`
+- **Method**: `GET`
+
+### 6. Get All Rejected Requests (admin)
+- **Route**: `/api/help/rejected`
+- **Method**: `GET`
+
+### 7. Accept Request (Responder) 
+- **Route**: `/api/help/accept/:id`
+- **Method**: `PUT`
+- **Response**: Help request marked as accepted.
+
+### 8. Complete Request (Responder)
+- **Route**: `/api/help/complete/:id`
+- **Method**: `PUT`
+- **Response**: Help request marked as completed.
+
+### 9. Get assigned requests for responder (Responder)
+- **Route**: `/api/help/assigned`
+- **Method**: `PUT`
+- **Response**: Help request marked as completed.
 
 ---
 
-## 🏥 NGO Functionality (if applicable)
-
-- Future implementation for donation & help tracking.
-
----
-
-Let me know if you want Swagger/OpenAPI documentation, Postman collection, or frontend integration guidance.
+  ## 📊 Dashboards
+  
+  ### User Dashboard
+  - **Route**: `/api/dashboard/user`
+  - **Method**: `GET`
+  
+  ### Admin Dashboard
+  - **Route**: `/api/dashboard/admin`
+  - **Method**: `GET`
+  
+  ### Government Dashboard
+  - **Route**: `/api/dashboard/government`
+  - **Method**: `GET`
+  
+  ---
