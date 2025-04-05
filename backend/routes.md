@@ -5,22 +5,64 @@ This document contains all available routes in the PralaySetu project, categoriz
 ---
 
 ## 🌐 Public Routes
-
-### 1. User Registration
-- **Route**: `/api/auth/register`
+### 1. User will recieve otp on email
+- **Route**: `/api/auth/sendOtp`
 - **Method**: `POST`
 - **Body**:
 ```json
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "yourPassword",
-  "role": "user"
+
+  "email": "dummy@example.com",
+
 }
 ```
-- **Response**: Success message and user data
+- **Response**: 
+```json
+{
+    "success": true,
+    "message": "Otp sent successfully",
+    "otp": "392399"
+}
+```
 
-### 2. User Login
+### 2. User Registration
+- **Route**: `/api/auth/signup`
+- **Method**: `POST`
+- **Body**:
+```json
+{
+  "email": "r1@gmail.com",
+  "otp": "392399",
+  "firstName": "John",
+  "lastName" : "Singh",
+  "password": "123456",
+  "role": "Responder",
+  "location": "New Delhi, India"
+}
+
+```
+- **Response**: 
+```json
+{
+    "success": true,
+    "message": "User created successfully",
+    "user": {
+        "firstName": "John",
+        "lastName": "Singh",
+        "email": "r1@gmail.com",
+        "password": "$2b$10$Ddrt5S6Zb/qafJS10X.apej5HAT/LxQnEP0MU2MHt3vQz5HzO95Dq",
+        "profilePic": "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+        "role": "Responder",
+        "isVerified": true,
+        "_id": "67f0f23a4bf4b22548b68c88",
+        "createdAt": "2025-04-05T09:04:58.786Z",
+        "updatedAt": "2025-04-05T09:04:58.786Z",
+        "__v": 0
+    }
+}
+```
+
+### 3. User Login
 - **Route**: `/api/auth/login`
 - **Method**: `POST`
 - **Body**:
@@ -30,9 +72,61 @@ This document contains all available routes in the PralaySetu project, categoriz
   "password": "yourPassword"
 }
 ```
-- **Response**: JWT token and user info
+- **Response**: Recieved JWT token as cookie
 
 ---
+### 3. User Login
+- **Route**: `/api/auth/login`
+- **Method**: `POST`
+- **Body**:
+```json
+{
+  "email": "john@example.com",
+  "password": "yourPassword"
+}
+```
+- **Response**: Recieved JWT token as cookie
+
+---
+### 4. forgot password
+- **Route**: `/api/auth/forgot-password`
+- **Method**: `POST`
+- **Body**:
+```json
+{
+  "email": "john@example.com",
+}
+```
+- **Response**: 
+```json
+{
+    "success": true,
+    "message": "Reset password link sent to email"
+}
+```
+
+---
+### 5. Reset password
+- **Route**: `/api/auth/login`
+- **Method**: `POST`
+- **Body**:
+```json
+{
+    "token": "dfd",
+    "email": "df",
+    "newPassword": "1234567"
+}
+```
+- **Response**: 
+```json
+{ 
+    "success": true,
+    "message": "Password reset successful" 
+ }
+```
+
+---
+
 
 ## 👤 User Functionality
 
