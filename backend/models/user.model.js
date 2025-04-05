@@ -12,7 +12,7 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["User", "Admin", "Government", "NGO"],
+      enum: ["User", "Admin", "Government", "NGO" , "Responder"],
       default: "User",
     },
     isVerified: { type: Boolean, default: false }, // Ensuring user verification
@@ -24,3 +24,4 @@ const userSchema = mongoose.Schema(
 
 const User = mongoose.model("User", userSchema);
 export { User };
+  

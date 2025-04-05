@@ -7,6 +7,7 @@ import otpGenerator from "otp-generator";
 import jwt from "jsonwebtoken";
 import { mailSender } from "../utils/mailSender.js";
 import { resetTemplate } from "../templates/reset.template.js";
+import { otpTemplate } from "../templates/otp.template.js";
 import crypto from "crypto";
 
 export const sendOtp = async (req, res) => {
@@ -90,9 +91,9 @@ export const sendOtp = async (req, res) => {
 }
 export const signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, otp } = req.body;
+    const { firstName, lastName, email, role, password, otp , location } = req.body;
     //check if some data is missing
-    if (!firstName || !lastName || !email || !password || !otp) {
+    if (!firstName || !lastName || !email || !role || !password || !otp) {
       return res.status(400).json({
         success: false,
         message: "All fields are required"
@@ -184,6 +185,7 @@ export const signup = async (req, res) => {
       firstName,
       lastName,
       email,
+      role,
       password: hashedPassword,
       isVerified: true,
     })

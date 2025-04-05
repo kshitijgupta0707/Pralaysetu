@@ -5,6 +5,12 @@ import { getReceiverSocketId, io } from "../config/socket.js";
 export const createReport = async (req, res) => {
   try {
     const { disasterType, location, description, media } = req.body;
+    if(!disasterType || !location || !description ) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
 
     const report = await Report.create({
       user: req.user.id,
@@ -32,6 +38,18 @@ export const getAllReports = async (req, res) => {
     res.status(500).json({ success: false, message: "Unable to fetch reports" });
   }
 };
+
+
+// Get all verified reports for public view
+export const getVerifiedReports = async (req, res) => {
+  try {
+    const reports = await Report.find({ status: "verified" }).populate("user", "name email");
+    res.status(200).json({ success: true, reports });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to fetch verified reports" });
+  }
+};
+
 export const verifyReport = async (req, res) => {
   try {
     const { reportId, status } = req.body;
@@ -79,3 +97,4 @@ export const verifyReport = async (req, res) => {
   }
 };
   
+
