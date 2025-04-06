@@ -1,17 +1,21 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import OtpVerification from "./pages/OtpVerification";
-import Dashboard from "./pages/Dashboard"; // Placeholder for now
-import Signup from "./pages/Signup"
+
+import LoginPage from "./pages/LoginPage"
+import SignupPage from "./pages/SignupPage";
+import { Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import OtpVerificationPage from "./pages/OtpVerificationPage";
+import ResponderDashboard from "./pages/ResponderDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import { Home } from "lucide-react";
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Signup />} />
-        <Route path="/verify-otp" element={<OtpVerification />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/otp-verification" element={<OtpVerificationPage />} />
+      <Route path="/responder-dashboard" element={<ResponderDashboard />} />
+    </Routes>     
   );
 }
 
