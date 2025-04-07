@@ -17,8 +17,10 @@ export const isAuthenticated = (req, res, next) => {
 };
 
 export const authenticate = async (req, res, next) => {
+  
     const token = req.cookies.token;
     if (!token) {
+      console.log("No token provided");
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
   

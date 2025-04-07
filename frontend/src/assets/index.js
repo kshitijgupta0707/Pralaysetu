@@ -1,4 +1,4 @@
 
-import user from "./user.png";
+import userimage from "./user.png";
 
-export { user };
+export { userimage };

@@ -31,6 +31,7 @@
   "firstName": "John",
   "lastName": "Singh",
   "password": "123456",
+  "confirmPassword": "123456",
   "role": "Responder",
   "location": "New Delhi, India"
 }
@@ -109,7 +110,8 @@
         "longitude": 1,
         "address": "Tamil Naidu"
     },
-    "description" : "everywher fllod"
+    "description" : "everywher fllod",
+    "media": "" //image file // optional
 
 }
 ```

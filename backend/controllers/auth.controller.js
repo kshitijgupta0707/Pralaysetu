@@ -91,7 +91,7 @@ export const sendOtp = async (req, res) => {
 }
 export const signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, role, password, otp , location } = req.body;
+    const { firstName, lastName, email, role, password, confirmPassword , otp , location } = req.body;
     //check if some data is missing
     if (!firstName || !lastName || !email || !role || !password || !otp) {
       return res.status(400).json({
@@ -107,7 +107,12 @@ export const signup = async (req, res) => {
             message: "Password must be at least 6 characters"
           });
         }
-
+  if(password !== confirmPassword) {
+    return res.status(400).json({
+      success: false,
+      message: "Password and confirm password do not match"
+    });
+  }
 
    //check if user already exist
     //use find one it gives an single object
@@ -221,7 +226,7 @@ export const login = async (req, res) => {
     // Compare password with hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: "Invalid credentials" });
+      return res.status(401).json({ success: false, message: "Invalid credentials"  });
     }
 
     // 👉 Get client IP
@@ -363,5 +368,14 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
-
+export const checkAuth = (req, res) => {
+  try {
+    console.log("Checking authentication status...");
+    console.log(req.user)
+    res.status(200).json(req.user);
+  } catch (error) {
+    console.log("Error in checkAuth controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 

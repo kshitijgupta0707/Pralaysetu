@@ -221,7 +221,7 @@ const AlertNotifications = ({ userLocation }) => {
     <Card className="w-full">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl flex items-center">
+          <CardTitle className="text-xl flex items-center`">
             <Bell className="h-5 w-5 mr-2" />
             Alert Notifications
           </CardTitle>

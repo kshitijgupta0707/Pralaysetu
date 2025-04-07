@@ -12,17 +12,18 @@ import AlertNotifications from './AlertNotifications';
 import ReportIncident from './ReportIncident';
 import RequestHelp from './RequestHelp';
 import { useAuthStore } from '@/store/useAuthstore';
-import {user} from '../assets/index.js'
+import { userimage } from '../assets/index.js'
+import { Alert } from '@/components/ui/alert';
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const {authUser} = useAuthStore()
+  const { authUser } = useAuthStore()
   const [loading, setLoading] = useState(true);
   const [alerts, setAlerts] = useState([]);
   const [recentReports, setRecentReports] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [userLocation, setUserLocation] = useState(null);
-  console.log("user" , authUser)
+  console.log("user", authUser)
   useEffect(() => {
     // Fetch user data
     const fetchUserData = async () => {
@@ -110,7 +111,7 @@ const UserDashboard = () => {
         <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex justify-between items-center">
           <div className="flex items-center">
             <Avatar className="h-10 w-10 mr-2">
-              <AvatarImage src={user} alt={authUser?.name} />
+              <AvatarImage src={userimage} alt={authUser?.name} />
               <AvatarFallback>{authUser?.name?.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
@@ -119,9 +120,9 @@ const UserDashboard = () => {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button 
-              variant="destructive" 
-              size="lg" 
+            <Button
+              variant="destructive"
+              size="lg"
               className="gap-2"
               onClick={() => setActiveTab('help')}
             >
@@ -161,67 +162,24 @@ const UserDashboard = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className='flex flex-col gap-6'>
+            <div className=" md:flex gap-6">
               {/* Alerts Section */}
-              <Card className="md:col-span-2">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
-                    <Bell className="h-5 w-5 mr-2" />
-                    Active Alerts
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[250px] pr-4">
-                    {alerts.length > 0 ? (
-                      <div className="space-y-4">
-                        {alerts.map((alert) => (
-                          <div 
-                            key={alert.id}
-                            className="flex items-start p-3 rounded-lg bg-white shadow-sm"
-                          >
-                            <div className={`w-3 h-3 rounded-full mt-1.5 mr-3 ${getAlertSeverityColor(alert.severity)}`} />
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <h4 className="font-medium">{alert.title}</h4>
-                                <Badge variant={alert.severity === 'critical' ? 'destructive' : 'outline'}>
-                                  {alert.severity}
-                                </Badge>
-                              </div>
-                              <p className="text-sm text-gray-600 mt-1">{alert.description}</p>
-                              <div className="flex items-center mt-2 text-xs text-gray-500">
-                                <MapPin className="h-3 w-3 mr-1" /> 
-                                {alert.location}
-                                <span className="mx-2">•</span>
-                                {new Date(alert.time).toLocaleString()}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                        <Bell className="h-12 w-12 mb-2 opacity-30" />
-                        <p>No active alerts for your location</p>
-                      </div>
-                    )}
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-
+              <AlertNotifications />
               {/* Recent Reports */}
-              <Card>
-                <CardHeader className="pb-2">
+              <Card >
+                <CardHeader className="pb-2 w-[400px]">
                   <CardTitle className="text-lg flex items-center">
                     <MessageSquare className="h-5 w-5 mr-2" />
                     Recent Reports
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ScrollArea className="h-[250px] pr-4">
+                  <ScrollArea className="h-[250px]  pr-4">
                     {recentReports.length > 0 ? (
                       <div className="space-y-4">
                         {recentReports.map((report) => (
-                          <div 
+                          <div
                             key={report.id}
                             className="p-3 rounded-lg bg-white shadow-sm"
                           >
@@ -231,7 +189,7 @@ const UserDashboard = () => {
                             </div>
                             <p className="text-sm text-gray-600 mt-1">{report.description}</p>
                             <div className="flex items-center mt-2 text-xs text-gray-500">
-                              <MapPin className="h-3 w-3 mr-1" /> 
+                              <MapPin className="h-3 w-3 mr-1" />
                               {report.location?.latitude.toFixed(2)}, {report.location?.longitude.toFixed(2)}
                               <span className="mx-2">•</span>
                               {new Date(report.createdAt).toLocaleString()}
@@ -240,27 +198,27 @@ const UserDashboard = () => {
                         ))}
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                      <div className="flex flex-col items-center justify-center h-full text-gray-500 mt-20">
                         <MessageSquare className="h-12 w-12 mb-2 opacity-30" />
                         <p>No recent reports</p>
                       </div>
                     )}
                   </ScrollArea>
                 </CardContent>
-                <CardFooter>
-                  <Button 
-                    variant="outline" 
+                {/* <CardFooter>
+                  <Button
+                    variant="outline"
                     className="w-full"
                     onClick={() => setActiveTab('report')}
                   >
                     Report an Incident
                     <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
-                </CardFooter>
-              </Card>
-
-              {/* Quick Map Preview */}
-              <Card className="md:col-span-3">
+                </CardFooter> */}
+              </Card>              
+            </div>
+            {/* Quick Map Preview */}
+            <Card className="md:col-span-3">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center">
                     <MapPin className="h-5 w-5 mr-2" />
@@ -274,7 +232,7 @@ const UserDashboard = () => {
                   {userLocation && <EmergencyMap location={userLocation} height="300px" />}
                 </CardContent>
                 <CardFooter>
-                  <Button 
+                  <Button
                     variant="outline"
                     className="w-full"
                     onClick={() => setActiveTab('map')}
@@ -284,6 +242,7 @@ const UserDashboard = () => {
                   </Button>
                 </CardFooter>
               </Card>
+
             </div>
           </TabsContent>
 
@@ -293,7 +252,7 @@ const UserDashboard = () => {
               <CardHeader>
                 <CardTitle>Emergency Resources Map</CardTitle>
                 <CardDescription>
-                  Find critical services including hospitals, police stations, 
+                  Find critical services including hospitals, police stations,
                   fire departments, and shelters in your area
                 </CardDescription>
               </CardHeader>
@@ -313,8 +272,6 @@ const UserDashboard = () => {
             <RequestHelp userLocation={userLocation} />
           </TabsContent>
         </Tabs>
-        <AlertNotifications/>
-
       </div>
     </div>
   );

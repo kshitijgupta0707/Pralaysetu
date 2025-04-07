@@ -5,10 +5,8 @@ const reportSchema = new mongoose.Schema({
   disasterType: { type: String, required: true }, // e.g. flood, fire, earthquake
   description: { type: String },
   imageUrl: { type: String },
-  location: {
-    latitude: { type: Number },
-    longitude: { type: Number },
-  },
+  latitude: { type: Number }
+ ,longitude: { type: Number },
   status: {
     type: String,
     enum: ["pending", "verified", "rejected"],

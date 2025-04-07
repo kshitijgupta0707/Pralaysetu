@@ -1,23 +1,44 @@
 // controllers/report.controller.js
 import { Report } from "../models/report.model.js";
 import { getReceiverSocketId, io } from "../config/socket.js";
+import { uploadImageToCloudinary } from "../utils/imageUploader.js";
 
 export const createReport = async (req, res) => {
   try {
-    const { disasterType, location, description, media } = req.body;
-    if(!disasterType || !location || !description ) {
+    console.log(req.body)
+    const { disasterType, latitude ,longitude, description } = req.body;
+    if(!disasterType || !latitude || !longitude || !description ) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
       });
     }
+      let media = req.files?.media;
+      
+  
 
+
+    let mediaUrl = null;
+    if (media) {
+      const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+      if (!allowedTypes.includes(media.mimetype)) {
+        return res.status(400).json({ message: "Only JPG and PNG files are allowed" });
+      }
+      // only 200kb photo rquired
+      if (media.size > 200 * 1024) {
+        return res.status(400).json({ message: "Media size must be less than 200Kb" });
+      }
+
+      const uploadResponse = await uploadImageToCloudinary(media, "PralaySetu");
+      mediaUrl = uploadResponse.secure_url;
+    }
     const report = await Report.create({
       user: req.user.id,
       disasterType,
-      location,
+      latitude ,
+      longitude,
       description,
-      media,
+      imageUrl: mediaUrl,
     });
 
     res.status(201).json({
