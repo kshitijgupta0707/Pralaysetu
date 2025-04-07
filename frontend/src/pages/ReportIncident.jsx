@@ -7,16 +7,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useReportStore } from '@/store/useReportStore'; // Update path as needed
 
 const ReportIncident = ({ userLocation }) => {
+  const { createReport, isCreatingReport } = useReportStore();
   const [formData, setFormData] = useState({
     disasterType: '',
     description: '',
     location: userLocation || { latitude: 0, longitude: 0 },
-    imageUrl: ''
+    imageFile: null
   });
   const [imagePreview, setImagePreview] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
 
   const disasterTypes = [
@@ -47,8 +48,7 @@ const ReportIncident = ({ userLocation }) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        // In a real app, you would upload to Cloudinary or similar service
-        setFormData({ ...formData, imageUrl: reader.result });
+        setFormData({ ...formData, imageFile: file });
       };
       reader.readAsDataURL(file);
     }
@@ -56,27 +56,31 @@ const ReportIncident = ({ userLocation }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setSubmitStatus(null);
 
     try {
-      // In a real app, you would send to your API
-      const response = await fetch('/api/reports', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
+      // Create FormData object for multipart/form-data submission
+      const reportFormData = new FormData();
+      reportFormData.append('disasterType', formData.disasterType);
+      reportFormData.append('description', formData.description);
+      reportFormData.append('latitude', formData.location.latitude);
+      reportFormData.append('longitude', formData.location.longitude);
+      
+      if (formData.imageFile) {
+        reportFormData.append('media', formData.imageFile);
+      }
 
-      if (response.ok) {
+      // Use the Zustand store's createReport function
+      const result = await createReport(reportFormData);
+      
+      if (result) {
         setSubmitStatus('success');
         // Reset form after successful submission
         setFormData({
           disasterType: '',
           description: '',
           location: userLocation || { latitude: 0, longitude: 0 },
-          imageUrl: ''
+          imageFile: null
         });
         setImagePreview(null);
       } else {
@@ -85,8 +89,6 @@ const ReportIncident = ({ userLocation }) => {
     } catch (error) {
       console.error('Error submitting report:', error);
       setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -227,7 +229,7 @@ const ReportIncident = ({ userLocation }) => {
                           e.preventDefault();
                           e.stopPropagation();
                           setImagePreview(null);
-                          setFormData({ ...formData, imageUrl: '' });
+                          setFormData({ ...formData, imageFile: null });
                         }}
                       >
                         <X className="h-4 w-4" />
@@ -256,10 +258,10 @@ const ReportIncident = ({ userLocation }) => {
         </Button>
         <Button 
           onClick={handleSubmit}
-          disabled={isSubmitting || !formData.disasterType || !formData.description}
+          disabled={isCreatingReport || !formData.disasterType || !formData.description}
           className="bg-blue-600 hover:bg-blue-700"
         >
-          {isSubmitting ? (
+          {isCreatingReport ? (
             <>
               <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
               Submitting...

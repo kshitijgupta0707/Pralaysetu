@@ -12,6 +12,7 @@ import AlertNotifications from './AlertNotifications';
 import ReportIncident from './ReportIncident';
 import RequestHelp from './RequestHelp';
 import { useAuthStore } from '@/store/useAuthstore';
+import {user} from '../assets/index.js'
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -109,7 +110,7 @@ const UserDashboard = () => {
         <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex justify-between items-center">
           <div className="flex items-center">
             <Avatar className="h-10 w-10 mr-2">
-              <AvatarImage src={authUser?.profileImage} alt={authUser?.name} />
+              <AvatarImage src={user} alt={authUser?.name} />
               <AvatarFallback>{authUser?.name?.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
@@ -312,6 +313,8 @@ const UserDashboard = () => {
             <RequestHelp userLocation={userLocation} />
           </TabsContent>
         </Tabs>
+        <AlertNotifications/>
+
       </div>
     </div>
   );

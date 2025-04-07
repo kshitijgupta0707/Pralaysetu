@@ -37,6 +37,7 @@ if (isCheckingAuth && !authUser)
 
   return (
     <div>
+      
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={!authUser ? <LoginPage />: <Navigate to="/"/>}  />
