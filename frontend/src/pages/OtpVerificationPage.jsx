@@ -5,10 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuthStore } from '@/store/useAuthstore';
+import toast from 'react-hot-toast';
 
 const OtpVerificationPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(120); // 2 minutes countdown
@@ -18,14 +18,18 @@ const OtpVerificationPage = () => {
   const location = useLocation();
   const userEmail = location.state?.email || '';
 
-  // Handle OTP input change
+  const { formData } = location.state || {}
+  const { signup, isSigningUp } = useAuthStore()
+
+  // Handle OTP input changeF
   const handleOtpChange = (index, value) => {
     if (isNaN(value)) return;
-    
+
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-    
+    console.log(newOtp)
+
     // Auto-focus next input field
     if (value && index < 5) {
       inputRefs.current[index + 1].focus();
@@ -66,41 +70,26 @@ const OtpVerificationPage = () => {
   };
 
   // Handle OTP verification
-  const handleVerifyOtp = (e) => {
+  const handleVerifyOtp = async(e) => {
     e.preventDefault();
     setError('');
-    
     const otpValue = otp.join('');
     if (otpValue.length !== 6) {
-      setError('Please enter all digits of the OTP');
+      toast.error('Please enter all digits of the OTP');
       return;
     }
-    
-    setIsLoading(true);
-    
     // Simulate API call to verify OTP
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      // For demo purposes, let's consider OTP "123456" as valid
-      if (otpValue === '123456') {
-        setIsVerified(true);
-        
-        // Redirect to dashboard after successful verification
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 2000);
-      } else {
-        setError('Invalid OTP. Please try again.');
+      if(formData && otpValue.length == 6){
+         formData.otp = otpValue
+         signup(formData , navigate)
       }
-    }, 1500);
   };
 
   // Handle resend OTP
   const handleResendOtp = () => {
     setResendDisabled(true);
     setTimer(120); // Reset timer to 2 minutes
-    
+
     // Simulate resending OTP
     setTimeout(() => {
       // Here you would make your actual API call to resend OTP
@@ -140,17 +129,7 @@ const OtpVerificationPage = () => {
                   </CardDescription>
                 </div>
               </div>
-              {error && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-              {isVerified && (
-                <Alert className="mt-4 bg-green-50 border-green-200 text-green-700">
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  <AlertDescription>Email verified successfully! Redirecting...</AlertDescription>
-                </Alert>
-              )}
+              
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -166,11 +145,11 @@ const OtpVerificationPage = () => {
                       onKeyDown={(e) => handleKeyDown(index, e)}
                       ref={(el) => (inputRefs.current[index] = el)}
                       className="w-12 h-12 text-center text-xl font-semibold border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      disabled={isLoading || isVerified}
+                      disabled={isSigningUp}
                     />
                   ))}
                 </div>
-                
+
                 <div className="text-center text-sm text-gray-600">
                   <p>Didn't receive the code?</p>
                   <div className="mt-2">
@@ -181,7 +160,7 @@ const OtpVerificationPage = () => {
                         type="button"
                         onClick={handleResendOtp}
                         className="text-blue-600 hover:text-blue-800 font-medium"
-                        disabled={isLoading || isVerified}
+                        disabled={isSigningUp}
                       >
                         Resend code
                       </button>
@@ -191,22 +170,19 @@ const OtpVerificationPage = () => {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6" 
-                disabled={isLoading || isVerified}
+              <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6"
+                disabled={isSigningUp }
               >
-                {isLoading ? (
+                {isSigningUp ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Verifying...
+                    signing up...
                   </>
-                ) : isVerified ? (
-                  <>
-                    <CheckCircle className="mr-2 h-5 w-5" />
-                    Verified
-                  </>
-                ) : (
+                )
+               : 
+               (
                   "Verify Email"
                 )}
               </Button>

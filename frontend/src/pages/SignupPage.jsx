@@ -9,39 +9,58 @@ import { Link } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/useAuthstore';
+
+
 const SignupPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [registerData, setRegisterData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
-    phoneNumber: '',
     location: '',
     role: 'User' // Default role
   });
+  const navigate = useNavigate();
+  const validateForm = () => {
+        //regular expression genereated with the help of ai
+    if (!/\S+@\S+\.\S+/.test(registerData.email)) return toast.error("Invalid email format");
+    if (!registerData.firstName.trim()) return toast.error(" name is required");
+    if (!registerData.lastName.trim()) return toast.error(" name is required");
+    if (!registerData.location.trim()) return toast.error(" location is required");
+    if (!registerData.email.trim()) return toast.error("Email is required");
+    //regular expression genereated with the help of ai
+    if (!/\S+@\S+\.\S+/.test(registerData.email)) return toast.error("Invalid email format");
+    if (!registerData.password) return toast.error("Password is required");
+    if (!registerData.confirmPassword) return toast.error("Confirm Password is required");
+    if(registerData.password != registerData.confirmPassword) return toast.error("Both password should be same");
+    if (registerData.password.length < 6) return toast.error("Password must be at least 6 characters");
+    return true;
+  };
+ 
+  const {  isSigningUp , sendOtp, isSendingOtp } = useAuthStore();
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const [error, setError] = useState('');
+
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault();
-    setError('');
-    
+
     if (!acceptTerms) {
-      setError("Please accept the terms and conditions");
+      toast.error("Please accept the terms and conditions");
       return;
     }
+
+    const success = validateForm();
     
-    if (registerData.password !== registerData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
+    if (success === true) {
+      console.log('Form is valid, proceeding with registration...');
+         sendOtp(registerData , navigate);
     }
-    
-    setIsLoading(true);
-    // Simulate API call
+    else return;
     setTimeout(() => {
-      setIsLoading(false);
       console.log('Register data:', registerData);
       // Here you would make your actual API call to register the user
       // The API should handle setting isVerified: false by default
@@ -51,6 +70,7 @@ const SignupPage = () => {
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
+    console.log(id, value);
     setRegisterData((prev) => ({
       ...prev,
       [id]: value
@@ -63,7 +83,7 @@ const SignupPage = () => {
       <div className="hidden lg:flex lg:w-1/2 bg-blue-700 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-900 opacity-90"></div>
         <div className="absolute inset-0 bg-[url('/images/waves-pattern.svg')] opacity-10"></div>
-        
+
         <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white">
           <div className="mb-8">
             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -75,7 +95,7 @@ const SignupPage = () => {
           </div>
           <h1 className="text-5xl font-bold mb-4">PralaySetu</h1>
           <p className="text-xl mb-8">Bridging Crisis to Safety</p>
-          
+
           <div className="max-w-md text-center">
             <p className="text-lg mb-6">
               Join our network of citizens, responders, and organizations working together for a safer tomorrow.
@@ -84,7 +104,7 @@ const SignupPage = () => {
               <div className="bg-white/10 p-4 rounded-lg backdrop-blur-sm text-left flex items-start">
                 <div className="bg-blue-500/70 p-2 rounded-full mr-4 mt-1">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                   </svg>
                 </div>
                 <div>
@@ -95,9 +115,9 @@ const SignupPage = () => {
               <div className="bg-white/10 p-4 rounded-lg backdrop-blur-sm text-left flex items-start">
                 <div className="bg-blue-500/70 p-2 rounded-full mr-4 mt-1">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/>
-                    <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/>
-                    <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+                    <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                    <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                    <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
                   </svg>
                 </div>
                 <div>
@@ -108,10 +128,10 @@ const SignupPage = () => {
               <div className="bg-white/10 p-4 rounded-lg backdrop-blur-sm text-left flex items-start">
                 <div className="bg-blue-500/70 p-2 rounded-full mr-4 mt-1">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.5 21h-10a2 2 0 0 1-2-2V7h14v12a2 2 0 0 1-2 2Z"/>
-                    <path d="M12.5 3h-6l-1 4h14l-1-4h-6Z"/>
-                    <path d="M9.5 7v14"/>
-                    <path d="M15.5 7v14"/>
+                    <path d="M17.5 21h-10a2 2 0 0 1-2-2V7h14v12a2 2 0 0 1-2 2Z" />
+                    <path d="M12.5 3h-6l-1 4h14l-1-4h-6Z" />
+                    <path d="M9.5 7v14" />
+                    <path d="M15.5 7v14" />
                   </svg>
                 </div>
                 <div>
@@ -121,13 +141,13 @@ const SignupPage = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="mt-auto text-sm opacity-80">
             © 2025 PralaySetu. All rights reserved.
           </div>
         </div>
       </div>
-      
+
       {/* Right side - Signup Form */}
       <div className="w-full lg:w-1/2 bg-gradient-to-br from-blue-50 to-indigo-100/50 flex items-center justify-center p-6">
         <div className="max-w-md w-full">
@@ -160,21 +180,16 @@ const SignupPage = () => {
                     </CardDescription>
                   </div>
                 </div>
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
+               
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName" className="text-gray-700">First Name</Label>
-                    <Input 
-                      id="firstName" 
-                      type="text" 
-                      placeholder="First name" 
+                    <Input
+                      id="firstName"
+                      type="text"
+                      placeholder="First name"
                       value={registerData.firstName}
                       onChange={handleInputChange}
                       className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
@@ -183,10 +198,10 @@ const SignupPage = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName" className="text-gray-700">Last Name</Label>
-                    <Input 
-                      id="lastName" 
-                      type="text" 
-                      placeholder="Last name" 
+                    <Input
+                      id="lastName"
+                      type="text"
+                      placeholder="Last name"
                       value={registerData.lastName}
                       onChange={handleInputChange}
                       className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
@@ -196,10 +211,10 @@ const SignupPage = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-gray-700">Email</Label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="your.email@example.com" 
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@example.com"
                     value={registerData.email}
                     onChange={handleInputChange}
                     className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
@@ -207,23 +222,11 @@ const SignupPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phoneNumber" className="text-gray-700">Phone Number</Label>
-                  <Input 
-                    id="phoneNumber" 
-                    type="tel" 
-                    placeholder="+91 9876543210" 
-                    value={registerData.phoneNumber}
-                    onChange={handleInputChange}
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
                   <Label htmlFor="location" className="text-gray-700">Location</Label>
-                  <Input 
-                    id="location" 
-                    type="text" 
-                    placeholder="City, State" 
+                  <Input
+                    id="location"
+                    type="text"
+                    placeholder="City, State"
                     value={registerData.location}
                     onChange={handleInputChange}
                     className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
@@ -232,9 +235,9 @@ const SignupPage = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role" className="text-gray-700">I am registering as</Label>
-                  <Select 
-                    value={registerData.role} 
-                    onValueChange={(value) => setRegisterData({...registerData, role: value})}
+                  <Select
+                    value={registerData.role}
+                    onValueChange={(value) => setRegisterData({ ...registerData, role: value })}
                   >
                     <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
                       <SelectValue placeholder="Select user type" />
@@ -249,10 +252,10 @@ const SignupPage = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-gray-700">Password</Label>
-                  <Input 
-                    id="password" 
-                    type="password" 
-                    placeholder="••••••••" 
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
                     value={registerData.password}
                     onChange={handleInputChange}
                     className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
@@ -261,10 +264,10 @@ const SignupPage = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword" className="text-gray-700">Confirm Password</Label>
-                  <Input 
-                    id="confirmPassword" 
-                    type="password" 
-                    placeholder="••••••••" 
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="••••••••"
                     value={registerData.confirmPassword}
                     onChange={handleInputChange}
                     className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
@@ -272,8 +275,8 @@ const SignupPage = () => {
                   />
                 </div>
                 <div className="flex items-start space-x-2 pt-2">
-                  <Checkbox 
-                    id="terms" 
+                  <Checkbox
+                    id="terms"
                     checked={acceptTerms}
                     onCheckedChange={setAcceptTerms}
                     className="mt-1"
@@ -284,12 +287,12 @@ const SignupPage = () => {
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col gap-4">
-                <Button 
-                  type="submit" 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6" 
-                  disabled={isLoading}
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6"
+                  disabled={isSigningUp}
                 >
-                  {isLoading ? (
+                  {isSendingOtp ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Creating account...

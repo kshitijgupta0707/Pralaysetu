@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BellRing, AlertTriangle, Map, Users, Heart, Phone, Star, ArrowRight, LifeBuoy, Shield, Globe, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
+import { useAuthStore } from '@/store/useAuthstore';
 import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin } from 'lucide-react';
 const HomePage = () => {
   const [language, setLanguage] = useState('en');
+  const {authUser} = useAuthStore()
 
   const translations = {
     en: {
@@ -82,6 +84,9 @@ const HomePage = () => {
 
   const t = translations[language];
 
+   useEffect(()=>{
+      console.log("Auth user" , authUser) 
+   })
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header/Navigation */}
@@ -107,16 +112,17 @@ const HomePage = () => {
               <a href="#how-it-works" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">How It Works</a>
               <a href="#about" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">About</a>
               <a href="#contact" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">Contact</a>
-              <a href="#dummy" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">dummy</a>
-              <Link to="/user-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+              { authUser && authUser.role == "User" &&  <Link to="/user-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
                 user
-              </Link>
-              <Link to="/admin-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+              </Link> }
+              { authUser && authUser.role == "Admin" && <Link to="/admin-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
                 admin
-              </Link>
+              </Link>}
+              {
+                authUser && authUser.role == "Responder" && 
               <Link to="/responder-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
                 responder
-              </Link>
+              </Link>}
             </nav>
 
             <div className="flex items-center space-x-4">
@@ -130,7 +136,7 @@ const HomePage = () => {
                 {/* Add more language options as needed */}
               </select>
 
-              <div className="hidden sm:flex items-center space-x-2">
+              {!authUser && <div className="hidden sm:flex items-center space-x-2">
                 <Link to="/login" className="px-4 py-2 text-blue-600 hover:text-blue-800 font-medium">
                   Log in
                 </Link>
@@ -139,7 +145,7 @@ const HomePage = () => {
                     Sign up
                   </Button>
                 </Link>
-              </div>
+              </div>}
 
               {/* Mobile menu button */}
               <button className="md:hidden rounded-md p-2 text-gray-700 hover:bg-gray-100">

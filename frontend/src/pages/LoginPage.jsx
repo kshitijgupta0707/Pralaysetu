@@ -4,21 +4,34 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/useAuthstore';
+import toast from 'react-hot-toast';
 
 const LoginPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const {login , isLoggingIn , authUser} = useAuthStore()
+  const navigate = useNavigate()
+  const validateForm = () => {
+
+    if (!loginData.email.trim()) return toast.error("Email is required");
+    //regular expression genereated with the help of ai
+    if (!/\S+@\S+\.\S+/.test(loginData.email)) return toast.error("Invalid email format");
+    if (!loginData.password) return toast.error("Password is required");
+    return true;
+  };
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
-    // Simulate API call
+    const success = validateForm();
+    if (!success) return;
+    console.log("enter details")
+    login(loginData)
+    console.log("auth user" , authUser);
+    if(authUser){
+      navigate('/')
+    }
     setTimeout(() => {
-      setIsLoading(false);
       console.log('Login data:', loginData);
       // Handle login logic here
     }, 1500);
@@ -96,12 +109,6 @@ const LoginPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {error && (
-                  <Alert variant="destructive" className="mb-4">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-gray-700">Email</Label>
                   <Input 
@@ -114,7 +121,7 @@ const LoginPage = () => {
                     required
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 my-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password" className="text-gray-700">Password</Label>
                     <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
@@ -136,9 +143,9 @@ const LoginPage = () => {
                 <Button 
                   type="submit" 
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6" 
-                  disabled={isLoading}
+                  disabled={isLoggingIn}
                 >
-                  {isLoading ? (
+                  {isLoggingIn ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Logging in...
