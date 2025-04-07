@@ -42,9 +42,9 @@ if (isCheckingAuth && !authUser)
         <Route path="/login" element={!authUser ? <LoginPage />: <Navigate to="/"/>}  />
         <Route path="/signup" element={!authUser ? <SignupPage /> : <Navigate to="/"/>} />
         <Route path="/otp-verification" element={<OtpVerificationPage />} />
-        <Route path="/responder-dashboard" element={<ResponderDashboard />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/user-dashboard" element={<UserDashboard/>}/>
+        <Route path="/responder-dashboard" element={authUser && authUser?.role === "Responder" ?<ResponderDashboard />:<Navigate to="/"/> } />
+        <Route path="/admin-dashboard" element={authUser && authUser?.role === "Admin" ?<AdminDashboard />:<Navigate to="/"/> } />
+        <Route path="/user-dashboard"   element={authUser && authUser?.role === "User" ?<UserDashboard />:<Navigate to="/"/> }  />
         
       </Routes>     
       <Toaster/>

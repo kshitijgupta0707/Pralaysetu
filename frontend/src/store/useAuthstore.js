@@ -26,7 +26,6 @@ export const useAuthStore = create((set, get) => ({
     } catch (error) {
       console.log(error);
       set({ authUser: null });
-      toast.error("Not logged in");
     } finally {
       set({ isCheckingAuth: false });
     }

@@ -11,16 +11,17 @@ import EmergencyMap from './EmergencyMap';
 import AlertNotifications from './AlertNotifications';
 import ReportIncident from './ReportIncident';
 import RequestHelp from './RequestHelp';
-
+import { useAuthStore } from '@/store/useAuthstore';
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const {authUser} = useAuthStore()
   const [loading, setLoading] = useState(true);
   const [alerts, setAlerts] = useState([]);
   const [recentReports, setRecentReports] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [userLocation, setUserLocation] = useState(null);
-
+  console.log("user" , authUser)
   useEffect(() => {
     // Fetch user data
     const fetchUserData = async () => {
@@ -108,12 +109,12 @@ const UserDashboard = () => {
         <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex justify-between items-center">
           <div className="flex items-center">
             <Avatar className="h-10 w-10 mr-2">
-              <AvatarImage src={user?.profileImage} alt={user?.name} />
-              <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+              <AvatarImage src={authUser?.profileImage} alt={authUser?.name} />
+              <AvatarFallback>{authUser?.name?.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium">Hello, {user?.name}</p>
-              <p className="text-sm text-gray-500">{user?.location?.city}</p>
+              <p className="font-medium">Hello, {authUser?.firstName + " " + authUser.lastName}</p>
+              <p className="text-sm text-gray-500">{authUser?.location?.city}</p>
             </div>
           </div>
           <div className="flex gap-2">

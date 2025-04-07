@@ -9,7 +9,6 @@ import { useAuthStore } from '@/store/useAuthstore';
 import toast from 'react-hot-toast';
 
 const OtpVerificationPage = () => {
-  const [error, setError] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(120); // 2 minutes countdown
   const [resendDisabled, setResendDisabled] = useState(true);
@@ -72,7 +71,6 @@ const OtpVerificationPage = () => {
   // Handle OTP verification
   const handleVerifyOtp = async(e) => {
     e.preventDefault();
-    setError('');
     const otpValue = otp.join('');
     if (otpValue.length !== 6) {
       toast.error('Please enter all digits of the OTP');
