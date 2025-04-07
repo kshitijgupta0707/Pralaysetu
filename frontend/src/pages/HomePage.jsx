@@ -101,18 +101,27 @@ const HomePage = () => {
                 <span className="text-xl font-bold text-blue-800">PralaySetu</span>
               </Link>
             </div>
-            
+
             <nav className="hidden md:flex items-center space-x-4">
               <a href="#features" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">Features</a>
               <a href="#how-it-works" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">How It Works</a>
               <a href="#about" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">About</a>
               <a href="#contact" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">Contact</a>
               <a href="#dummy" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">dummy</a>
+              <Link to="/user-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+                user
+              </Link>
+              <Link to="/admin-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+                admin
+              </Link>
+              <Link to="/responder-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+                responder
+              </Link>
             </nav>
-            
+
             <div className="flex items-center space-x-4">
-              <select 
-                value={language} 
+              <select
+                value={language}
                 onChange={(e) => setLanguage(e.target.value)}
                 className="px-2 py-1 text-sm border border-gray-300 rounded bg-white"
               >
@@ -120,7 +129,7 @@ const HomePage = () => {
                 <option value="hi">हिंदी</option>
                 {/* Add more language options as needed */}
               </select>
-              
+
               <div className="hidden sm:flex items-center space-x-2">
                 <Link to="/login" className="px-4 py-2 text-blue-600 hover:text-blue-800 font-medium">
                   Log in
@@ -131,7 +140,7 @@ const HomePage = () => {
                   </Button>
                 </Link>
               </div>
-              
+
               {/* Mobile menu button */}
               <button className="md:hidden rounded-md p-2 text-gray-700 hover:bg-gray-100">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -140,7 +149,7 @@ const HomePage = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Mobile menu - You can expand this with state management */}
         </div>
       </header>
@@ -172,7 +181,7 @@ const HomePage = () => {
                   </Link>
                 </div>
               </div>
-              
+
               <div className="flex justify-center md:justify-end">
                 <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-xl">
                   <div className="flex items-center mb-4">
@@ -203,7 +212,7 @@ const HomePage = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="absolute -bottom-30 left-0 right-0  ">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
               <path fill="#ffffff" fillOpacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,117.3C672,107,768,117,864,128C960,139,1056,149,1152,144C1248,139,1344,117,1392,106.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
@@ -306,7 +315,7 @@ const HomePage = () => {
                 </ul>
                 <Button className="bg-blue-600 hover:bg-blue-700">Explore Maps</Button>
               </div>
-              
+
               <div className="bg-white rounded-xl shadow-xl overflow-hidden">
                 <div className="aspect-video bg-gray-200 relative">
                   {/* This would be your actual map integration */}
@@ -355,7 +364,7 @@ const HomePage = () => {
                   <span>For NGOs</span>
                 </TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="users" className="border rounded-lg p-6 shadow-md">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
@@ -409,7 +418,7 @@ const HomePage = () => {
                   </div>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="responders" className="border rounded-lg p-6 shadow-md">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
@@ -465,7 +474,7 @@ const HomePage = () => {
                   </div>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="ngos" className="border rounded-lg p-6 shadow-md">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
@@ -503,7 +512,7 @@ const HomePage = () => {
                       <p className="text-sm text-gray-700">Emergency supplies needed for 500+ families. Food, medicine, and clean water are priorities.</p>
                       <div className="mt-3">
                         <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
-                          <div className="bg-purple-600 h-2.5 rounded-full" style={{width: '67%'}}></div>
+                          <div className="bg-purple-600 h-2.5 rounded-full" style={{ width: '67%' }}></div>
                         </div>
                         <div className="flex justify-between text-xs text-gray-500">
                           <span>₹6,70,000 raised</span>
@@ -544,7 +553,7 @@ const HomePage = () => {
             <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
               {/* Step 1 */}
               <div className="relative flex flex-col items-center text-center">
-                <div className="absolute top-1/4 w-full h-0.5 bg-blue-200 hidden md:block" style={{zIndex: 0}}></div>
+                <div className="absolute top-1/4 w-full h-0.5 bg-blue-200 hidden md:block" style={{ zIndex: 0 }}></div>
                 <div className="relative w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center mb-4 z-10">
                   <Volume2 className="h-6 w-6" />
                 </div>
@@ -554,7 +563,7 @@ const HomePage = () => {
 
               {/* Step 2 */}
               <div className="relative flex flex-col items-center text-center">
-                <div className="absolute top-1/4 w-full h-0.5 bg-blue-200 hidden md:block" style={{zIndex: 0}}></div>
+                <div className="absolute top-1/4 w-full h-0.5 bg-blue-200 hidden md:block" style={{ zIndex: 0 }}></div>
                 <div className="relative w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center mb-4 z-10">
                   <AlertTriangle className="h-6 w-6" />
                 </div>
@@ -564,7 +573,7 @@ const HomePage = () => {
 
               {/* Step 3 */}
               <div className="relative flex flex-col items-center text-center">
-                <div className="absolute top-1/4 w-full h-0.5 bg-blue-200 hidden md:block" style={{zIndex: 0}}></div>
+                <div className="absolute top-1/4 w-full h-0.5 bg-blue-200 hidden md:block" style={{ zIndex: 0 }}></div>
                 <div className="relative w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center mb-4 z-10">
                   <LifeBuoy className="h-6 w-6" />
                 </div>
@@ -719,7 +728,7 @@ const HomePage = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Contact */}
               <div id="contact">
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">{t.contactUs}</h2>
@@ -729,43 +738,43 @@ const HomePage = () => {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium" htmlFor="name">Name</label>
-                          <input 
-                            id="name" 
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                            type="text" 
+                          <input
+                            id="name"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            type="text"
                             required
                           />
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium" htmlFor="email">Email</label>
-                          <input 
-                            id="email" 
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                            type="email" 
+                          <input
+                            id="email"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            type="email"
                             required
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium" htmlFor="subject">Subject</label>
-                        <input 
-                          id="subject" 
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                          type="text" 
+                        <input
+                          id="subject"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                          type="text"
                           required
                         />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium" htmlFor="message">Message</label>
-                        <textarea 
-                          id="message" 
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                          rows="4" 
+                        <textarea
+                          id="message"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                          rows="4"
                           required
                         ></textarea>
                       </div>
                       <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                        
+
                         Send Message
                       </Button>
                     </form>
@@ -799,131 +808,131 @@ const HomePage = () => {
         </section>
       </main>
       <footer className="bg-gradient-to-br from-blue-900 to-indigo-900 text-white">
-      <div className="container mx-auto px-6 py-12">
-        {/* Top section with logo and description */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {/* Logo and about */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="bg-white/20 p-2 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M16 2c1 0 3 2 3 4v1a3 3 0 1 1-6 0V6c0-2 2-4 3-4Z" />
-                  <path d="M10 5c1 0 3 2 3 4v1a3 3 0 1 1-6 0V9c0-2 2-4 3-4Z" />
-                  <path d="M4 8c1 0 3 2 3 4v1a3 3 0 1 1-6 0v-1c0-2 2-4 3-4Z" />
-                  <path d="M22 19c0-3-2.5-5-5-5-2 0-3.5 1.5-4 2-1.5-2-3-2-4-2-2.5 0-5 2-5 5 0 3 3 6 9 6 6 0 9-3 9-6Z" />
-                </svg>
+        <div className="container mx-auto px-6 py-12">
+          {/* Top section with logo and description */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            {/* Logo and about */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="bg-white/20 p-2 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 2c1 0 3 2 3 4v1a3 3 0 1 1-6 0V6c0-2 2-4 3-4Z" />
+                    <path d="M10 5c1 0 3 2 3 4v1a3 3 0 1 1-6 0V9c0-2 2-4 3-4Z" />
+                    <path d="M4 8c1 0 3 2 3 4v1a3 3 0 1 1-6 0v-1c0-2 2-4 3-4Z" />
+                    <path d="M22 19c0-3-2.5-5-5-5-2 0-3.5 1.5-4 2-1.5-2-3-2-4-2-2.5 0-5 2-5 5 0 3 3 6 9 6 6 0 9-3 9-6Z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold">PralaySetu</h3>
               </div>
-              <h3 className="text-xl font-bold">PralaySetu</h3>
+              <p className="text-gray-300">
+                Bridging Crisis to Safety - Your reliable partner in disaster management and emergency response.
+              </p>
+              <div className="flex space-x-4">
+                <a href="#" className="hover:text-blue-300 transition-colors">
+                  <Facebook size={20} />
+                </a>
+                <a href="#" className="hover:text-blue-300 transition-colors">
+                  <Twitter size={20} />
+                </a>
+                <a href="#" className="hover:text-blue-300 transition-colors">
+                  <Instagram size={20} />
+                </a>
+                <a href="#" className="hover:text-blue-300 transition-colors">
+                  <Youtube size={20} />
+                </a>
+              </div>
             </div>
-            <p className="text-gray-300">
-              Bridging Crisis to Safety - Your reliable partner in disaster management and emergency response.
-            </p>
-            <div className="flex space-x-4">
-              <a href="#" className="hover:text-blue-300 transition-colors">
-                <Facebook size={20} />
-              </a>
-              <a href="#" className="hover:text-blue-300 transition-colors">
-                <Twitter size={20} />
-              </a>
-              <a href="#" className="hover:text-blue-300 transition-colors">
-                <Instagram size={20} />
-              </a>
-              <a href="#" className="hover:text-blue-300 transition-colors">
-                <Youtube size={20} />
-              </a>
-            </div>
-          </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
-            <ul className="space-y-2">
-              <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors">About Us</Link></li>
-              <li><Link to="/services" className="text-gray-300 hover:text-white transition-colors">Our Services</Link></li>
-              <li><Link to="/responders" className="text-gray-300 hover:text-white transition-colors">Responder Network</Link></li>
-              <li><Link to="/resources" className="text-gray-300 hover:text-white transition-colors">Disaster Resources</Link></li>
-              <li><Link to="/blog" className="text-gray-300 hover:text-white transition-colors">Latest Updates</Link></li>
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div>
-            <h4 className="font-semibold text-lg mb-4">Support</h4>
-            <ul className="space-y-2">
-              <li><Link to="/faq" className="text-gray-300 hover:text-white transition-colors">FAQ</Link></li>
-              <li><Link to="/help-center" className="text-gray-300 hover:text-white transition-colors">Help Center</Link></li>
-              <li><Link to="/safety-tips" className="text-gray-300 hover:text-white transition-colors">Safety Tips</Link></li>
-              <li><Link to="/training" className="text-gray-300 hover:text-white transition-colors">Training Resources</Link></li>
-              <li><Link to="/contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link></li>
-            </ul>
-          </div>
-
-          {/* Contact Info */}
-          <div>
-            <h4 className="font-semibold text-lg mb-4">Contact Info</h4>
-            <ul className="space-y-4">
-              <li className="flex items-start space-x-3">
-                <MapPin size={20} className="flex-shrink-0 mt-1 text-blue-300" />
-                <span className="text-gray-300">123 Emergency Avenue, Safety District, India</span>
-              </li>
-              <li className="flex items-center space-x-3">
-                <Phone size={20} className="flex-shrink-0 text-blue-300" />
-                <span className="text-gray-300">Emergency: 1800-HELP-NOW</span>
-              </li>
-              <li className="flex items-center space-x-3">
-                <Mail size={20} className="flex-shrink-0 text-blue-300" />
-                <span className="text-gray-300">info@pralaysetu.org</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Middle section with download app buttons */}
-        <div className="py-8 border-t border-b border-blue-800/50">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            {/* Quick Links */}
             <div>
-              <h4 className="text-lg font-medium mb-2">Download Our Mobile App</h4>
-              <p className="text-gray-300 text-sm">Stay prepared with real-time alerts and emergency assistance on your phone.</p>
+              <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
+              <ul className="space-y-2">
+                <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors">About Us</Link></li>
+                <li><Link to="/services" className="text-gray-300 hover:text-white transition-colors">Our Services</Link></li>
+                <li><Link to="/responders" className="text-gray-300 hover:text-white transition-colors">Responder Network</Link></li>
+                <li><Link to="/resources" className="text-gray-300 hover:text-white transition-colors">Disaster Resources</Link></li>
+                <li><Link to="/blog" className="text-gray-300 hover:text-white transition-colors">Latest Updates</Link></li>
+              </ul>
             </div>
-            <div className="flex flex-wrap gap-4">
-              <a href="#" className="bg-black/30 hover:bg-black/50 backdrop-blur-sm transition-colors flex items-center space-x-3 rounded-lg px-4 py-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.5 12c0 .3-.2.5-.5.5h-10c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h10c.3 0 .5.2.5.5zm-5-4c0 .3-.2.5-.5.5h-5c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h5c.3 0 .5.2.5.5zm5 8c0 .3-.2.5-.5.5h-10c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h10c.3 0 .5.2.5.5zm1.7-12h-14.4c-.7 0-1.3.6-1.3 1.3v13.4c0 .7.6 1.3 1.3 1.3h14.4c.7 0 1.3-.6 1.3-1.3v-13.4c0-.7-.6-1.3-1.3-1.3zm-14.4 1h14.4c.2 0 .3.1.3.3v13.4c0 .2-.1.3-.3.3h-14.4c-.2 0-.3-.1-.3-.3v-13.4c0-.2.1-.3.3-.3z"/>
-                </svg>
-                <div>
-                  <div className="text-xs">Get it on</div>
-                  <div className="font-medium">Google Play</div>
-                </div>
-              </a>
-              <a href="#" className="bg-black/30 hover:bg-black/50 backdrop-blur-sm transition-colors flex items-center space-x-3 rounded-lg px-4 py-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53-1.71-2.52-3.03-7.02-1.27-10.14.87-1.5 2.43-2.45 4.12-2.48 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83l.01.03zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                </svg>
-                <div>
-                  <div className="text-xs">Download on the</div>
-                  <div className="font-medium">App Store</div>
-                </div>
-              </a>
-            </div>
-          </div>
-        </div>
 
-        {/* Bottom section with copyright and additional links */}
-        <div className="pt-8 grid grid-cols-1 md:grid-cols-2 items-center">
-          <div className="text-sm text-gray-300 mb-4 md:mb-0">
-            © 2025 PralaySetu. All rights reserved.
+            {/* Support */}
+            <div>
+              <h4 className="font-semibold text-lg mb-4">Support</h4>
+              <ul className="space-y-2">
+                <li><Link to="/faq" className="text-gray-300 hover:text-white transition-colors">FAQ</Link></li>
+                <li><Link to="/help-center" className="text-gray-300 hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link to="/safety-tips" className="text-gray-300 hover:text-white transition-colors">Safety Tips</Link></li>
+                <li><Link to="/training" className="text-gray-300 hover:text-white transition-colors">Training Resources</Link></li>
+                <li><Link to="/contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link></li>
+              </ul>
+            </div>
+
+            {/* Contact Info */}
+            <div>
+              <h4 className="font-semibold text-lg mb-4">Contact Info</h4>
+              <ul className="space-y-4">
+                <li className="flex items-start space-x-3">
+                  <MapPin size={20} className="flex-shrink-0 mt-1 text-blue-300" />
+                  <span className="text-gray-300">123 Emergency Avenue, Safety District, India</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <Phone size={20} className="flex-shrink-0 text-blue-300" />
+                  <span className="text-gray-300">Emergency: 1800-HELP-NOW</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <Mail size={20} className="flex-shrink-0 text-blue-300" />
+                  <span className="text-gray-300">info@pralaysetu.org</span>
+                </li>
+              </ul>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-4 text-xs text-gray-300 justify-start md:justify-end">
-            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link>
-            <Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
-            <Link to="/accessibility" className="hover:text-white transition-colors">Accessibility</Link>
+
+          {/* Middle section with download app buttons */}
+          <div className="py-8 border-t border-b border-blue-800/50">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+              <div>
+                <h4 className="text-lg font-medium mb-2">Download Our Mobile App</h4>
+                <p className="text-gray-300 text-sm">Stay prepared with real-time alerts and emergency assistance on your phone.</p>
+              </div>
+              <div className="flex flex-wrap gap-4">
+                <a href="#" className="bg-black/30 hover:bg-black/50 backdrop-blur-sm transition-colors flex items-center space-x-3 rounded-lg px-4 py-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.5 12c0 .3-.2.5-.5.5h-10c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h10c.3 0 .5.2.5.5zm-5-4c0 .3-.2.5-.5.5h-5c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h5c.3 0 .5.2.5.5zm5 8c0 .3-.2.5-.5.5h-10c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h10c.3 0 .5.2.5.5zm1.7-12h-14.4c-.7 0-1.3.6-1.3 1.3v13.4c0 .7.6 1.3 1.3 1.3h14.4c.7 0 1.3-.6 1.3-1.3v-13.4c0-.7-.6-1.3-1.3-1.3zm-14.4 1h14.4c.2 0 .3.1.3.3v13.4c0 .2-.1.3-.3.3h-14.4c-.2 0-.3-.1-.3-.3v-13.4c0-.2.1-.3.3-.3z" />
+                  </svg>
+                  <div>
+                    <div className="text-xs">Get it on</div>
+                    <div className="font-medium">Google Play</div>
+                  </div>
+                </a>
+                <a href="#" className="bg-black/30 hover:bg-black/50 backdrop-blur-sm transition-colors flex items-center space-x-3 rounded-lg px-4 py-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53-1.71-2.52-3.03-7.02-1.27-10.14.87-1.5 2.43-2.45 4.12-2.48 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83l.01.03zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                  </svg>
+                  <div>
+                    <div className="text-xs">Download on the</div>
+                    <div className="font-medium">App Store</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom section with copyright and additional links */}
+          <div className="pt-8 grid grid-cols-1 md:grid-cols-2 items-center">
+            <div className="text-sm text-gray-300 mb-4 md:mb-0">
+              © 2025 PralaySetu. All rights reserved.
+            </div>
+            <div className="flex flex-wrap gap-4 text-xs text-gray-300 justify-start md:justify-end">
+              <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link>
+              <Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
+              <Link to="/accessibility" className="hover:text-white transition-colors">Accessibility</Link>
+            </div>
           </div>
         </div>
-      </div>
-    </footer>
-      
+      </footer>
+
     </div>
   );
 
