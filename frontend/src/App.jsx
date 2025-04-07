@@ -15,6 +15,7 @@ function App() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/otp-verification" element={<OtpVerificationPage />} />
       <Route path="/responder-dashboard" element={<ResponderDashboard />} />
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
     </Routes>     
   );
 }
