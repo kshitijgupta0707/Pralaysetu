@@ -119,13 +119,13 @@ const HomePage = () => {
             <a href="#about" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">About</a>
             <a href="#contact" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">Contact</a>
             { authUser && authUser.registerAs == "None" && actingAs == "User" &&  <Link to="/user-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
-              user
+              User Portal
             </Link> }
             { authUser && authUser.registerAs == "None" && actingAs == "Responder" &&  <Link to="/responder-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
-              Responder
+              Responder Portal
             </Link>}
             { authUser && authUser.registerAs == "Admin" && <Link to="/admin-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
-              admin
+              Admin Portal
             </Link>}
           
           </nav>

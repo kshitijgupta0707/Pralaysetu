@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 
 export const useReportStore = create((set) => ({
   reports: [],
-  verifiedReports: [],
+  // verifiedReports: [],
   isCreatingReport: false,
   isFetchingReports: false,
   isVerifyingReport: false,
@@ -51,19 +51,19 @@ export const useReportStore = create((set) => ({
 },
 
 // 3. Get Verified Reports (All Users)
-getVerifiedReports: async () => {
-    set({ isFetchingReports: true });
-    try {
-        const res = await axiosInstance.get('/reports/getVerifiedReports');
-        set({ verifiedReports: res.reports || [] });
+// getVerifiedReports: async () => {
+//     set({ isFetchingReports: true });
+//     try {
+//         const res = await axiosInstance.get('/reports/getVerifiedReports');
+//         set({ verifiedReports: res.reports || [] });
 
-    } catch (err) {
-        console.error(err);
-        toast.error('Failed to fetch verified reports');
-    } finally {
-        set({ isFetchingReports: false });
-    }
-},
+//     } catch (err) {
+//         console.error(err);
+//         toast.error('Failed to fetch verified reports');
+//     } finally {
+//         set({ isFetchingReports: false });
+//     }
+// },
 
 // 4. Verify a Report (Admin)
 verifyReport: async (reportId, status = 'verified') => {

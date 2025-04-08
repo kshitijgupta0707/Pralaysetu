@@ -11,11 +11,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useReportStore } from '@/store/useReportStore';
+import { Link } from 'react-router-dom';
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('reports');
   const [helpRequests, setHelpRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedItem, setSelectedItem] = useState(null);
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -38,7 +38,7 @@ const AdminDashboard = () => {
   // Add this to extract methods from reportStore
 const { 
   reports, 
-  verifiedReports, 
+  // verifiedReports, 
   isFetchingReports, 
   getAllReports, 
   verifyReport 
@@ -242,9 +242,11 @@ useEffect(() => {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="w-64 bg-white shadow-md">
+        <Link to={"/"} >
         <div className="p-4 border-b">
           <h2 className="text-xl font-bold">PralaySetu Admin</h2>
         </div>
+        </Link>
         <nav className="p-2">
           <ul className="space-y-1">
             <li>
