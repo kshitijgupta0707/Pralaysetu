@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
+import { Link } from 'react-router-dom';
 // Mock data - Would be fetched from API in production
 const MOCK_REQUESTS = [
   {
@@ -250,8 +250,10 @@ const ResponderDashboard = () => {
             </svg>
           </div>
           <div>
+            <Link to={"/"} >
             <h1 className="font-bold text-blue-800">PralaySetu</h1>
             <p className="text-xs text-gray-500">Responder Portal</p>
+            </Link>
           </div>
         </div>
         

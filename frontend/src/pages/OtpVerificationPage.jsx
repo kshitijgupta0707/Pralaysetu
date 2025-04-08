@@ -17,8 +17,7 @@ const OtpVerificationPage = () => {
   const location = useLocation();
   const userEmail = location.state?.email || '';
 
-  const { formData } = location.state || {}
-  const { signup, isSigningUp } = useAuthStore()
+  const { signup, isSigningUp , formData} = useAuthStore()
 
   // Handle OTP input changeF
   const handleOtpChange = (index, value) => {
@@ -78,7 +77,7 @@ const OtpVerificationPage = () => {
     }
     // Simulate API call to verify OTP
       if(formData && otpValue.length == 6){
-         formData.otp = otpValue
+        formData.set("otp", otpValue); 
          signup(formData , navigate)
       }
   };

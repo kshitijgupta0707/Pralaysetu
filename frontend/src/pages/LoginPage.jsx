@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,15 +7,27 @@ import { Label } from '@/components/ui/label';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthstore';
 import toast from 'react-hot-toast';
+import RegistrationRoleModal from './RegistrationRoleModel'; // Import the new component
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const {login , isLoggingIn , authUser} = useAuthStore()
-  const navigate = useNavigate()
-  const validateForm = () => {
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const { login, isLoggingIn, authUser  } = useAuthStore();
 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is logged in and needs to select a role
+    if (authUser && authUser.registerAs === 'None') {
+      setShowRoleModal(true);
+    } else if (authUser) {
+      // If user is logged in and already has a role, navigate to home
+      navigate('/');
+    }
+  }, [authUser, navigate]);
+
+  const validateForm = () => {
     if (!loginData.email.trim()) return toast.error("Email is required");
-    //regular expression genereated with the help of ai
     if (!/\S+@\S+\.\S+/.test(loginData.email)) return toast.error("Invalid email format");
     if (!loginData.password) return toast.error("Password is required");
     return true;
@@ -25,16 +37,19 @@ const LoginPage = () => {
     e.preventDefault();
     const success = validateForm();
     if (!success) return;
-    console.log("enter details")
-    login(loginData)
-    console.log("auth user" , authUser);
-    if(authUser){
-      navigate('/')
-    }
-    setTimeout(() => {
-      console.log('Login data:', loginData);
-      // Handle login logic here
-    }, 1500);
+    
+    login(loginData);
+  };
+
+  const handleRoleSelection = (role) => {
+    // Update user profile with selected role
+    // This would typically call an API to update the user's role
+    toast.success(`You've logged in as a ${role === 'normalUser' ? 'User' : 'Responder'}`);
+    // Close the modal
+    setShowRoleModal(false);
+    localStorage.setItem("loggedInAs", role === 'normalUser' ? 'User' : 'Responder');
+    // Navigate to appropriate dashboard or onboarding flow based on role    
+    navigate('/');
   };
 
   return (
@@ -177,11 +192,15 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
+      
+      {/* Role Selection Modal */}
+      <RegistrationRoleModal 
+        isOpen={showRoleModal}
+        onClose={() => setShowRoleModal(false)}
+        onSelectRole={handleRoleSelection}
+      />
     </div>
   );
 };
 
 export default LoginPage;
-
-
-

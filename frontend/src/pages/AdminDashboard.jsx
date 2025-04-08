@@ -9,12 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
+import { useAdminStore } from '@/store/useAdminStore';
+import { useReportStore } from '@/store/useReportStore';
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('reports');
-  const [reports, setReports] = useState([]);
   const [helpRequests, setHelpRequests] = useState([]);
-  const [responders, setResponders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
   const [broadcastMessage, setBroadcastMessage] = useState('');
@@ -24,67 +23,46 @@ const AdminDashboard = () => {
   const [showBroadcastDialog, setShowBroadcastDialog] = useState(false);
   const [broadcastType, setBroadcastType] = useState('alert');
   const [broadcastRegion, setBroadcastRegion] = useState('all');
-  const [pendingRegistrations, setPendingRegistrations] = useState([]);
+  // Extract data and functions from adminStore
+  const { 
+    pendingUsers, 
+    responders, 
+    verifiedEntities, 
+    loading, 
+    fetchPendingUsers, 
+    approveUser, 
+    rejectUser, 
+    fetchAllResponders, 
+    fetchAllVerifiedEntities 
+  } = useAdminStore();
+  // Add this to extract methods from reportStore
+const { 
+  reports, 
+  verifiedReports, 
+  isFetchingReports, 
+  getAllReports, 
+  verifyReport 
+} = useReportStore();
+  useEffect(()=>{
+    console.log("admin dashboard" , responders)
+  },[responders])
   
   useEffect(() => {
-    // Simulate API calls
-    fetchReports();
+    // Fetch data from store
+    fetchPendingUsers();
+    fetchAllResponders();
+    fetchAllVerifiedEntities();
+    
+    // Simulate API calls for reports and help requests (keeping original)
+    getAllReports();
     fetchHelpRequests();
-    fetchResponders();
-    fetchPendingRegistrations();
   }, []);
+  // Set the loading state based on the store
+useEffect(() => {
+  setIsLoading(isFetchingReports);
+}, [isFetchingReports])
   
-  const fetchReports = () => {
-    setIsLoading(true);
-    // Simulated API call
-    setTimeout(() => {
-      const mockReports = [
-        {
-          _id: 'rep1',
-          user: { _id: 'user1', name: 'Rahul Sharma', email: 'rahul@example.com', photo: '/placeholder-user.jpg' },
-          disasterType: 'Flood',
-          description: 'Water level rising rapidly near Ganges river, multiple houses affected in the area.',
-          imageUrl: '/api/placeholder/400/300',
-          location: { latitude: 25.3176, longitude: 82.9739 },
-          status: 'pending',
-          createdAt: '2025-04-06T10:30:00Z'
-        },
-        {
-          _id: 'rep2',
-          user: { _id: 'user2', name: 'Priya Singh', email: 'priya@example.com', photo: '/placeholder-user.jpg' },
-          disasterType: 'Fire',
-          description: 'Fire spotted in the industrial area, smoke rising from chemical factory.',
-          imageUrl: '/api/placeholder/400/300',
-          location: { latitude: 28.7041, longitude: 77.1025 },
-          status: 'pending',
-          createdAt: '2025-04-06T09:15:00Z'
-        },
-        {
-          _id: 'rep3',
-          user: { _id: 'user3', name: 'Ankit Patel', email: 'ankit@example.com', photo: '/placeholder-user.jpg' },
-          disasterType: 'Landslide',
-          description: 'Mountain road blocked by fallen rocks after heavy rainfall. Route to Shimla affected.',
-          imageUrl: '/api/placeholder/400/300',
-          location: { latitude: 31.1048, longitude: 77.1734 },
-          status: 'verified',
-          createdAt: '2025-04-05T15:45:00Z'
-        },
-        {
-          _id: 'rep4',
-          user: { _id: 'user4', name: 'Meena Kumari', email: 'meena@example.com', photo: '/placeholder-user.jpg' },
-          disasterType: 'Earthquake',
-          description: 'Mild tremors felt in southern region, no visible damage but people evacuated buildings.',
-          imageUrl: '/api/placeholder/400/300',
-          location: { latitude: 13.0827, longitude: 80.2707 },
-          status: 'rejected',
-          createdAt: '2025-04-04T18:20:00Z'
-        }
-      ];
-      setReports(mockReports);
-      setIsLoading(false);
-    }, 1000);
-  };
-  
+ 
   const fetchHelpRequests = () => {
     setIsLoading(true);
     // Simulated API call
@@ -138,71 +116,13 @@ const AdminDashboard = () => {
     }, 1000);
   };
   
-  const fetchResponders = () => {
-    // Simulated API call
-    setTimeout(() => {
-      const mockResponders = [
-        { _id: 'resp1', name: 'NDRF Team A', type: 'Government', status: 'available' },
-        { _id: 'resp2', name: 'NDRF Team B', type: 'Government', status: 'assigned' },
-        { _id: 'resp3', name: 'State Fire Department', type: 'Government', status: 'available' },
-        { _id: 'resp4', name: 'Medical Response Unit', type: 'Government', status: 'available' },
-        { _id: 'resp5', name: 'Red Cross Volunteers', type: 'NGO', status: 'available' }
-      ];
-      setResponders(mockResponders);
-    }, 1200);
-  };
-  
-  const fetchPendingRegistrations = () => {
-    // Simulated API call
-    setTimeout(() => {
-      const mockPendingRegistrations = [
-        { 
-          _id: 'reg1', 
-          name: 'Delhi Fire Services', 
-          type: 'Government', 
-          email: 'dfs-admin@delhi.gov.in',
-          contactPerson: 'Rajesh Mishra',
-          phone: '+91-9876543210',
-          idProof: '/api/placeholder/400/300',
-          createdAt: '2025-04-06T15:20:00Z'
-        },
-        { 
-          _id: 'reg2', 
-          name: 'Maharashtra SDRF Team C', 
-          type: 'Government', 
-          email: 'sdrf-c@maharashtra.gov.in',
-          contactPerson: 'Priyanka Deshmukh',
-          phone: '+91-9876123450',
-          idProof: '/api/placeholder/400/300',
-          createdAt: '2025-04-05T11:15:00Z'
-        },
-        { 
-          _id: 'reg3', 
-          name: 'Goonj Relief NGO', 
-          type: 'NGO', 
-          email: 'operations@goonj.org',
-          contactPerson: 'Amit Singh',
-          phone: '+91-9856743210',
-          idProof: '/api/placeholder/400/300',
-          createdAt: '2025-04-07T09:30:00Z'
-        }
-      ];
-      setPendingRegistrations(mockPendingRegistrations);
-    }, 1500);
-  };
-  
   const handleVerifyReport = (id) => {
-    setReports(reports.map(report => 
-      report._id === id ? {...report, status: 'verified'} : report
-    ));
+    verifyReport(id, 'verified');
   };
   
   const handleRejectReport = (id) => {
-    setReports(reports.map(report => 
-      report._id === id ? {...report, status: 'rejected'} : report
-    ));
+    verifyReport(id, 'rejected');
   };
-  
   const handleVerifyHelpRequest = (id) => {
     setHelpRequests(helpRequests.map(request => 
       request._id === id ? {...request, status: 'verified'} : request
@@ -223,31 +143,31 @@ const AdminDashboard = () => {
       request._id === id ? {
         ...request, 
         status: 'assigned',
-        assignedTo: { _id: responder._id, name: responder.name }
+        assignedTo: { _id: responder._id, name: responder.firstName + ' ' + responder.lastName }
       } : request
     ));
     setSelectedResponder('');
   };
   
-  const handleApproveResponder = (id) => {
-    setPendingRegistrations(pendingRegistrations.filter(reg => reg._id !== id));
-    // Here you would typically make an API call to approve the responder
-    // and then update the responders list
-    
-    const approved = pendingRegistrations.find(reg => reg._id === id);
-    if (approved) {
-      setResponders([...responders, {
-        _id: approved._id,
-        name: approved.name,
-        type: approved.type,
-        status: 'available'
-      }]);
+  const handleApproveRegistration = async (id) => {
+    try {
+      await approveUser(id);
+      // Refresh data after approval
+      fetchPendingUsers();
+      fetchAllVerifiedEntities();
+    } catch (error) {
+      console.error("Error approving user:", error);
     }
   };
   
-  const handleRejectResponder = (id) => {
-    setPendingRegistrations(pendingRegistrations.filter(reg => reg._id !== id));
-    // Here you would typically make an API call to reject the responder
+  const handleRejectRegistration = async (id) => {
+    try {
+      await rejectUser(id);
+      // Refresh pending users after rejection
+      fetchPendingUsers();
+    } catch (error) {
+      console.error("Error rejecting user:", error);
+    }
   };
   
   const handleBroadcast = () => {
@@ -263,13 +183,14 @@ const AdminDashboard = () => {
     setShowBroadcastDialog(false);
   };
   
-  // Filter functions
   const filteredReports = reports.filter(report => {
-    const matchesSearch = report.description.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          report.disasterType.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = 
+      (report.description?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+       report.disasterType?.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = filterStatus === 'all' ? true : report.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
+
   
   const filteredHelpRequests = helpRequests.filter(request => {
     const matchesSearch = request.reason.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -304,6 +225,7 @@ const AdminDashboard = () => {
       case 'pending':
         return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">Pending</Badge>;
       case 'verified':
+      case 'approved':
         return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">Verified</Badge>;
       case 'rejected':
         return <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">Rejected</Badge>;
@@ -437,60 +359,60 @@ const AdminDashboard = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredReports.map(report => (
-                    <Card key={report._id} className="overflow-hidden">
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <CardTitle className="flex items-center">
-                              <Badge className="mr-2">{report.disasterType}</Badge>
-                              {getStatusBadge(report.status)}
-                            </CardTitle>
-                            <CardDescription className="pt-1">
-                              Reported by {report.user.name}
-                            </CardDescription>
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {formatDate(report.createdAt)}
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pb-2">
-                        <img 
-                          src={report.imageUrl} 
-                          alt={report.disasterType} 
-                          className="w-full h-40 object-cover rounded-md mb-2"
-                        />
-                        <p className="text-sm">{report.description}</p>
-                        <div className="flex items-center text-xs text-gray-500 mt-2">
-                          <MapPin className="h-3 w-3 mr-1" />
-                          <span>Lat: {report.location.latitude.toFixed(4)}, Long: {report.location.longitude.toFixed(4)}</span>
-                        </div>
-                      </CardContent>
-                      {report.status === 'pending' && (
-                        <CardFooter className="flex justify-between pt-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="border-green-500 text-green-500 hover:bg-green-50" 
-                            onClick={() => handleVerifyReport(report._id)}
-                          >
-                            <Check className="h-4 w-4 mr-1" />
-                            Verify
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="border-red-500 text-red-500 hover:bg-red-50" 
-                            onClick={() => handleRejectReport(report._id)}
-                          >
-                            <X className="h-4 w-4 mr-1" />
-                            Reject
-                          </Button>
-                        </CardFooter>
-                      )}
-                    </Card>
-                  ))}
+                 {filteredReports.map(report => (
+  <Card key={report._id} className="overflow-hidden">
+    <CardHeader className="pb-2">
+      <div className="flex justify-between items-start">
+        <div>
+          <CardTitle className="flex items-center">
+            <Badge className="mr-2">{report.disasterType}</Badge>
+            {getStatusBadge(report.status)}
+          </CardTitle>
+          {/* <CardDescription className="pt-1">
+            Reported by {report.user?.firstName || "Anonymous"}
+          </CardDescription> */}
+        </div>
+        <div className="text-xs text-gray-500">
+          {formatDate(report.createdAt)}
+        </div>
+      </div>
+    </CardHeader>
+    <CardContent className="pb-2">
+      <img 
+        src={report.imageUrl} 
+        alt={report.disasterType} 
+        className="w-full h-40 object-cover rounded-md mb-2"
+      />
+      <p className="text-sm">{report.description}</p>
+      <div className="flex items-center text-xs text-gray-500 mt-2">
+        <MapPin className="h-3 w-3 mr-1" />
+        <span>Lat: {report.latitude?.toFixed(4)}, Long: {report.longitude?.toFixed(4)}</span>
+      </div>
+    </CardContent>
+    {report.status === 'pending' && (
+      <CardFooter className="flex justify-between pt-2">
+        <Button 
+          size="sm" 
+          variant="outline" 
+          className="border-green-500 text-green-500 hover:bg-green-50" 
+          onClick={() => handleVerifyReport(report._id)}
+        >
+          <Check className="h-4 w-4 mr-1" />
+          Verify
+        </Button>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          className="border-red-500 text-red-500 hover:bg-red-50" 
+          onClick={() => handleRejectReport(report._id)}
+        >
+          <X className="h-4 w-4 mr-1" />
+          Reject
+        </Button>
+      </CardFooter>
+    )}
+  </Card>
+))}
                 </div>
               )}
             </div>
@@ -638,7 +560,9 @@ const AdminDashboard = () => {
               <Tabs defaultValue="active">
                 <TabsList>
                   <TabsTrigger value="active">Active Responders</TabsTrigger>
+                  <TabsTrigger value="responders"> Responders</TabsTrigger>
                   <TabsTrigger value="pending">Pending Registrations</TabsTrigger>
+                  <TabsTrigger value="entities"> Registered Registrations</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="active" className="mt-4">
@@ -658,11 +582,11 @@ const AdminDashboard = () => {
                         <tbody>
                           {responders.map(responder => (
                             <tr key={responder._id} className="border-t hover:bg-gray-50">
-                              <td className="px-4 py-3">{responder.name}</td>
-                              <td className="px-4 py-3">{responder.type}</td>
+                              <td className="px-4 py-3">{responder.firstName}</td>
+                              <td className="px-4 py-3">{responder.registerAs == "None"? "User": responder.registerAs}</td>
                               <td className="px-4 py-3">
-                                <Badge variant={responder.status === 'available' ? 'outline' : 'secondary'}>
-                                  {responder.status}
+                                <Badge variant={responder.Verified === 'available' ? 'outline' : 'secondary'}>
+                                  {responder.registerAs}
                                 </Badge>
                               </td>
                             </tr>
@@ -675,10 +599,10 @@ const AdminDashboard = () => {
   
                 <TabsContent value="pending" className="mt-4">
                   <div className="space-y-4">
-                    {pendingRegistrations.map(registration => (
+                    {pendingUsers.map(registration => (
                       <Card key={registration._id}>
                         <CardHeader>
-                          <CardTitle>{registration.name}</CardTitle>
+                          <CardTitle>{registration.registerAs}</CardTitle>
                           <CardDescription>
                             <span className="font-semibold">Type:</span> {registration.type} | 
                             <span className="font-semibold ml-2">Applied on:</span> {formatDate(registration.createdAt)}
@@ -689,7 +613,7 @@ const AdminDashboard = () => {
                             <div className="space-y-2">
                               <div>
                                 <span className="text-sm font-medium">Contact Person:</span>
-                                <p>{registration.contactPerson}</p>
+                                <p>{registration.firstName + " " + registration.lastName }</p>
                               </div>
                               <div>
                                 <span className="text-sm font-medium">Email:</span>
@@ -697,7 +621,7 @@ const AdminDashboard = () => {
                               </div>
                               <div>
                                 <span className="text-sm font-medium">Phone:</span>
-                                <p>{registration.phone}</p>
+                                <p>{"95555XXXX8"}</p>
                               </div>
                             </div>
                           </div>
@@ -707,7 +631,7 @@ const AdminDashboard = () => {
                                 <span className="text-sm font-medium">ID Proof:</span>
                                 <div className="mt-1">
                                   <img 
-                                    src={registration.idProof} 
+                                    src={registration.governmentDocument} 
                                     alt="ID Proof" 
                                     className="w-full max-w-xs rounded border"
                                   />
@@ -720,7 +644,7 @@ const AdminDashboard = () => {
                           <Button 
                             variant="outline" 
                             className="border-green-500 text-green-500 hover:bg-green-50"
-                            onClick={() => handleApproveResponder(registration._id)}
+                            onClick={() => handleApproveRegistration(registration._id)}
                           >
                             <Check className="h-4 w-4 mr-1" />
                             Approve
@@ -728,7 +652,7 @@ const AdminDashboard = () => {
                           <Button 
                             variant="outline" 
                             className="border-red-500 text-red-500 hover:bg-red-50"
-                            onClick={() => handleRejectResponder(registration._id)}
+                            onClick={() => handleRejectRegistration(registration._id)}
                           >
                             <X className="h-4 w-4 mr-1" />
                             Reject
@@ -737,13 +661,101 @@ const AdminDashboard = () => {
                       </Card>
                     ))}
                     
-                    {pendingRegistrations.length === 0 && (
+                    {pendingUsers .length === 0 && (
                       <div className="text-center p-8 bg-white rounded-lg border">
                         <p className="text-gray-500">No pending registration requests</p>
                       </div>
                     )}
                   </div>
                 </TabsContent>
+                <TabsContent value="responders">
+          {loading ? (
+            <div className="text-center py-10">Loading responders...</div>
+          ) : responders.length === 0 ? (
+            <div className="text-center py-10">No responders found.</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {responders.map(responder => (
+                <div key={responder._id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow p-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <img 
+                      src={responder.profilePic || "/placeholder-user.jpg"} 
+                      alt={`${responder.firstName} ${responder.lastName}`} 
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div>
+                      <h3 className="font-semibold">
+                        {responder.firstName} {responder.lastName}
+                      </h3>
+                      <p className="text-sm text-gray-600">{responder.email}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2 mb-2">
+                    <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
+                      {responder.registerAs || "Responder"}
+                    </Badge>
+                  </div>
+                  
+                  <div className="mt-3 flex justify-end">
+                    <Button variant="outline" size="sm">
+                      View Profile
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+                </TabsContent>
+                 {/* Verified Entities Tab */}
+          <TabsContent value="entities">
+            {loading ? (
+              <div className="text-center py-10">Loading verified entities...</div>
+            ) : verifiedEntities.length === 0 ? (
+              <div className="text-center py-10">No verified entities found.</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {verifiedEntities.map(entity => (
+                  <div key={entity._id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <img 
+                        src={entity.profilePic || "/placeholder-user.jpg"} 
+                        alt={`${entity.firstName} ${entity.lastName}`} 
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      <div>
+                        <h3 className="font-semibold">
+                          {entity.firstName} {entity.lastName}
+                        </h3>
+                        <p className="text-sm text-gray-600">{entity.email}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2 mb-2">
+                      <Badge variant="outline" className={`${
+                        entity.registerAs === 'Government' 
+                          ? 'bg-purple-100 text-purple-800 border-purple-200' 
+                          : 'bg-green-100 text-green-800 border-green-200'
+                      }`}>
+                        {entity.registerAs}
+                      </Badge>
+                      {entity.workAsResponder && (
+                        <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
+                          Responder
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <div className="mt-3 flex justify-end">
+                      <Button variant="outline" size="sm">
+                        View Profile
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
               </Tabs>
             </div>
           )}
@@ -835,3 +847,9 @@ const AdminDashboard = () => {
 }
 
 export default AdminDashboard;
+
+
+
+
+
+

@@ -13,6 +13,7 @@ import { app , server } from "./config/socket.js";
 import { connectCloudinary } from "./config/cloudinary.js";
 import helpRoutes from "./routes/help.route.js"
 import dashboardRoutes from "./routes/dashboard.route.js";
+import adminRoutes from "./routes/admin.route.js"
 
 
 dotenv.config();
@@ -45,7 +46,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/help", helpRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-
+app.use("/api/admin", adminRoutes);
 
 
 const PORT = process.env.PORT || 5000;

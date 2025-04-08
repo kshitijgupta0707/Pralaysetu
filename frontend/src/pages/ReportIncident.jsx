@@ -23,13 +23,8 @@ const ReportIncident = ({ userLocation }) => {
   const disasterTypes = [
     'Flood',
     'Earthquake',
-    'Fire',
     'Cyclone',
-    'Landslide',
     'Tsunami',
-    'Building Collapse',
-    'Traffic Accident',
-    'Gas Leak',
     'Other'
   ];
 

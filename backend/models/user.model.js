@@ -10,12 +10,34 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
     },
-    role: {
+    registerAs: {
       type: String,
-      enum: ["User", "Admin", "Government", "NGO" , "Responder"],
+      enum: ["Admin", "NGO" , "Government", "None"],
       default: "User",
+      
     },
-    isVerified: { type: Boolean, default: false }, // Ensuring user verification
+    registrationStatus: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: function () {
+        return this.registerAs === "NGO" || this.registerAs === "Government" ? "pending" : "approved";
+      }
+    },
+    isVerified: {
+      type: Boolean,
+      default: function () {
+        return this.registerAs === "NGO" || this.registerAs === "Government" ? false : true;
+      }
+    },
+    //only for Govenemrnt , Ngo verifiucaiton
+    governmentDocument: {
+      type: String,
+      default: ""
+    },
+    workAsResponder: {
+      type: Boolean,
+      default: false
+    },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
   },

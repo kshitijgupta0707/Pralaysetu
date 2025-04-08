@@ -13,6 +13,10 @@ const reportSchema = new mongoose.Schema({
     default: "pending",
   },
   createdAt: { type: Date, default: Date.now },
+  verifiedBy : {
+    type: String,
+    default: "Admin"
+  }
 });
 
 export const Report = mongoose.model("Report", reportSchema);

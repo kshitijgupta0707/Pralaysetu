@@ -9,6 +9,7 @@ import { mailSender } from "../utils/mailSender.js";
 import { resetTemplate } from "../templates/reset.template.js";
 import { otpTemplate } from "../templates/otp.template.js";
 import crypto from "crypto";
+import { uploadImageToCloudinary } from "../utils/imageUploader.js";
 
 export const sendOtp = async (req, res) => {
   try {
@@ -91,14 +92,48 @@ export const sendOtp = async (req, res) => {
 }
 export const signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, role, password, confirmPassword , otp , location } = req.body;
+    const { firstName, lastName, email, registerAs  , workAsResponder, password, confirmPassword , otp , location } = req.body;
+
+     let governmentDocument =    req.files?.governmentDocument;
+    // let media = req.files?.media;
+    
     //check if some data is missing
-    if (!firstName || !lastName || !email || !role || !password || !otp) {
+    console.log(req.body)
+    if (!firstName || !lastName || !email || !registerAs || !workAsResponder || !password || !otp) {
       return res.status(400).json({
         success: false,
         message: "All fields are required"
       });
     }
+    if(registerAs == "Government"|| registerAs == "NGO"){
+        if(!governmentDocument){
+          return res.status(400).json({
+            success: false,
+            message: "Government document is required"
+          })
+        }
+    }
+    
+    if (governmentDocument) {
+      const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+      if (!allowedTypes.includes(governmentDocument.mimetype)) {
+        return res.status(400).json({ message: "Only JPG and PNG files are allowed" });
+      }
+    
+      if (governmentDocument.size > 200 * 1024) {
+        return res.status(400).json({ message: "Media size must be less than 200Kb" });
+      }
+    
+      const uploadResponse = await uploadImageToCloudinary(governmentDocument, "PralaySetu");
+    
+      if (!uploadResponse || !uploadResponse.secure_url) {
+        return res.status(500).json({ message: "Document upload failed" });
+      }
+    
+      //  Assign only the URL string
+      governmentDocument = uploadResponse.secure_url;
+    }
+    
     
         //check whether length is >= 6
         if (password.length < 6) {
@@ -181,24 +216,35 @@ export const signup = async (req, res) => {
         }
       }
     }
-     
 
 
-     //entry in db
-
-     const user = await User.create({
+    
+    
+    
+    //entry in db
+    
+    const user = await User.create({
       firstName,
       lastName,
       email,
-      role,
+      registerAs,
+      workAsResponder,
       password: hashedPassword,
-      isVerified: true,
+      governmentDocument
     })
-
-
+    if (registerAs === "NGO" || registerAs === "Government") {
+      // Save the registration with status "pending"
+      // Notify admin via email / dashboard
+      const sendMail = mailSender(email , "Registration Request" , `Your request to register as a ${registerAs} has been recieved . We will notify you soon`);
+      return res.status(200).json({
+        message: "Your registration request has been received and is pending admin approval.",
+      });
+    }
+    
+    
     return res.status(200).json({
       success: true,
-      message: "User created successfully",
+      message: "Account created successfully",
       user
     });
   }catch (error) {
@@ -227,6 +273,11 @@ export const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ success: false, message: "Invalid credentials"  });
+    }
+
+    //checking if the user exist if verified by the 
+    if (!user.isVerified || user.registrationStatus !== "approved") {
+      return res.status(403).json({ message: "Your account is pending approval by the admin. Please give us some time we will notify you soon" });
     }
 
     // 👉 Get client IP

@@ -39,15 +39,16 @@ export const authenticate = async (req, res, next) => {
 
 export const authorizeRoles = (...allowedRoles) => (req, res, next) => {
   console.log("Allowed roles:", allowedRoles);
-  console.log("User role:", req.user?.role);
-    if (!allowedRoles.includes(req.user?.role)) {
-      console.log("Access denied for role:", req.user?.role);
+  console.log(req.user)
+  console.log("User role:", req.user?.registerAs);
+    if (!allowedRoles.includes(req.user?.registerAs)) {
+      console.log("Access denied for role:", req.user?.registerAs);
       return res.status(403).json({
         success: false,
-        message: `Access denied for role: ${req.user?.role || 'unknown'}`,
+        message: `Access denied for role: ${req.user?.registerAs || 'unknown'}`,
       });
     }
-    console.log("Access granted for role:", req.user?.role);
+    console.log("Access granted for role:", req.user?.registerAs);
     next();
   };
   

@@ -4,11 +4,10 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
 
-
 const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "/";
-
 export const useAuthStore = create((set, get) => ({
   authUser: null,
+  formData: null,
   isSendingOtp: false,
   isSigningUp: false,
   isLoggingIn: false,
@@ -16,13 +15,13 @@ export const useAuthStore = create((set, get) => ({
   isCheckingAuth: true,
   onlineUsers: [],
   socket: null,
-
+  setFormData: (data) => set({ formData: data }),
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
       console.log(res)
       set({ authUser: res.data });
-      get().connectSocket();
+      // get().connectSocket();
     } catch (error) {
       console.log(error);
       set({ authUser: null });
@@ -34,12 +33,17 @@ export const useAuthStore = create((set, get) => ({
       console.log("Sending OTP with data:", data); // Log the data being sent
     set({ isSendingOtp: true });
     try {
-      const res = await axiosInstance.post("/auth/sendOtp", data)
+      const res = await axiosInstance.post("/auth/sendOtp", data, { headers: {
+        'Content-Type': 'multipart/form-data',
+      }})
       toast.success("Otp Send on mail");
       set({ isSendingOtp: false });
+       // Save FormData to Zustand store
+      get().setFormData(data);
       setTimeout(() => {
         // Use React Router's navigate function to redirect and pass state
-        navigate("/otp-verification", { state: { formData: data } });
+        console.log("Navigating to otp verification"  );
+        navigate("/otp-verification");
       }, 2000); // Adjust delay as needed
       // get().connectSocket();
     } catch (error) {
@@ -52,10 +56,14 @@ export const useAuthStore = create((set, get) => ({
   signup: async (data, navigate) => {
     set({ isSigningUp: true });
     try {
-      const res = await axiosInstance.post("/auth/signup", data);
+      const res = await axiosInstance.post("/auth/signup", data , {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       //so that the user get authenticated soon after the signup
       // set({ authUser: res.data });
-      toast.success("Account created successfully");
+      toast.success(res.data.message);
       set({ isSigningUp: false });
       setTimeout(() => {
         // Use React Router's navigate function to redirect and pass state
@@ -72,8 +80,10 @@ export const useAuthStore = create((set, get) => ({
   login: async (data) => {
     set({ isLoggingIn: true });
     try {
+      console.log(data);
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data.responseUser });
+
       toast.success("Logged in successfully ");
     //   get().connectSocket();
     } catch (error) {
@@ -86,6 +96,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
+      localStorage.removeItem("loggedInAs");
       toast.success("Logged out successfully");
     //   get().disconnectSocket();
     } catch (error) {

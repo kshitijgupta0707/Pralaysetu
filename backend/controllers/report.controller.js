@@ -6,7 +6,7 @@ import { uploadImageToCloudinary } from "../utils/imageUploader.js";
 export const createReport = async (req, res) => {
   try {
     console.log(req.body)
-    const { disasterType, latitude ,longitude, description } = req.body;
+    const { disasterType, latitude ,longitude, description  } = req.body;
     if(!disasterType || !latitude || !longitude || !description ) {
       return res.status(400).json({
         success: false,
@@ -33,7 +33,7 @@ export const createReport = async (req, res) => {
       mediaUrl = uploadResponse.secure_url;
     }
     const report = await Report.create({
-      user: req.user.id,
+      user: req.user._id,
       disasterType,
       latitude ,
       longitude,
@@ -53,7 +53,7 @@ export const createReport = async (req, res) => {
 };
 export const getAllReports = async (req, res) => {
   try {
-    const reports = await Report.find().populate("user", "name email role");
+    const reports = await Report.find().populate("user");
     res.status(200).json({ success: true, reports });
   } catch (error) {
     res.status(500).json({ success: false, message: "Unable to fetch reports" });
@@ -74,6 +74,7 @@ export const getVerifiedReports = async (req, res) => {
 export const verifyReport = async (req, res) => {
   try {
     const { reportId, status } = req.body;
+    console.log(reportId , status);
 
     if (!["verified", "rejected"].includes(status)) {
       return res.status(400).json({
@@ -89,20 +90,21 @@ export const verifyReport = async (req, res) => {
         message: "Report not found",
       });
     }
-
+  
     report.status = status;
-    report.verifiedBy = req.user.id; // Admin who verified
+    console.log("user ", req.user)
+    report.verifiedBy = req.user._id; // Admin who verified
     await report.save();
 
     // Send real-time notification
-    const receiverSocketId = getReceiverSocketId(report.user._id.toString());
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("reportStatusUpdate", {
-        reportId: report._id,
-        status: report.status,
-        message: `Your report has been ${status}`,
-      });
-    }
+    // const receiverSocketId = getReceiverSocketId(report.user._id.toString());
+    // if (receiverSocketId) {
+    //   io.to(receiverSocketId).emit("reportStatusUpdate", {
+    //     reportId: report._id,
+    //     status: report.status,
+    //     message: `Your report has been ${status}`,
+    //   });
+    // }
 
     res.status(200).json({
       success: true,
