@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AlertCircle, Camera, MapPin, Check, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,27 +8,79 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {useHelpStore} from '@/store/useHelpStore';
+import toast from 'react-hot-toast';
 
 const RequestHelp = ({ userLocation }) => {
   const [formData, setFormData] = useState({
     reason: '',
     urgency: 'medium',
-    location: userLocation || { lat: 0, lng: 0 },
+    latitude: userLocation?.lat || 0,
+    longitude: userLocation?.lng || 0,
     photo: ''
   });
+``
+
+const validated = async () => {
+  if (formData.latitude === 0 || formData.longitude === 0) {
+    // toast.error("Fetching your location...");
+
+    try {
+      const position = await new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        })
+      );
+
+      const { latitude, longitude } = position.coords;
+      console.log("User Location by map")
+      console.log(latitude , longitude)
+
+      setFormData(prev => ({
+        ...prev,
+        latitude,
+        longitude,
+      }));
+      console.log("User Location by form data")
+     console.log(formData.latitude , formData.longitude)
+      toast.success("Location fetched successfully!");
+      return {latitude , longitude}
+    } catch (err) {
+      console.error("Error getting location: ", err);
+      if (err.code === 1) {
+        toast.error("Location permission denied. Please allow it from browser settings.");
+      } else if (err.code === 2) {
+        toast.error("Location unavailable. Try again.");
+      } else {
+        toast.error("Location request timed out.");
+      }
+      return null;
+    }
+  }
+  const {latitude ,longitude} = formData
+return {latitude ,longitude};
+};
+ 
+
+
+
   const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
-
+  
+  const {loading , createHelpRequest} = useHelpStore();
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
+  
   const handleUrgencyChange = (value) => {
     setFormData({ ...formData, urgency: value });
   };
-
+  
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -41,35 +93,40 @@ const RequestHelp = ({ userLocation }) => {
       reader.readAsDataURL(file);
     }
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let location = await validated();
+    if (!location) {
+      return;
+    }
     setIsSubmitting(true);
     setSubmitStatus(null);
-
+  
     try {
-      // In a real app, you would send to your API
-      const response = await fetch('/api/help-requests', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (response.ok) {
-        setSubmitStatus('success');
-        // Reset form after successful submission
-        setFormData({
-          reason: '',
-          urgency: 'medium',
-          location: userLocation || { lat: 0, lng: 0 },
-          photo: ''
-        });
-        setImagePreview(null);
-      } else {
-        setSubmitStatus('error');
+      const formDataToSend = new FormData();
+      formDataToSend.append('reason', formData.reason);
+      formDataToSend.append('urgency', formData.urgency);
+      formDataToSend.append('latitude', location.latitude);
+      formDataToSend.append('longitude', location.longitude);
+  
+      if (formData.photo) {
+        formDataToSend.append('photo', formData.photo);
       }
+  
+      // Use the createHelpRequest from your store
+      await createHelpRequest(formDataToSend);
+  
+      // Reset form on success
+      setFormData({
+        reason: '',
+        urgency: 'medium',
+        latitude: userLocation?.lat || 0,
+        longitude: userLocation?.lng || 0,
+        photo: ''
+      });
+      setImagePreview(null);
+      setSubmitStatus('success');
     } catch (error) {
       console.error('Error submitting help request:', error);
       setSubmitStatus('error');
@@ -77,29 +134,36 @@ const RequestHelp = ({ userLocation }) => {
       setIsSubmitting(false);
     }
   };
-
+  
+  
   const getCurrentLocationString = () => {
-    if (formData.location && formData.location.lat && formData.location.lng) {
-      return `${formData.location.lat.toFixed(6)}, ${formData.location.lng.toFixed(6)}`;
+    if (formData.location && formData.location?.lat && formData.location?.lng) {
+      return `${formData.location?.lat.toFixed(6)}, ${formData.location?.lng.toFixed(6)}`;
     }
     return 'Location not available';
   };
-
+  
   const getUrgencyColor = (urgency) => {
     switch (urgency) {
       case 'critical':
         return 'bg-red-500 text-white';
-      case 'high':
-        return 'bg-orange-500 text-white';
-      case 'medium':
-        return 'bg-yellow-500 text-white';
-      case 'low':
-        return 'bg-blue-500 text-white';
+        case 'high':
+          return 'bg-orange-500 text-white';
+          case 'medium':
+            return 'bg-yellow-500 text-white';
+            case 'low':
+              return 'bg-blue-500 text-white';
       default:
         return 'bg-gray-500 text-white';
     }
   };
+  useEffect(()=>{
 
+   console.log("location : " ,userLocation)
+   console.log("lat : " ,userLocation?.lat)
+   console.log("long : " ,userLocation?.lng)
+  },[userLocation])
+  
   return (
     <Card>
       <CardHeader className="bg-red-50 border-b border-red-100">
@@ -214,44 +278,6 @@ const RequestHelp = ({ userLocation }) => {
             </RadioGroup>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="location" className="font-medium">Your Current Location *</Label>
-            <div className="flex items-center gap-2">
-              <Input 
-                id="location"
-                value={getCurrentLocationString()}
-                readOnly
-                className="flex-1"
-              />
-              <Button 
-                type="button" 
-                variant="outline"
-                className="flex items-center gap-1"
-                onClick={() => {
-                  navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                      setFormData({
-                        ...formData,
-                        location: {
-                          lat: position.coords.latitude,
-                          lng: position.coords.longitude
-                        }
-                      });
-                    },
-                    (error) => {
-                      console.error('Error getting location:', error);
-                    }
-                  );
-                }}
-              >
-                <MapPin className="h-4 w-4" />
-                Update
-              </Button>
-            </div>
-            <p className="text-xs text-gray-500">
-              Your precise location helps responders reach you quickly.
-            </p>
-          </div>
 
           <div className="space-y-2">
             <Label htmlFor="image" className="font-medium">Upload Photo (Optional)</Label>

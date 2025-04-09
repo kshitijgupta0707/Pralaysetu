@@ -16,7 +16,7 @@ const RegistrationRoleModal = ({ isOpen, onClose, onSelectRole }) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">Complete Your Profile</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">How would you like to proceed?</DialogTitle>
           <DialogDescription className="text-center">
             Choose how you want to use PralaySetu
           </DialogDescription>
@@ -31,7 +31,7 @@ const RegistrationRoleModal = ({ isOpen, onClose, onSelectRole }) => {
             <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
               <Users className="h-7 w-7 text-blue-600" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">Normal User</h3>
+            <h3 className="font-semibold text-lg mb-2"> User</h3>
             <p className="text-gray-600 text-sm">
               Receive alerts, access resources, and get help during emergencies
             </p>

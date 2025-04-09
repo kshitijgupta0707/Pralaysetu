@@ -1,22 +1,75 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Camera, Upload, MapPin, AlertTriangle, Check, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea'; 
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useReportStore } from '@/store/useReportStore'; // Update path as needed
+import toast from 'react-hot-toast';
 
 const ReportIncident = ({ userLocation }) => {
   const { createReport, isCreatingReport } = useReportStore();
   const [formData, setFormData] = useState({
     disasterType: '',
     description: '',
-    location: userLocation || { latitude: 0, longitude: 0 },
+    latitude: userLocation?.lat || 0,
+    longitude: userLocation?.lng || 0,
     imageFile: null
   });
+
+  // useEffect(()=>{
+  //     console.log("location approved")
+  //      setFormData({
+  //       latitude: userLocation.lat,
+  //       longitude: userLocation.lng
+  //      })
+  // },[userLocation])
+  const validated = async () => {
+    if (formData.latitude === 0 || formData.longitude === 0) {
+      // toast.error("Fetching your location...");
+  
+      try {
+        const position = await new Promise((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          })
+        );
+  
+        const { latitude, longitude } = position.coords;
+        console.log("User Location by map")
+        console.log(latitude , longitude)
+  
+        setFormData(prev => ({
+          ...prev,
+          latitude,
+          longitude,
+        }));
+        console.log("User Location by form data")
+       console.log(formData.latitude , formData.longitude)
+        toast.success("Location fetched successfully!");
+        return {latitude , longitude}
+      } catch (err) {
+        console.error("Error getting location: ", err);
+        if (err.code === 1) {
+          toast.error("Location permission denied. Please allow it from browser settings.");
+        } else if (err.code === 2) {
+          toast.error("Location unavailable. Try again.");
+        } else {
+          toast.error("Location request timed out.");
+        }
+        return null;
+      }
+    }
+    const {latitude ,longitude} = formData
+  return {latitude ,longitude};
+  };
+   
+
   const [imagePreview, setImagePreview] = useState(null);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
 
@@ -52,29 +105,33 @@ const ReportIncident = ({ userLocation }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitStatus(null);
+    let location = await validated();
+    if (!location) {
+      return;
+    }
+    console.log("i am submitting at handle submit" , formData.latitude , formData.longitude);
 
     try {
       // Create FormData object for multipart/form-data submission
       const reportFormData = new FormData();
       reportFormData.append('disasterType', formData.disasterType);
       reportFormData.append('description', formData.description);
-      reportFormData.append('latitude', formData.location.latitude);
-      reportFormData.append('longitude', formData.location.longitude);
-      
+      reportFormData.append('latitude', location.latitude);
+      reportFormData.append('longitude', location.longitude);
+
       if (formData.imageFile) {
         reportFormData.append('media', formData.imageFile);
       }
 
       // Use the Zustand store's createReport function
       const result = await createReport(reportFormData);
-      
+
       if (result) {
         setSubmitStatus('success');
         // Reset form after successful submission
         setFormData({
           disasterType: '',
           description: '',
-          location: userLocation || { latitude: 0, longitude: 0 },
           imageFile: null
         });
         setImagePreview(null);
@@ -87,19 +144,13 @@ const ReportIncident = ({ userLocation }) => {
     }
   };
 
-  const getCurrentLocationString = () => {
-    if (formData.location && formData.location.latitude && formData.location.longitude) {
-      return `${formData.location.latitude.toFixed(6)}, ${formData.location.longitude.toFixed(6)}`;
-    }
-    return 'Location not available';
-  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Report an Incident</CardTitle>
         <CardDescription>
-          Your reports help us identify and respond to disasters more effectively. 
+          Your reports help us identify and respond to disasters more effectively.
           All reports are reviewed by our team before being shared.
         </CardDescription>
       </CardHeader>
@@ -128,8 +179,8 @@ const ReportIncident = ({ userLocation }) => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="disasterType">Type of Incident *</Label>
-            <Select 
-              value={formData.disasterType} 
+            <Select
+              value={formData.disasterType}
               onValueChange={handleSelectChange}
               required
             >
@@ -148,7 +199,7 @@ const ReportIncident = ({ userLocation }) => {
 
           <div className="space-y-2">
             <Label htmlFor="description">Description *</Label>
-            <Textarea 
+            <Textarea
               id="description"
               name="description"
               value={formData.description}
@@ -159,41 +210,6 @@ const ReportIncident = ({ userLocation }) => {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
-            <div className="flex items-center gap-2">
-              <Input 
-                id="location"
-                value={getCurrentLocationString()}
-                readOnly
-                className="flex-1"
-              />
-              <Button 
-                type="button" 
-                variant="outline"
-                className="flex items-center gap-1"
-                onClick={() => {
-                  navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                      setFormData({
-                        ...formData,
-                        location: {
-                          latitude: position.coords.latitude,
-                          longitude: position.coords.longitude
-                        }
-                      });
-                    },
-                    (error) => {
-                      console.error('Error getting location:', error);
-                    }
-                  );
-                }}
-              >
-                <MapPin className="h-4 w-4" />
-                Update
-              </Button>
-            </div>
-          </div>
 
           <div className="space-y-2">
             <Label htmlFor="image">Upload Photo (Optional)</Label>
@@ -206,16 +222,16 @@ const ReportIncident = ({ userLocation }) => {
                   onChange={handleImageUpload}
                   className="hidden"
                 />
-                <label 
-                  htmlFor="image" 
+                <label
+                  htmlFor="image"
                   className="flex flex-col items-center justify-center cursor-pointer h-40"
                 >
                   {imagePreview ? (
                     <div className="relative w-full h-full">
-                      <img 
-                        src={imagePreview} 
-                        alt="Preview" 
-                        className="w-full h-full object-cover rounded" 
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover rounded"
                       />
                       <button
                         type="button"
@@ -251,7 +267,7 @@ const ReportIncident = ({ userLocation }) => {
         <Button variant="outline" type="button">
           Cancel
         </Button>
-        <Button 
+        <Button
           onClick={handleSubmit}
           disabled={isCreatingReport || !formData.disasterType || !formData.description}
           className="bg-blue-600 hover:bg-blue-700"

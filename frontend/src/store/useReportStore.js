@@ -28,6 +28,7 @@ export const useReportStore = create((set) => ({
       toast.success(res.data.message);
       return res.data.report;
     } catch (err) {
+      
       toast.error(err.response?.data?.message || 'Failed to create report');
     } finally {
       set({ isCreatingReport: false });

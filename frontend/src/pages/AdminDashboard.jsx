@@ -62,6 +62,11 @@ useEffect(() => {
   setIsLoading(isFetchingReports);
 }, [isFetchingReports])
   
+const handleStatusChange = (status) => {
+  setFilterStatus(status);
+  console.log(`Status filtered to: ${status}`);
+};
+
  
   const fetchHelpRequests = () => {
     setIsLoading(true);
@@ -336,17 +341,45 @@ useEffect(() => {
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
-                  <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="verified">Verified</SelectItem>
-                      <SelectItem value="rejected">Rejected</SelectItem>
-                    </SelectContent>
-                  </Select>
+                   <div className="flex flex-wrap gap-2">
+      <button 
+        className={`px-3 py-1 rounded-md border ${filterStatus === 'all' 
+          ? 'bg-blue-500 text-white border-blue-600' 
+          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
+        onClick={() => handleStatusChange('all')}
+      >
+        All Status
+      </button>
+      
+      <button 
+        className={`px-3 py-1 rounded-md border ${filterStatus === 'pending' 
+          ? 'bg-yellow-500 text-white border-yellow-600' 
+          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
+        onClick={() => handleStatusChange('pending')}
+      >
+        Pending
+      </button>
+      
+      <button 
+        className={`px-3 py-1 rounded-md border ${filterStatus === 'verified' 
+          ? 'bg-green-500 text-white border-green-600' 
+          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
+        onClick={() => handleStatusChange('verified')}
+      >
+        Verified
+      </button>
+      
+      <button 
+        className={`px-3 py-1 rounded-md border ${filterStatus === 'rejected' 
+          ? 'bg-red-500 text-white border-red-600' 
+          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
+        onClick={() => handleStatusChange('rejected')}
+      >
+        Rejected
+      </button>
+    </div>
+
+
                 </div>
               </div>
   
