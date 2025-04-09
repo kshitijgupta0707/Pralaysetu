@@ -218,7 +218,7 @@ const SignupPage = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-900 opacity-90"></div>
         <div className="absolute inset-0 bg-[url('/images/waves-pattern.svg')] opacity-10"></div>
 
-        <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white">
+        <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white m-auto">
           <div className="mb-8">
             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 2c1 0 3 2 3 4v1a3 3 0 1 1-6 0V6c0-2 2-4 3-4Z" />

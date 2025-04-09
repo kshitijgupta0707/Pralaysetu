@@ -6,10 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthstore';
-import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin } from 'lucide-react'
+import Sidebar from './Sidebar';
 const HomePage = () => {
   const [language, setLanguage] = useState('en');
   const {authUser , logout} = useAuthStore()
+  const [isOpen, setIsOpen] = useState(false);
   const actingAs = localStorage.getItem("loggedInAs");
   useEffect(()=>{
      console.log(authUser)
@@ -97,6 +99,15 @@ const HomePage = () => {
     <div className="flex flex-col min-h-screen">
       {/* Header/Navigation */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200">
+      <Sidebar
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        authUser={authUser}
+        actingAs={actingAs}
+        language={language}
+        setLanguage={setLanguage}
+        logout={logout}
+      />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -114,17 +125,17 @@ const HomePage = () => {
           </div>
 
           <nav className="hidden md:flex items-center space-x-4">
-            <a href="#features" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">Features</a>
-            <a href="#how-it-works" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">How It Works</a>
-            <a href="#about" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">About</a>
-            <a href="#contact" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">Contact</a>
-            { authUser && authUser.registerAs == "None" && actingAs == "User" &&  <Link to="/user-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+            <a href="#features" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors hidden lg:block">Features</a>
+            <a href="#how-it-works" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors hidden lg:block">How It Works</a>
+            <a href="#about" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors hidden lg:block">About</a>
+            <a href="#contact" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors hidden lg:block">Contact</a>
+            { authUser && authUser.registerAs == "None" && actingAs == "User" &&  <Link to="/user-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors hidden lg:block ">
               User Portal
             </Link> }
-            { authUser && authUser.registerAs == "None" && actingAs == "Responder" &&  <Link to="/responder-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+            { authUser && authUser.registerAs == "None" && actingAs == "Responder" &&  <Link to="/responder-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors hidden lg:block">
               Responder Portal
             </Link>}
-            { authUser && authUser.registerAs == "Admin" && <Link to="/admin-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+            { authUser && authUser.registerAs == "Admin" && <Link to="/admin-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors hidden lg:block ">
               Admin Portal
             </Link>}
           
@@ -142,11 +153,11 @@ const HomePage = () => {
             </select>
 
             {!authUser && <div className="hidden sm:flex items-center space-x-2">
-              <Link to="/login" className="px-4 py-2 text-blue-600 hover:text-blue-800 font-medium">
+              <Link to="/login" className="px-4 py-2 text-blue-600 hover:text-blue-800 font-medium hidden lg:block ">
                 Log in
               </Link>
               <Link to="/signup">
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button className="bg-blue-600 hover:bg-blue-700 hidden lg:block ">
                   Sign up
                 </Button>
               </Link>
@@ -168,11 +179,15 @@ const HomePage = () => {
             </div>}
 
             {/* Mobile menu button */}
-            <button className="md:hidden rounded-md p-2 text-gray-700 hover:bg-gray-100">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
+            <button 
+          className="lg:hidden rounded-md p-2 text-gray-700 hover:bg-gray-100 mobile-menu-button"
+          onClick={() => setIsOpen(true)}
+          aria-label="Toggle menu"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
           </div>
         </div>
 
@@ -366,7 +381,7 @@ const HomePage = () => {
         </section>
 
         {/* Features Section with Tabs */}
-        <section id="featuresx  " className="py-16 bg-white">
+        <section id="features" className="py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900">{t.featuresTitle}</h2>

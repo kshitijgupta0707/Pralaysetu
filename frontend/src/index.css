@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
 @keyframes blob {
   0% {
     transform: scale(1);
