@@ -218,7 +218,7 @@ const AlertNotifications = ({ userLocation }) => {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-[95%] sm:w-full m-auto">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl flex items-center`">

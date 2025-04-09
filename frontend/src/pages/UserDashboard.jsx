@@ -153,7 +153,7 @@ const UserDashboard = () => {
 
         {/* Main Dashboard Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6 ">
+          <TabsList className="grid w-full grid-cols-4 mb-6 gap-1 ml01">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="map">Map</TabsTrigger>
             <TabsTrigger value="report">Report</TabsTrigger>
@@ -163,7 +163,7 @@ const UserDashboard = () => {
           {/* Overview Tab */}
           <TabsContent value="overview">
             <div className='flex flex-col gap-6'>
-            <div className=" md:flex gap-6">
+            <div className=" flex flex-col lg:flex-row gap-10">
               {/* Alerts Section */}
               <AlertNotifications />
               {/* Recent Reports */}
