@@ -30,8 +30,11 @@ app.use(
   );
 app.use(cors(
     {
-      origin: ["http://localhost:5173", "https://pralaysetu.vercel.app/"],
+
+      origin: ["http://localhost:5173",
+         "https://pralaysetu.vercel.app/"],
       credentials: true
+
     }
   ))
 //so you can send json response and request
