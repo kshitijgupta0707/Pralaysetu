@@ -5,13 +5,20 @@ import { uploadImageToCloudinary } from "../utils/imageUploader.js";
 
 export const createReport = async (req, res) => {
   try {
-    console.log(req.body)
+    console.log("body mei yeh hain",req.body)
     const { disasterType, latitude ,longitude, description  } = req.body;
     if(!disasterType || !latitude || !longitude || !description ) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
       });
+    }
+    console.log("yha tak agya")
+    if(latitude == 0 || longitude == 0){
+      return res.status(500).json({
+              success: false,
+              message: "Please send us the location"
+      })
     }
       let media = req.files?.media;
       

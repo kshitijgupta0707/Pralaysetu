@@ -12,7 +12,7 @@ import { acceptHelpRequest , rejectHelpRequest , completeHelpRequest } from "../
 const router = express.Router();
 
 // Normal users create help requests
-router.post("/request", authenticate, authorizeRoles('User') ,createHelpRequest);
+router.post("/request", authenticate, authorizeRoles('None') ,createHelpRequest);
 
 router.get("/rejected", authenticate, authorizeRoles("Admin"), getAllRejectedHelpRequests);
 

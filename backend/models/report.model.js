@@ -5,15 +5,22 @@ const reportSchema = new mongoose.Schema({
   disasterType: { type: String, required: true }, // e.g. flood, fire, earthquake
   description: { type: String },
   imageUrl: { type: String },
-  latitude: { type: Number }
- ,longitude: { type: Number },
+  latitude: {
+    type: Number
+    , required: true
+  }
+  ,
+  longitude: {
+    type: Number,
+    required: true
+  },
   status: {
     type: String,
     enum: ["pending", "verified", "rejected"],
     default: "pending",
   },
   createdAt: { type: Date, default: Date.now },
-  verifiedBy : {
+  verifiedBy: {
     type: String,
     default: "Admin"
   }

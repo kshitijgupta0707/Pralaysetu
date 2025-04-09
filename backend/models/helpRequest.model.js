@@ -8,12 +8,13 @@ const helpRequestSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    location: {
-      type: {
-        lat: Number,
-        lng: Number,
-      },
-      required: true,
+    latitude: {
+      type: Number,
+      required: true
+    },
+    longitude: {
+      type: Number,
+      required: true
     },
     reason: {
       type: String,

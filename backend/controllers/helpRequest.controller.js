@@ -6,33 +6,37 @@ import { io, getReceiverSocketId } from "../config/socket.js";
 // Create Help Request
 export const createHelpRequest = async (req, res) => {
     try {
-        console.log("Creating help request:", req.body);
-        const { location, reason, urgency } = req.body;
-
-        if (!location || !reason) {
-            return res.status(400).json({ success: false, message: "Location and reason are required." });
-        }
-
-        let photoUrl = "";
-
-        // Optional image upload to Cloudinary
-        if (req.files && req.files.photo) {
-            console.log("i am not inside the if block")
-            const result = await cloudinary.uploader.upload(req.files.photo.tempFilePath, {
-                folder: "pralaysetu/helpRequests",
-            });
-            photoUrl = result.secure_url;
-        }
-    console.log("user id", req.user)
-        const helpRequest = await HelpRequest.create({
-            user: req.user._id,
-            location,
-            reason,
-            urgency,
-            photo: photoUrl,
+      console.log(1)
+      console.log("creating the help request")  
+      console.log("Creating help request:", req.body);
+      const { latitude , longitude, reason, urgency } = req.body;
+      
+      if (!latitude || !longitude || !urgency || !reason) {
+        console.log("Enter all the details")
+        return res.status(400).json({ success: false, message: "Location and reason are required." });
+      }
+      
+      let photoUrl = "";
+      
+      // Optional image upload to Cloudinary
+      if (req.files && req.files.photo) {
+        console.log("i am not inside the if block")
+        const result = await cloudinary.uploader.upload(req.files.photo.tempFilePath, {
+          folder: "pralaysetu/helpRequests",
         });
-
-        res.status(201).json({
+        photoUrl = result.secure_url;
+      }
+      console.log("user id", req.user)
+      const helpRequest = await HelpRequest.create({
+        user: req.user._id,
+        latitude,
+        longitude,
+        reason,
+        urgency,
+        photo: photoUrl,
+      });
+      console.log(2)
+      res.status(201).json({
             success: true,
             message: "Help request created successfully.",
             helpRequest,
