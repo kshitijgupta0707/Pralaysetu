@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "/";
+// const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "/";
 export const useAuthStore = create((set, get) => ({
   authUser: null,
   formData: null,
@@ -103,31 +103,31 @@ export const useAuthStore = create((set, get) => ({
       toast.error(error.response.data.message);
     }
   },
-  connectSocket: () => {
-    const { authUser } = get();
-    //alreadyConnected or not autheticated - not do it
-    if (!authUser || get().socket?.connected) return;
+  // connectSocket: () => {
+  //   const { authUser } = get();
+  //   //alreadyConnected or not autheticated - not do it
+  //   if (!authUser || get().socket?.connected) return;
 
-    const socket = io(BASE_URL, {
-      // i am sending some data to the backend 
-      // sending the userId to know who is online
-      query: {
-        userId: authUser._id,
-        userName: authUser.firstName
-      },
-    }
-    );
-    //connection established by the user with io so it give notification to the backend 
-    //and you have written what to do now in backend
-    socket.connect();
+  //   const socket = io(BASE_URL, {
+  //     // i am sending some data to the backend 
+  //     // sending the userId to know who is online
+  //     query: {
+  //       userId: authUser._id,
+  //       userName: authUser.firstName
+  //     },
+  //   }
+  //   );
+  //   //connection established by the user with io so it give notification to the backend 
+  //   //and you have written what to do now in backend
+  //   socket.connect();
 
-    set({ socket: socket });
+  //   set({ socket: socket });
 
-    socket.on("getOnlineUsers", (userIds) => {
-      set({ onlineUsers: userIds });
-    });
-  },
-  disconnectSocket: () => {
-    if (get().socket?.connected) get().socket.disconnect();
-  },
+  //   socket.on("getOnlineUsers", (userIds) => {
+  //     set({ onlineUsers: userIds });
+  //   });
+  // },
+  // disconnectSocket: () => {
+  //   if (get().socket?.connected) get().socket.disconnect();
+  // },
 }));
