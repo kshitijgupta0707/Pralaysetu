@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, AlertTriangle, FileText, Users, Settings, LogOut, Search, Filter, X, Check, MapPin, Clock, User, MessageSquare } from 'lucide-react';
+import { Bell, AlertTriangle, FileText, Users, Settings, LogOut, Search, Filter, X, Check, MapPin, Clock, User, MessageSquare 
+  ,Menu
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +25,7 @@ const AdminDashboard = () => {
   const [showBroadcastDialog, setShowBroadcastDialog] = useState(false);
   const [broadcastType, setBroadcastType] = useState('alert');
   const [broadcastRegion, setBroadcastRegion] = useState('all');
+  const [showSidebar, setShowSidebar] = useState(false);
   // Extract data and functions from adminStore
   const { 
     pendingUsers, 
@@ -244,13 +247,21 @@ const handleStatusChange = (status) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow-md">
-        <Link to={"/"} >
-        <div className="p-4 border-b">
-          <h2 className="text-xl font-bold">PralaySetu Admin</h2>
-        </div>
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
+      {/* Sidebar - becomes top navigation on mobile */}
+      <div className={`w-full lg:w-64 bg-white shadow-md ${showSidebar ? 'block' : 'hidden lg:block'}`}>
+        <Link to={"/"}>
+          <div className="p-4 border-b flex items-center justify-between">
+            <h2 className="text-xl font-bold">PralaySetu Admin</h2>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="lg:hidden" 
+              onClick={() => setShowSidebar(false)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
         </Link>
         <nav className="p-2">
           <ul className="space-y-1">
@@ -258,7 +269,10 @@ const handleStatusChange = (status) => {
               <Button 
                 variant={activeTab === 'reports' ? "default" : "ghost"} 
                 className="w-full justify-start" 
-                onClick={() => setActiveTab('reports')}
+                onClick={() => {
+                  setActiveTab('reports');
+                  setShowSidebar(false);
+                }}
               >
                 <FileText className="mr-2 h-4 w-4" />
                 Reports
@@ -268,7 +282,10 @@ const handleStatusChange = (status) => {
               <Button 
                 variant={activeTab === 'help' ? "default" : "ghost"} 
                 className="w-full justify-start" 
-                onClick={() => setActiveTab('help')}
+                onClick={() => {
+                  setActiveTab('help');
+                  setShowSidebar(false);
+                }}
               >
                 <AlertTriangle className="mr-2 h-4 w-4" />
                 Help Requests
@@ -278,7 +295,10 @@ const handleStatusChange = (status) => {
               <Button 
                 variant={activeTab === 'responders' ? "default" : "ghost"} 
                 className="w-full justify-start" 
-                onClick={() => setActiveTab('responders')}
+                onClick={() => {
+                  setActiveTab('responders');
+                  setShowSidebar(false);
+                }}
               >
                 <Users className="mr-2 h-4 w-4" />
                 Responders
@@ -288,7 +308,10 @@ const handleStatusChange = (status) => {
               <Button 
                 variant={activeTab === 'settings' ? "default" : "ghost"} 
                 className="w-full justify-start" 
-                onClick={() => setActiveTab('settings')}
+                onClick={() => {
+                  setActiveTab('settings');
+                  setShowSidebar(false);
+                }}
               >
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
@@ -299,23 +322,41 @@ const handleStatusChange = (status) => {
       </div>
   
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold">{activeTab === 'reports' ? 'Disaster Reports' : 
-                                                 activeTab === 'help' ? 'Help Requests' :
-                                                 activeTab === 'responders' ? 'Responders' : 'Settings'}</h1>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="lg:hidden" 
+              onClick={() => setShowSidebar(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl md:text-2xl font-bold truncate">
+              {activeTab === 'reports' ? 'Disaster Reports' : 
+               activeTab === 'help' ? 'Help Requests' :
+               activeTab === 'responders' ? 'Responders' : 'Settings'}
+            </h1>
           </div>
           <div className="flex items-center space-x-2">
             <Button 
               variant="outline" 
               size="sm" 
               onClick={() => setShowBroadcastDialog(true)} 
-              className="flex items-center"
+              className="hidden sm:flex items-center"
             >
               <Bell className="h-4 w-4 mr-2" />
               Broadcast Alert
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowBroadcastDialog(true)}
+              className="sm:hidden"
+            >
+              <Bell className="h-4 w-4" />
             </Button>
             <Avatar>
               <AvatarImage src="/placeholder-user.jpg" />
@@ -324,68 +365,64 @@ const handleStatusChange = (status) => {
           </div>
         </header>
   
-        {/* Content Area */}
-        <main className="p-6">
+        {/* Content Area with Scroll */}
+        <main className="p-3 md:p-6 overflow-auto flex-1">
           {activeTab === 'reports' && (
             <div className="space-y-4">
-              {/* Filter and Search */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                    <Input
-                      type="search"
-                      placeholder="Search reports..."
-                      className="pl-8 w-64"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                   <div className="flex flex-wrap gap-2">
-      <button 
-        className={`px-3 py-1 rounded-md border ${filterStatus === 'all' 
-          ? 'bg-blue-500 text-white border-blue-600' 
-          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
-        onClick={() => handleStatusChange('all')}
-      >
-        All Status
-      </button>
-      
-      <button 
-        className={`px-3 py-1 rounded-md border ${filterStatus === 'pending' 
-          ? 'bg-yellow-500 text-white border-yellow-600' 
-          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
-        onClick={() => handleStatusChange('pending')}
-      >
-        Pending
-      </button>
-      
-      <button 
-        className={`px-3 py-1 rounded-md border ${filterStatus === 'verified' 
-          ? 'bg-green-500 text-white border-green-600' 
-          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
-        onClick={() => handleStatusChange('verified')}
-      >
-        Verified
-      </button>
-      
-      <button 
-        className={`px-3 py-1 rounded-md border ${filterStatus === 'rejected' 
-          ? 'bg-red-500 text-white border-red-600' 
-          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
-        onClick={() => handleStatusChange('rejected')}
-      >
-        Rejected
-      </button>
-    </div>
-
-
+              {/* Filter and Search - Responsive */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 ml-8 mr-8">
+                <div className="w-full sm:w-auto relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                  <Input
+                    type="search"
+                    placeholder="Search reports..."
+                    className="pl-8 w-full sm:w-64  "
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto mt-2 sm:mt-0 items-center justify-center text-xs-mobile  ">
+                  <button 
+                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'all' 
+                      ? 'bg-blue-500 text-white border-blue-600' 
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
+                    onClick={() => handleStatusChange('all')}
+                  >
+                    All
+                  </button>
+                  
+                  <button 
+                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'pending' 
+                      ? 'bg-yellow-500 text-white border-yellow-600' 
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
+                    onClick={() => handleStatusChange('pending')}
+                  >
+                    Pending
+                  </button>
+                  
+                  <button 
+                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'verified' 
+                      ? 'bg-green-500 text-white border-green-600' 
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
+                    onClick={() => handleStatusChange('verified')}
+                  >
+                    Verified
+                  </button>
+                  
+                  <button 
+                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'rejected' 
+                      ? 'bg-red-500 text-white border-red-600' 
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
+                    onClick={() => handleStatusChange('rejected')}
+                  >
+                    Rejected
+                  </button>
                 </div>
               </div>
   
-              {/* Reports Grid */}
+              {/* Reports Grid - Responsive */}
               {isLoading ? (
-                <div className="flex justify-center p-8">
+                <div className="flex justify-center p-8 ">
                   <p>Loading reports...</p>
                 </div>
               ) : filteredReports.length === 0 ? (
@@ -393,61 +430,58 @@ const handleStatusChange = (status) => {
                   <p className="text-gray-500">No reports match your filters</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                 {filteredReports.map(report => (
-  <Card key={report._id} className="overflow-hidden">
-    <CardHeader className="pb-2">
-      <div className="flex justify-between items-start">
-        <div>
-          <CardTitle className="flex items-center">
-            <Badge className="mr-2">{report.disasterType}</Badge>
-            {getStatusBadge(report.status)}
-          </CardTitle>
-          {/* <CardDescription className="pt-1">
-            Reported by {report.user?.firstName || "Anonymous"}
-          </CardDescription> */}
-        </div>
-        <div className="text-xs text-gray-500">
-          {formatDate(report.createdAt)}
-        </div>
-      </div>
-    </CardHeader>
-    <CardContent className="pb-2">
-      <img 
-        src={report.imageUrl} 
-        alt={report.disasterType} 
-        className="w-full h-40 object-cover rounded-md mb-2"
-      />
-      <p className="text-sm">{report.description}</p>
-      <div className="flex items-center text-xs text-gray-500 mt-2">
-        <MapPin className="h-3 w-3 mr-1" />
-        <span>Lat: {report.latitude?.toFixed(4)}, Long: {report.longitude?.toFixed(4)}</span>
-      </div>
-    </CardContent>
-    {report.status === 'pending' && (
-      <CardFooter className="flex justify-between pt-2">
-        <Button 
-          size="sm" 
-          variant="outline" 
-          className="border-green-500 text-green-500 hover:bg-green-50" 
-          onClick={() => handleVerifyReport(report._id)}
-        >
-          <Check className="h-4 w-4 mr-1" />
-          Verify
-        </Button>
-        <Button 
-          size="sm" 
-          variant="outline" 
-          className="border-red-500 text-red-500 hover:bg-red-50" 
-          onClick={() => handleRejectReport(report._id)}
-        >
-          <X className="h-4 w-4 mr-1" />
-          Reject
-        </Button>
-      </CardFooter>
-    )}
-  </Card>
-))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredReports.map(report => (
+                    <Card key={report._id} className="overflow-hidden">
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="flex items-center flex-wrap gap-1">
+                              <Badge className="mr-2">{report.disasterType}</Badge>
+                              {getStatusBadge(report.status)}
+                            </CardTitle>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {formatDate(report.createdAt)}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pb-2">
+                        <img 
+                          src={report.imageUrl} 
+                          alt={report.disasterType} 
+                          className="w-full h-40 object-cover rounded-md mb-2"
+                        />
+                        <p className="text-sm">{report.description}</p>
+                        <div className="flex items-center text-xs text-gray-500 mt-2">
+                          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                          <span className="truncate">Lat: {report.latitude?.toFixed(4)}, Long: {report.longitude?.toFixed(4)}</span>
+                        </div>
+                      </CardContent>
+                      {report.status === 'pending' && (
+                        <CardFooter className="flex justify-between pt-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-green-500 text-green-500 hover:bg-green-50" 
+                            onClick={() => handleVerifyReport(report._id)}
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            Verify
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-red-500 text-red-500 hover:bg-red-50" 
+                            onClick={() => handleRejectReport(report._id)}
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Reject
+                          </Button>
+                        </CardFooter>
+                      )}
+                    </Card>
+                  ))}
                 </div>
               )}
             </div>
@@ -455,21 +489,21 @@ const handleStatusChange = (status) => {
   
           {activeTab === 'help' && (
             <div className="space-y-4">
-              {/* Filter and Search */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                    <Input
-                      type="search"
-                      placeholder="Search help requests..."
-                      className="pl-8 w-64"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
+              {/* Filter and Search - Responsive */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                <div className="w-full sm:w-auto relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                  <Input
+                    type="search"
+                    placeholder="Search help requests..."
+                    className="pl-8 w-full"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <div className="w-full sm:w-auto">
                   <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger className="w-32">
+                    <SelectTrigger className="w-full sm:w-32">
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -484,7 +518,7 @@ const handleStatusChange = (status) => {
                 </div>
               </div>
   
-              {/* Help Requests List */}
+              {/* Help Requests - Responsive Grid */}
               {isLoading ? (
                 <div className="flex justify-center p-8">
                   <p>Loading help requests...</p>
@@ -494,13 +528,13 @@ const handleStatusChange = (status) => {
                   <p className="text-gray-500">No help requests match your filters</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredHelpRequests.map(request => (
                     <Card key={request._id} className="overflow-hidden">
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start">
                           <div>
-                            <CardTitle className="flex items-center space-x-2">
+                            <CardTitle className="flex items-center flex-wrap gap-1">
                               <Badge className={`${getUrgencyColor(request.urgency)} text-white`}>
                                 {request.urgency.charAt(0).toUpperCase() + request.urgency.slice(1)}
                               </Badge>
@@ -525,8 +559,8 @@ const handleStatusChange = (status) => {
                         )}
                         <p className="text-sm">{request.reason}</p>
                         <div className="flex items-center text-xs text-gray-500 mt-2">
-                          <MapPin className="h-3 w-3 mr-1" />
-                          <span>Lat: {request.location.lat.toFixed(4)}, Long: {request.location.lng.toFixed(4)}</span>
+                          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                          <span className="truncate">Lat: {request.location.lat.toFixed(4)}, Long: {request.location.lng.toFixed(4)}</span>
                         </div>
                         {request.status === 'assigned' && (
                           <div className="flex items-center text-xs text-blue-500 mt-1">
@@ -592,13 +626,15 @@ const handleStatusChange = (status) => {
   
           {activeTab === 'responders' && (
             <div className="space-y-6">
-              <Tabs defaultValue="active">
-                <TabsList>
-                  <TabsTrigger value="active">Active Responders</TabsTrigger>
-                  <TabsTrigger value="responders"> Responders</TabsTrigger>
-                  <TabsTrigger value="pending">Pending Registrations</TabsTrigger>
-                  <TabsTrigger value="entities"> Registered Registrations</TabsTrigger>
-                </TabsList>
+              <Tabs defaultValue="active" className="w-full">
+                <div className="overflow-x-auto">
+                  <TabsList className="mb-2">
+                    <TabsTrigger value="active">Active Responders</TabsTrigger>
+                    <TabsTrigger value="responders">Responders</TabsTrigger>
+                    <TabsTrigger value="pending">Pending Registrations</TabsTrigger>
+                    <TabsTrigger value="entities">Registered Entities</TabsTrigger>
+                  </TabsList>
+                </div>
                 
                 <TabsContent value="active" className="mt-4">
                   <div className="bg-white rounded-lg shadow">
@@ -638,7 +674,7 @@ const handleStatusChange = (status) => {
                       <Card key={registration._id}>
                         <CardHeader>
                           <CardTitle>{registration.registerAs}</CardTitle>
-                          <CardDescription>
+                          <CardDescription className="text-sm">
                             <span className="font-semibold">Type:</span> {registration.type} | 
                             <span className="font-semibold ml-2">Applied on:</span> {formatDate(registration.createdAt)}
                           </CardDescription>
@@ -652,7 +688,7 @@ const handleStatusChange = (status) => {
                               </div>
                               <div>
                                 <span className="text-sm font-medium">Email:</span>
-                                <p>{registration.email}</p>
+                                <p className="break-words">{registration.email}</p>
                               </div>
                               <div>
                                 <span className="text-sm font-medium">Phone:</span>
@@ -675,10 +711,10 @@ const handleStatusChange = (status) => {
                             </div>
                           </div>
                         </CardContent>
-                        <CardFooter className="flex justify-between">
+                        <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
                           <Button 
                             variant="outline" 
-                            className="border-green-500 text-green-500 hover:bg-green-50"
+                            className="border-green-500 text-green-500 hover:bg-green-50 w-full sm:w-auto"
                             onClick={() => handleApproveRegistration(registration._id)}
                           >
                             <Check className="h-4 w-4 mr-1" />
@@ -686,7 +722,7 @@ const handleStatusChange = (status) => {
                           </Button>
                           <Button 
                             variant="outline" 
-                            className="border-red-500 text-red-500 hover:bg-red-50"
+                            className="border-red-500 text-red-500 hover:bg-red-50 w-full sm:w-auto"
                             onClick={() => handleRejectRegistration(registration._id)}
                           >
                             <X className="h-4 w-4 mr-1" />
@@ -696,101 +732,102 @@ const handleStatusChange = (status) => {
                       </Card>
                     ))}
                     
-                    {pendingUsers .length === 0 && (
+                    {pendingUsers.length === 0 && (
                       <div className="text-center p-8 bg-white rounded-lg border">
                         <p className="text-gray-500">No pending registration requests</p>
                       </div>
                     )}
                   </div>
                 </TabsContent>
+                
                 <TabsContent value="responders">
-          {loading ? (
-            <div className="text-center py-10">Loading responders...</div>
-          ) : responders.length === 0 ? (
-            <div className="text-center py-10">No responders found.</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {responders.map(responder => (
-                <div key={responder._id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <img 
-                      src={responder.profilePic || "/placeholder-user.jpg"} 
-                      alt={`${responder.firstName} ${responder.lastName}`} 
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    <div>
-                      <h3 className="font-semibold">
-                        {responder.firstName} {responder.lastName}
-                      </h3>
-                      <p className="text-sm text-gray-600">{responder.email}</p>
+                  {loading ? (
+                    <div className="text-center py-10">Loading responders...</div>
+                  ) : responders.length === 0 ? (
+                    <div className="text-center py-10">No responders found.</div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {responders.map(responder => (
+                        <div key={responder._id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow p-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <img 
+                              src={responder.profilePic || "/placeholder-user.jpg"} 
+                              alt={`${responder.firstName} ${responder.lastName}`} 
+                              className="w-12 h-12 rounded-full object-cover"
+                            />
+                            <div className="overflow-hidden">
+                              <h3 className="font-semibold truncate">
+                                {responder.firstName} {responder.lastName}
+                              </h3>
+                              <p className="text-sm text-gray-600 truncate">{responder.email}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2 mb-2 flex-wrap">
+                            <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
+                              {responder.registerAs || "Responder"}
+                            </Badge>
+                          </div>
+                          
+                          <div className="mt-3 flex justify-end">
+                            <Button variant="outline" size="sm">
+                              View Profile
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                  
-                  <div className="flex gap-2 mb-2">
-                    <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
-                      {responder.registerAs || "Responder"}
-                    </Badge>
-                  </div>
-                  
-                  <div className="mt-3 flex justify-end">
-                    <Button variant="outline" size="sm">
-                      View Profile
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                  )}
                 </TabsContent>
-                 {/* Verified Entities Tab */}
-          <TabsContent value="entities">
-            {loading ? (
-              <div className="text-center py-10">Loading verified entities...</div>
-            ) : verifiedEntities.length === 0 ? (
-              <div className="text-center py-10">No verified entities found.</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {verifiedEntities.map(entity => (
-                  <div key={entity._id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <img 
-                        src={entity.profilePic || "/placeholder-user.jpg"} 
-                        alt={`${entity.firstName} ${entity.lastName}`} 
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                      <div>
-                        <h3 className="font-semibold">
-                          {entity.firstName} {entity.lastName}
-                        </h3>
-                        <p className="text-sm text-gray-600">{entity.email}</p>
-                      </div>
+                
+                <TabsContent value="entities">
+                  {loading ? (
+                    <div className="text-center py-10">Loading verified entities...</div>
+                  ) : verifiedEntities.length === 0 ? (
+                    <div className="text-center py-10">No verified entities found.</div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {verifiedEntities.map(entity => (
+                        <div key={entity._id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow p-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <img 
+                              src={entity.profilePic || "/placeholder-user.jpg"} 
+                              alt={`${entity.firstName} ${entity.lastName}`} 
+                              className="w-12 h-12 rounded-full object-cover"
+                            />
+                            <div className="overflow-hidden">
+                              <h3 className="font-semibold truncate">
+                                {entity.firstName} {entity.lastName}
+                              </h3>
+                              <p className="text-sm text-gray-600 truncate">{entity.email}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2 mb-2 flex-wrap">
+                            <Badge variant="outline" className={`${
+                              entity.registerAs === 'Government' 
+                                ? 'bg-purple-100 text-purple-800 border-purple-200' 
+                                : 'bg-green-100 text-green-800 border-green-200'
+                            }`}>
+                              {entity.registerAs}
+                            </Badge>
+                            {entity.workAsResponder && (
+                              <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
+                                Responder
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          <div className="mt-3 flex justify-end">
+                            <Button variant="outline" size="sm">
+                              View Profile
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    
-                    <div className="flex gap-2 mb-2">
-                      <Badge variant="outline" className={`${
-                        entity.registerAs === 'Government' 
-                          ? 'bg-purple-100 text-purple-800 border-purple-200' 
-                          : 'bg-green-100 text-green-800 border-green-200'
-                      }`}>
-                        {entity.registerAs}
-                      </Badge>
-                      {entity.workAsResponder && (
-                        <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
-                          Responder
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    <div className="mt-3 flex justify-end">
-                      <Button variant="outline" size="sm">
-                        View Profile
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </TabsContent>
+                  )}
+                </TabsContent>
               </Tabs>
             </div>
           )}
@@ -822,7 +859,7 @@ const handleStatusChange = (status) => {
   
       {/* Broadcast Dialog */}
       <Dialog open={showBroadcastDialog} onOpenChange={setShowBroadcastDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-w-[95vw] mx-auto">
           <DialogHeader>
             <DialogTitle>Broadcast Alert</DialogTitle>
             <DialogDescription>
@@ -867,11 +904,11 @@ const handleStatusChange = (status) => {
               />
             </div>
           </div>
-          <DialogFooter className="sm:justify-between">
-            <Button variant="outline" onClick={() => setShowBroadcastDialog(false)}>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setShowBroadcastDialog(false)} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button type="submit" onClick={handleBroadcast} disabled={!broadcastMessage.trim()}>
+            <Button type="submit" onClick={handleBroadcast} disabled={!broadcastMessage.trim()} className="w-full sm:w-auto">
               Broadcast Now
             </Button>
           </DialogFooter>

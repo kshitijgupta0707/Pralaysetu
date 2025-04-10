@@ -1,6 +1,18 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+
+@media (max-width: 380px) {
+  .text-xs-mobile {
+    gap: 1;
+    font-size: 1px;
+    padding: 0;
+    flex-wrap: nowrap;
+    /* background: red; */
+  }
+}
+
+
 @keyframes blob {
   0% {
     transform: scale(1);
