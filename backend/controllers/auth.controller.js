@@ -320,7 +320,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       //STRICT IF HOSTED TOGETHER
-     sameSite: "None", //Allow cross-site cookies
+      sameSite: "None", //Allow cross-site cookies
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     }
 
