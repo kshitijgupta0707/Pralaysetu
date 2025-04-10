@@ -58,21 +58,21 @@ export const sendOtp = async (req, res) => {
         message: "Error in saving otp",
       });
     }
-    
+
     //send otp to the user email
     const mailResponse = await mailSender(
       email,
       "Email Verification",
       otpTemplate(otp));
-      console.log("mail response", mailResponse);
-      //check if mail is sent or not
+    console.log("mail response", mailResponse);
+    //check if mail is sent or not
     if (!mailResponse) {
       return res.status(400).json({
         success: false,
         message: "Error in sending otp",
       });
     }
-    
+
 
     //return succesfull response
     return res.status(200).json({
@@ -92,11 +92,11 @@ export const sendOtp = async (req, res) => {
 }
 export const signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, registerAs  , workAsResponder, password, confirmPassword , otp , location } = req.body;
+    const { firstName, lastName, email, registerAs, workAsResponder, password, confirmPassword, otp, location } = req.body;
 
-     let governmentDocument =    req.files?.governmentDocument;
+    let governmentDocument = req.files?.governmentDocument;
     // let media = req.files?.media;
-    
+
     //check if some data is missing
     console.log(req.body)
     if (!firstName || !lastName || !email || !registerAs || !workAsResponder || !password || !otp) {
@@ -105,51 +105,51 @@ export const signup = async (req, res) => {
         message: "All fields are required"
       });
     }
-    if(registerAs == "Government"|| registerAs == "NGO"){
-        if(!governmentDocument){
-          return res.status(400).json({
-            success: false,
-            message: "Government document is required"
-          })
-        }
+    if (registerAs == "Government" || registerAs == "NGO") {
+      if (!governmentDocument) {
+        return res.status(400).json({
+          success: false,
+          message: "Government document is required"
+        })
+      }
     }
-    
+
     if (governmentDocument) {
       const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
       if (!allowedTypes.includes(governmentDocument.mimetype)) {
         return res.status(400).json({ message: "Only JPG and PNG files are allowed" });
       }
-    
+
       if (governmentDocument.size > 200 * 1024) {
         return res.status(400).json({ message: "Media size must be less than 200Kb" });
       }
-    
+
       const uploadResponse = await uploadImageToCloudinary(governmentDocument, "PralaySetu");
-    
+
       if (!uploadResponse || !uploadResponse.secure_url) {
         return res.status(500).json({ message: "Document upload failed" });
       }
-    
+
       //  Assign only the URL string
       governmentDocument = uploadResponse.secure_url;
     }
-    
-    
-        //check whether length is >= 6
-        if (password.length < 6) {
-          return res.status(400).json({
-            success: false,
-            message: "Password must be at least 6 characters"
-          });
-        }
-  if(password !== confirmPassword) {
-    return res.status(400).json({
-      success: false,
-      message: "Password and confirm password do not match"
-    });
-  }
 
-   //check if user already exist
+
+    //check whether length is >= 6
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters"
+      });
+    }
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Password and confirm password do not match"
+      });
+    }
+
+    //check if user already exist
     //use find one it gives an single object
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -160,9 +160,9 @@ export const signup = async (req, res) => {
         message: "User already exists",
       });
     }
-    
 
-     //compare the otp
+
+    //compare the otp
     //find the most recent stored for the user
 
     const recentOtp = await OTP.find({ email })
@@ -218,11 +218,11 @@ export const signup = async (req, res) => {
     }
 
 
-    
-    
-    
+
+
+
     //entry in db
-    
+
     const user = await User.create({
       firstName,
       lastName,
@@ -235,19 +235,19 @@ export const signup = async (req, res) => {
     if (registerAs === "NGO" || registerAs === "Government") {
       // Save the registration with status "pending"
       // Notify admin via email / dashboard
-      const sendMail = mailSender(email , "Registration Request" , `Your request to register as a ${registerAs} has been recieved . We will notify you soon`);
+      const sendMail = mailSender(email, "Registration Request", `Your request to register as a ${registerAs} has been recieved . We will notify you soon`);
       return res.status(200).json({
         message: "Your registration request has been received and is pending admin approval.",
       });
     }
-    
-    
+
+
     return res.status(200).json({
       success: true,
       message: "Account created successfully",
       user
     });
-  }catch (error) {
+  } catch (error) {
     console.log(error);
     res.json({
       message: "User cannot be registed, Please try again later",
@@ -272,7 +272,7 @@ export const login = async (req, res) => {
     // Compare password with hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: "Invalid credentials"  });
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
     //checking if the user exist if verified by the 
@@ -315,12 +315,13 @@ export const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
-    
+
     const options = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       //STRICT IF HOSTED TOGETHER
-      sameSite: "None", //Allow cross-site cookies
+       //Allow cross-site cookies
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     }
 
@@ -329,7 +330,7 @@ export const login = async (req, res) => {
 
 
     // Send token in HTTP-only cookie
-    res.cookie("token", token,options).status(200).json({
+    res.cookie("token", token, options).status(200).json({
       success: true,
       message: "Login successful",
       token,
