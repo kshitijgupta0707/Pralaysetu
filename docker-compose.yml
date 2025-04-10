@@ -9,7 +9,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - "500:5173"
+      - "5173:5173"
     env_file:
       - ./frontend/.env
     depends_on:
