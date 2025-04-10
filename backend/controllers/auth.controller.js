@@ -345,7 +345,13 @@ export const login = async (req, res) => {
 };
 export const logout = async (req, res) => {
   try {
-    res.cookie("token", "", { maxAge: 0 }); //expire immediattely get removed by maxage , erased by " "
+    res.cookie("token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Strict",
+      expires: new Date(0), // Alternatively to maxAge
+    });
+     //expire immediattely get removed by maxage , erased by " "
 
     res.status(200).json({
       success: true,
