@@ -1,6 +1,6 @@
 // routes/help.routes.js
 import express from "express";
-import { createHelpRequest , verifyOrRejectHelpRequest , getAllVerifiedHelpRequests, assignHelpRequest , getAllPendingRequests
+import { createHelpRequest , verifyOrRejectHelpRequest , getAllVerifiedHelpRequests, assignHelpRequest , getAllRequests
     ,getAllRejectedHelpRequests ,
     getAssignedRequestsForResponder
 } from "../controllers/helpRequest.controller.js";
@@ -19,11 +19,18 @@ router.get("/rejected", authenticate, authorizeRoles("Admin"), getAllRejectedHel
 // Admin-only routes
 // Admins can view all pending requests, verify them, and assign them to responders
 
-router.get("/pending", authenticate, authorizeRoles("Admin"), getAllPendingRequests);
+router.get("/pending", authenticate, authorizeRoles("Admin"), getAllRequests);
 router.put("/verify/:id", authenticate, authorizeRoles("Admin"), verifyOrRejectHelpRequest);
 
-router.get("/verified", authenticate, getAllVerifiedHelpRequests);
+router.get("/verified", authenticate, authorizeRoles("Admin"), getAllVerifiedHelpRequests);
 router.put("/assign/:id", authenticate, authorizeRoles("Admin"), assignHelpRequest);
+
+
+
+
+
+
+
 
 //get all assigned requests for a specific responder
 router.get("/assigned", authenticate, authorizeRoles("Government", "Responder"), getAssignedRequestsForResponder);

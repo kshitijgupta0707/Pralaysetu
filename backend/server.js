@@ -6,10 +6,10 @@ import cors from "cors";
 import path from "path";
 import { dbConnect } from "./config/database.js";
 import authRoutes from "./routes/auth.route.js";
-import reportRoutes from "./routes/report.route.js";    
+import reportRoutes from "./routes/report.route.js";
 import fileUpload from "express-fileupload";
 import cookieParser from "cookie-parser";
-import { app , server } from "./config/socket.js";
+import { app, server } from "./config/socket.js";
 import { connectCloudinary } from "./config/cloudinary.js";
 import helpRoutes from "./routes/help.route.js"
 import dashboardRoutes from "./routes/dashboard.route.js";
@@ -23,20 +23,20 @@ dotenv.config();
 //to remove cors error
 // Middleware for parsing files
 app.use(
-    fileUpload({
-      useTempFiles: true, // Enables temporary file storage
-      tempFileDir: "/tmp/", // Temporary directory for uploaded files
-    })
-  );
+  fileUpload({
+    useTempFiles: true, // Enables temporary file storage
+    tempFileDir: "/tmp/", // Temporary directory for uploaded files
+  })
+);
 app.use(cors(
-    {
+  {
 
-      origin: ["http://localhost:5173",
-         "https://pralaysetu.vercel.app"],
-      credentials: true
+    origin: ["http://localhost:5173",
+      "https://pralaysetu.vercel.app"],
+    credentials: true
 
-    }
-  ))
+  }
+))
 //so you can send json response and request
 app.use(express.json());
 
@@ -55,7 +55,7 @@ app.use("/api/admin", adminRoutes);
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
 
-    console.log(`Server running on port ${PORT}`)
-    dbConnect()
-    connectCloudinary()
+  console.log(`Server running on port ${PORT}`)
+  dbConnect()
+  connectCloudinary()
 });

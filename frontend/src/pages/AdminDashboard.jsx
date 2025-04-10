@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, AlertTriangle, FileText, Users, Settings, LogOut, Search, Filter, X, Check, MapPin, Clock, User, MessageSquare 
-  ,Menu
+import {
+  Bell, AlertTriangle, FileText, Users, Settings, LogOut, Search, Filter, X, Check, MapPin, Clock, User, MessageSquare
+  , Menu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,10 +14,26 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useReportStore } from '@/store/useReportStore';
+import { useHelpStore } from '@/store/useHelpStore';
 import { Link } from 'react-router-dom';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('reports');
-  const [helpRequests, setHelpRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,137 +43,90 @@ const AdminDashboard = () => {
   const [broadcastType, setBroadcastType] = useState('alert');
   const [broadcastRegion, setBroadcastRegion] = useState('all');
   const [showSidebar, setShowSidebar] = useState(false);
+  // Add these state variables to your component
+  const [confirmAssignmentId, setConfirmAssignmentId] = useState(null);
+  const [selectedResponderForAssignment, setSelectedResponderForAssignment] = useState(null);
   // Extract data and functions from adminStore
-  const { 
-    pendingUsers, 
-    responders, 
-    verifiedEntities, 
-    loading, 
-    fetchPendingUsers, 
-    approveUser, 
-    rejectUser, 
-    fetchAllResponders, 
-    fetchAllVerifiedEntities 
+  const {
+    pendingUsers,
+    responders,
+    verifiedEntities,
+    loading,
+    fetchPendingUsers,
+    approveUser,
+    rejectUser,
+    fetchAllResponders,
+    fetchAllVerifiedEntities
   } = useAdminStore();
   // Add this to extract methods from reportStore
-const { 
-  reports, 
-  // verifiedReports, 
-  isFetchingReports, 
-  getAllReports, 
-  verifyReport 
-} = useReportStore();
-  useEffect(()=>{
-    console.log("admin dashboard" , responders)
-  },[responders])
-  
+  const {
+    reports,
+    // verifiedReports, 
+    isFetchingReports,
+    getAllReports,
+    verifyReport
+  } = useReportStore();
+  useEffect(() => {
+    console.log("admin dashboard", responders)
+  }, [responders])
+
+  const {
+    loading: helpLoading,
+    requests: helpRequests,
+    fetchHelpRequests,
+    verifyOrRejectRequest,
+    assignHelpRequest
+  } = useHelpStore();
+
   useEffect(() => {
     // Fetch data from store
     fetchPendingUsers();
     fetchAllResponders();
     fetchAllVerifiedEntities();
-    
+
     // Simulate API calls for reports and help requests (keeping original)
     getAllReports();
     fetchHelpRequests();
   }, []);
   // Set the loading state based on the store
-useEffect(() => {
-  setIsLoading(isFetchingReports);
-}, [isFetchingReports])
-  
-const handleStatusChange = (status) => {
-  setFilterStatus(status);
-  console.log(`Status filtered to: ${status}`);
-};
+  useEffect(() => {
+    setIsLoading(isFetchingReports);
+  }, [isFetchingReports])
+  useEffect(() => {
+    setIsLoading(helpLoading);
+  }, [helpLoading]);
 
- 
-  const fetchHelpRequests = () => {
-    setIsLoading(true);
-    // Simulated API call
-    setTimeout(() => {
-      const mockHelpRequests = [
-        {
-          _id: 'help1',
-          user: { _id: 'user5', name: 'Vikram Rathore', email: 'vikram@example.com', photo: '/placeholder-user.jpg' },
-          location: { lat: 19.0760, lng: 72.8777 },
-          reason: 'Trapped in building due to flooding, water level rising, need immediate evacuation.',
-          urgency: 'critical',
-          photo: '/api/placeholder/400/300',
-          status: 'pending',
-          createdAt: '2025-04-07T08:10:00Z'
-        },
-        {
-          _id: 'help2',
-          user: { _id: 'user6', name: 'Deepa Mehta', email: 'deepa@example.com', photo: '/placeholder-user.jpg' },
-          location: { lat: 22.5726, lng: 88.3639 },
-          reason: 'Medical supplies needed for community shelter, multiple children with fever.',
-          urgency: 'high',
-          photo: '/api/placeholder/400/300',
-          status: 'verified',
-          createdAt: '2025-04-06T14:30:00Z'
-        },
-        {
-          _id: 'help3',
-          user: { _id: 'user7', name: 'Suresh Kumar', email: 'suresh@example.com', photo: '/placeholder-user.jpg' },
-          location: { lat: 17.3850, lng: 78.4867 },
-          reason: 'Elderly parents stranded, need food and water, area inaccessible by road.',
-          urgency: 'high',
-          photo: '/api/placeholder/400/300',
-          status: 'assigned',
-          assignedTo: { _id: 'resp2', name: 'NDRF Team B' },
-          createdAt: '2025-04-05T11:45:00Z'
-        },
-        {
-          _id: 'help4',
-          user: { _id: 'user8', name: 'Arjun Nair', email: 'arjun@example.com', photo: '/placeholder-user.jpg' },
-          location: { lat: 12.9716, lng: 77.5946 },
-          reason: 'Roof collapsed, family of 5 needs temporary shelter urgently.',
-          urgency: 'medium',
-          photo: '/api/placeholder/400/300',
-          status: 'completed',
-          assignedTo: { _id: 'resp1', name: 'NDRF Team A' },
-          createdAt: '2025-04-04T09:20:00Z'
-        }
-      ];
-      setHelpRequests(mockHelpRequests);
-      setIsLoading(false);
-    }, 1000);
+  const handleStatusChange = (status) => {
+    setFilterStatus(status);
+    console.log(`Status filtered to: ${status}`);
   };
-  
+
+
+
+
   const handleVerifyReport = (id) => {
     verifyReport(id, 'verified');
   };
-  
+
   const handleRejectReport = (id) => {
     verifyReport(id, 'rejected');
   };
   const handleVerifyHelpRequest = (id) => {
-    setHelpRequests(helpRequests.map(request => 
-      request._id === id ? {...request, status: 'verified'} : request
-    ));
+    verifyOrRejectRequest(id, 'verified');
   };
-  
+
   const handleRejectHelpRequest = (id) => {
-    setHelpRequests(helpRequests.map(request => 
-      request._id === id ? {...request, status: 'rejected'} : request
-    ));
+    verifyOrRejectRequest(id, 'rejected');
   };
-  
-  const handleAssignHelpRequest = (id) => {
-    if (!selectedResponder) return;
-    
-    const responder = responders.find(r => r._id === selectedResponder);
-    setHelpRequests(helpRequests.map(request => 
-      request._id === id ? {
-        ...request, 
-        status: 'assigned',
-        assignedTo: { _id: responder._id, name: responder.firstName + ' ' + responder.lastName }
-      } : request
-    ));
-    setSelectedResponder('');
+
+  const handleAssignHelpRequest = (id, responderId) => {
+    console.log("i am called");
+    console.log(id , responderId);
+    console.log(selectedResponderForAssignment)
+    assignHelpRequest(id, responderId);
+    setSelectedResponderForAssignment(null);
+    setConfirmAssignmentId(null);
   };
-  
   const handleApproveRegistration = async (id) => {
     try {
       await approveUser(id);
@@ -167,7 +137,7 @@ const handleStatusChange = (status) => {
       console.error("Error approving user:", error);
     }
   };
-  
+
   const handleRejectRegistration = async (id) => {
     try {
       await rejectUser(id);
@@ -177,39 +147,40 @@ const handleStatusChange = (status) => {
       console.error("Error rejecting user:", error);
     }
   };
-  
+
   const handleBroadcast = () => {
     if (!broadcastMessage.trim()) return;
-    
+
     // Simulate sending broadcast
     console.log('Broadcasting message:', broadcastMessage);
     console.log('Broadcast type:', broadcastType);
     console.log('Broadcast region:', broadcastRegion);
-    
+
     alert(`${broadcastType.toUpperCase()} broadcast sent successfully to ${broadcastRegion === 'all' ? 'all regions' : broadcastRegion}!`);
     setBroadcastMessage('');
     setShowBroadcastDialog(false);
   };
-  
+
   const filteredReports = reports.filter(report => {
-    const matchesSearch = 
-      (report.description?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-       report.disasterType?.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesSearch =
+      (report.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        report.disasterType?.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = filterStatus === 'all' ? true : report.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
-  
+
   const filteredHelpRequests = helpRequests.filter(request => {
-    const matchesSearch = request.reason.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          request.urgency.toLowerCase().includes(searchQuery.toLowerCase());
+    console.log(request)
+    // const matchesSearch = request.reason?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      request.urgency?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (request.user && (request.user.firstName + " " + request.user.lastName).toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = filterStatus === 'all' ? true : request.status === filterStatus;
-    return matchesSearch && matchesStatus;
+    return  matchesStatus;
   });
-  
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleString('en-IN', { 
+    return date.toLocaleString('en-IN', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -217,9 +188,9 @@ const handleStatusChange = (status) => {
       minute: '2-digit'
     });
   };
-  
+
   const getUrgencyColor = (urgency) => {
-    switch(urgency) {
+    switch (urgency) {
       case 'critical': return 'bg-red-500';
       case 'high': return 'bg-orange-500';
       case 'medium': return 'bg-yellow-500';
@@ -227,9 +198,11 @@ const handleStatusChange = (status) => {
       default: return 'bg-blue-500';
     }
   };
-  
+
   const getStatusBadge = (status) => {
-    switch(status) {
+    switch (status) {
+      case 'accepted':
+        return <Badge variant="outline" className="bg-blue-300 text-blue-800 border-blue-300">Accepted</Badge>;
       case 'pending':
         return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">Pending</Badge>;
       case 'verified':
@@ -253,10 +226,10 @@ const handleStatusChange = (status) => {
         <Link to={"/"}>
           <div className="p-4 border-b flex items-center justify-between">
             <h2 className="text-xl font-bold">PralaySetu Admin</h2>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="lg:hidden" 
+            <Button
+              variant="ghost"
+              size="sm"
+              className="lg:hidden"
               onClick={() => setShowSidebar(false)}
             >
               <X className="h-5 w-5" />
@@ -266,9 +239,9 @@ const handleStatusChange = (status) => {
         <nav className="p-2">
           <ul className="space-y-1">
             <li>
-              <Button 
-                variant={activeTab === 'reports' ? "default" : "ghost"} 
-                className="w-full justify-start" 
+              <Button
+                variant={activeTab === 'reports' ? "default" : "ghost"}
+                className="w-full justify-start"
                 onClick={() => {
                   setActiveTab('reports');
                   setShowSidebar(false);
@@ -279,9 +252,9 @@ const handleStatusChange = (status) => {
               </Button>
             </li>
             <li>
-              <Button 
-                variant={activeTab === 'help' ? "default" : "ghost"} 
-                className="w-full justify-start" 
+              <Button
+                variant={activeTab === 'help' ? "default" : "ghost"}
+                className="w-full justify-start"
                 onClick={() => {
                   setActiveTab('help');
                   setShowSidebar(false);
@@ -292,9 +265,9 @@ const handleStatusChange = (status) => {
               </Button>
             </li>
             <li>
-              <Button 
-                variant={activeTab === 'responders' ? "default" : "ghost"} 
-                className="w-full justify-start" 
+              <Button
+                variant={activeTab === 'responders' ? "default" : "ghost"}
+                className="w-full justify-start"
                 onClick={() => {
                   setActiveTab('responders');
                   setShowSidebar(false);
@@ -305,9 +278,9 @@ const handleStatusChange = (status) => {
               </Button>
             </li>
             <li>
-              <Button 
-                variant={activeTab === 'settings' ? "default" : "ghost"} 
-                className="w-full justify-start" 
+              <Button
+                variant={activeTab === 'settings' ? "default" : "ghost"}
+                className="w-full justify-start"
                 onClick={() => {
                   setActiveTab('settings');
                   setShowSidebar(false);
@@ -320,31 +293,31 @@ const handleStatusChange = (status) => {
           </ul>
         </nav>
       </div>
-  
+
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="lg:hidden" 
+            <Button
+              variant="ghost"
+              size="sm"
+              className="lg:hidden"
               onClick={() => setShowSidebar(true)}
             >
               <Menu className="h-5 w-5" />
             </Button>
             <h1 className="text-xl md:text-2xl font-bold truncate">
-              {activeTab === 'reports' ? 'Disaster Reports' : 
-               activeTab === 'help' ? 'Help Requests' :
-               activeTab === 'responders' ? 'Responders' : 'Settings'}
+              {activeTab === 'reports' ? 'Disaster Reports' :
+                activeTab === 'help' ? 'Help Requests' :
+                  activeTab === 'responders' ? 'Responders' : 'Settings'}
             </h1>
           </div>
           <div className="flex items-center space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setShowBroadcastDialog(true)} 
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowBroadcastDialog(true)}
               className="hidden sm:flex items-center"
             >
               <Bell className="h-4 w-4 mr-2" />
@@ -364,7 +337,7 @@ const handleStatusChange = (status) => {
             </Avatar>
           </div>
         </header>
-  
+
         {/* Content Area with Scroll */}
         <main className="p-3 md:p-6 overflow-auto flex-1">
           {activeTab === 'reports' && (
@@ -382,36 +355,36 @@ const handleStatusChange = (status) => {
                   />
                 </div>
                 <div className="flex flex-wrap gap-2 w-full sm:w-auto mt-2 sm:mt-0 items-center justify-center text-xs-mobile  ">
-                  <button 
-                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'all' 
-                      ? 'bg-blue-500 text-white border-blue-600' 
+                  <button
+                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'all'
+                      ? 'bg-blue-500 text-white border-blue-600'
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
                     onClick={() => handleStatusChange('all')}
                   >
                     All
                   </button>
-                  
-                  <button 
-                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'pending' 
-                      ? 'bg-yellow-500 text-white border-yellow-600' 
+
+                  <button
+                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'pending'
+                      ? 'bg-yellow-500 text-white border-yellow-600'
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
                     onClick={() => handleStatusChange('pending')}
                   >
                     Pending
                   </button>
-                  
-                  <button 
-                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'verified' 
-                      ? 'bg-green-500 text-white border-green-600' 
+
+                  <button
+                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'verified'
+                      ? 'bg-green-500 text-white border-green-600'
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
                     onClick={() => handleStatusChange('verified')}
                   >
                     Verified
                   </button>
-                  
-                  <button 
-                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'rejected' 
-                      ? 'bg-red-500 text-white border-red-600' 
+
+                  <button
+                    className={`px-3 py-1 rounded-md border text-sm ${filterStatus === 'rejected'
+                      ? 'bg-red-500 text-white border-red-600'
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
                     onClick={() => handleStatusChange('rejected')}
                   >
@@ -419,7 +392,7 @@ const handleStatusChange = (status) => {
                   </button>
                 </div>
               </div>
-  
+
               {/* Reports Grid - Responsive */}
               {isLoading ? (
                 <div className="flex justify-center p-8 ">
@@ -447,9 +420,9 @@ const handleStatusChange = (status) => {
                         </div>
                       </CardHeader>
                       <CardContent className="pb-2">
-                        <img 
-                          src={report.imageUrl} 
-                          alt={report.disasterType} 
+                        <img
+                          src={report.imageUrl}
+                          alt={report.disasterType}
                           className="w-full h-40 object-cover rounded-md mb-2"
                         />
                         <p className="text-sm">{report.description}</p>
@@ -460,19 +433,19 @@ const handleStatusChange = (status) => {
                       </CardContent>
                       {report.status === 'pending' && (
                         <CardFooter className="flex justify-between pt-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="border-green-500 text-green-500 hover:bg-green-50" 
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-green-500 text-green-500 hover:bg-green-50"
                             onClick={() => handleVerifyReport(report._id)}
                           >
                             <Check className="h-4 w-4 mr-1" />
                             Verify
                           </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="border-red-500 text-red-500 hover:bg-red-50" 
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-red-500 text-red-500 hover:bg-red-50"
                             onClick={() => handleRejectReport(report._id)}
                           >
                             <X className="h-4 w-4 mr-1" />
@@ -486,7 +459,7 @@ const handleStatusChange = (status) => {
               )}
             </div>
           )}
-  
+
           {activeTab === 'help' && (
             <div className="space-y-4">
               {/* Filter and Search - Responsive */}
@@ -517,7 +490,7 @@ const handleStatusChange = (status) => {
                   </Select>
                 </div>
               </div>
-  
+
               {/* Help Requests - Responsive Grid */}
               {isLoading ? (
                 <div className="flex justify-center p-8">
@@ -541,7 +514,7 @@ const handleStatusChange = (status) => {
                               {getStatusBadge(request.status)}
                             </CardTitle>
                             <CardDescription className="pt-1">
-                              From {request.user.name}
+                              From {request.user?.firstName + " " + request.user?.lastName || "Unknown User"}
                             </CardDescription>
                           </div>
                           <div className="text-xs text-gray-500">
@@ -551,39 +524,41 @@ const handleStatusChange = (status) => {
                       </CardHeader>
                       <CardContent className="pb-2">
                         {request.photo && (
-                          <img 
-                            src={request.photo} 
-                            alt="Help request" 
+                          <img
+                            src={request.photo}
+                            alt="Help request"
                             className="w-full h-40 object-cover rounded-md mb-2"
                           />
                         )}
                         <p className="text-sm">{request.reason}</p>
                         <div className="flex items-center text-xs text-gray-500 mt-2">
                           <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
-                          <span className="truncate">Lat: {request.location.lat.toFixed(4)}, Long: {request.location.lng.toFixed(4)}</span>
+                          <span className="truncate">
+                            Lat: {request.latitude?.toFixed(4)}, Long: {request.longitude?.toFixed(4)}
+                          </span>
                         </div>
                         {request.status === 'assigned' && (
                           <div className="flex items-center text-xs text-blue-500 mt-1">
                             <User className="h-3 w-3 mr-1" />
-                            <span>Assigned to: {request.assignedTo.name}</span>
+                            <span>Assigned to: {request.assignedTo.firstName + " " + request.assignedTo.lastName}</span>
                           </div>
                         )}
                       </CardContent>
                       {request.status === 'pending' && (
                         <CardFooter className="flex justify-between pt-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="border-green-500 text-green-500 hover:bg-green-50" 
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-green-500 text-green-500 hover:bg-green-50"
                             onClick={() => handleVerifyHelpRequest(request._id)}
                           >
                             <Check className="h-4 w-4 mr-1" />
                             Verify
                           </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="border-red-500 text-red-500 hover:bg-red-50" 
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-red-500 text-red-500 hover:bg-red-50"
                             onClick={() => handleRejectHelpRequest(request._id)}
                           >
                             <X className="h-4 w-4 mr-1" />
@@ -593,28 +568,38 @@ const handleStatusChange = (status) => {
                       )}
                       {request.status === 'verified' && (
                         <CardFooter className="flex-col space-y-2 pt-2">
-                          <Select value={selectedResponder} onValueChange={setSelectedResponder}>
-                            <SelectTrigger className="w-full text-xs">
-                              <SelectValue placeholder="Assign to responder" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {responders
-                                .filter(r => r.status === 'available')
-                                .map(responder => (
-                                  <SelectItem key={responder._id} value={responder._id}>
-                                    {responder.name}
-                                  </SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
-                          <Button 
-                            size="sm" 
-                            className="w-full" 
-                            disabled={!selectedResponder}
-                            onClick={() => handleAssignHelpRequest(request._id)}
-                          >
-                            Assign Help
-                          </Button>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" className="w-full">
+                                <User className="h-4 w-4 mr-2" />
+                                Assign to responder
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0 max-h-60 overflow-y-auto">
+                              <div className="py-2">
+                                {responders.length === 0 ? (
+                                  <div className="px-4 py-2 text-sm text-gray-500">No available responders</div>
+                                ) : (
+                                  responders
+                                   .map(responder => (
+                                      <button
+                                        key={responder._id}
+                                        className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center"
+                                        onClick={() => {
+                                          setSelectedResponderForAssignment(responder);
+                                          setConfirmAssignmentId(request._id);
+                                        }}
+                                      >
+                                        <Avatar className="h-6 w-6 mr-2">
+                                          <AvatarFallback>{responder.firstName?.charAt(0) || 'R'}</AvatarFallback>
+                                        </Avatar>
+                                        <span>{responder.firstName + " " + responder.lastName}</span>
+                                      </button>
+                                    ))
+                                )}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
                         </CardFooter>
                       )}
                     </Card>
@@ -623,7 +608,7 @@ const handleStatusChange = (status) => {
               )}
             </div>
           )}
-  
+
           {activeTab === 'responders' && (
             <div className="space-y-6">
               <Tabs defaultValue="active" className="w-full">
@@ -635,7 +620,7 @@ const handleStatusChange = (status) => {
                     <TabsTrigger value="entities">Registered Entities</TabsTrigger>
                   </TabsList>
                 </div>
-                
+
                 <TabsContent value="active" className="mt-4">
                   <div className="bg-white rounded-lg shadow">
                     <div className="p-4 border-b">
@@ -654,7 +639,7 @@ const handleStatusChange = (status) => {
                           {responders.map(responder => (
                             <tr key={responder._id} className="border-t hover:bg-gray-50">
                               <td className="px-4 py-3">{responder.firstName}</td>
-                              <td className="px-4 py-3">{responder.registerAs == "None"? "User": responder.registerAs}</td>
+                              <td className="px-4 py-3">{responder.registerAs == "None" ? "User" : responder.registerAs}</td>
                               <td className="px-4 py-3">
                                 <Badge variant={responder.Verified === 'available' ? 'outline' : 'secondary'}>
                                   {responder.registerAs}
@@ -667,7 +652,7 @@ const handleStatusChange = (status) => {
                     </div>
                   </div>
                 </TabsContent>
-  
+
                 <TabsContent value="pending" className="mt-4">
                   <div className="space-y-4">
                     {pendingUsers.map(registration => (
@@ -675,7 +660,7 @@ const handleStatusChange = (status) => {
                         <CardHeader>
                           <CardTitle>{registration.registerAs}</CardTitle>
                           <CardDescription className="text-sm">
-                            <span className="font-semibold">Type:</span> {registration.type} | 
+                            <span className="font-semibold">Type:</span> {registration.type} |
                             <span className="font-semibold ml-2">Applied on:</span> {formatDate(registration.createdAt)}
                           </CardDescription>
                         </CardHeader>
@@ -684,7 +669,7 @@ const handleStatusChange = (status) => {
                             <div className="space-y-2">
                               <div>
                                 <span className="text-sm font-medium">Contact Person:</span>
-                                <p>{registration.firstName + " " + registration.lastName }</p>
+                                <p>{registration.firstName + " " + registration.lastName}</p>
                               </div>
                               <div>
                                 <span className="text-sm font-medium">Email:</span>
@@ -701,9 +686,9 @@ const handleStatusChange = (status) => {
                               <div>
                                 <span className="text-sm font-medium">ID Proof:</span>
                                 <div className="mt-1">
-                                  <img 
-                                    src={registration.governmentDocument} 
-                                    alt="ID Proof" 
+                                  <img
+                                    src={registration.governmentDocument}
+                                    alt="ID Proof"
                                     className="w-full max-w-xs rounded border"
                                   />
                                 </div>
@@ -712,16 +697,16 @@ const handleStatusChange = (status) => {
                           </div>
                         </CardContent>
                         <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             className="border-green-500 text-green-500 hover:bg-green-50 w-full sm:w-auto"
                             onClick={() => handleApproveRegistration(registration._id)}
                           >
                             <Check className="h-4 w-4 mr-1" />
                             Approve
                           </Button>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             className="border-red-500 text-red-500 hover:bg-red-50 w-full sm:w-auto"
                             onClick={() => handleRejectRegistration(registration._id)}
                           >
@@ -731,7 +716,7 @@ const handleStatusChange = (status) => {
                         </CardFooter>
                       </Card>
                     ))}
-                    
+
                     {pendingUsers.length === 0 && (
                       <div className="text-center p-8 bg-white rounded-lg border">
                         <p className="text-gray-500">No pending registration requests</p>
@@ -739,7 +724,7 @@ const handleStatusChange = (status) => {
                     )}
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="responders">
                   {loading ? (
                     <div className="text-center py-10">Loading responders...</div>
@@ -750,9 +735,9 @@ const handleStatusChange = (status) => {
                       {responders.map(responder => (
                         <div key={responder._id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow p-4">
                           <div className="flex items-center gap-3 mb-3">
-                            <img 
-                              src={responder.profilePic || "/placeholder-user.jpg"} 
-                              alt={`${responder.firstName} ${responder.lastName}`} 
+                            <img
+                              src={responder.profilePic || "/placeholder-user.jpg"}
+                              alt={`${responder.firstName} ${responder.lastName}`}
                               className="w-12 h-12 rounded-full object-cover"
                             />
                             <div className="overflow-hidden">
@@ -762,13 +747,13 @@ const handleStatusChange = (status) => {
                               <p className="text-sm text-gray-600 truncate">{responder.email}</p>
                             </div>
                           </div>
-                          
+
                           <div className="flex gap-2 mb-2 flex-wrap">
                             <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
                               {responder.registerAs || "Responder"}
                             </Badge>
                           </div>
-                          
+
                           <div className="mt-3 flex justify-end">
                             <Button variant="outline" size="sm">
                               View Profile
@@ -779,7 +764,7 @@ const handleStatusChange = (status) => {
                     </div>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="entities">
                   {loading ? (
                     <div className="text-center py-10">Loading verified entities...</div>
@@ -790,9 +775,9 @@ const handleStatusChange = (status) => {
                       {verifiedEntities.map(entity => (
                         <div key={entity._id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow p-4">
                           <div className="flex items-center gap-3 mb-3">
-                            <img 
-                              src={entity.profilePic || "/placeholder-user.jpg"} 
-                              alt={`${entity.firstName} ${entity.lastName}`} 
+                            <img
+                              src={entity.profilePic || "/placeholder-user.jpg"}
+                              alt={`${entity.firstName} ${entity.lastName}`}
                               className="w-12 h-12 rounded-full object-cover"
                             />
                             <div className="overflow-hidden">
@@ -802,13 +787,12 @@ const handleStatusChange = (status) => {
                               <p className="text-sm text-gray-600 truncate">{entity.email}</p>
                             </div>
                           </div>
-                          
+
                           <div className="flex gap-2 mb-2 flex-wrap">
-                            <Badge variant="outline" className={`${
-                              entity.registerAs === 'Government' 
-                                ? 'bg-purple-100 text-purple-800 border-purple-200' 
-                                : 'bg-green-100 text-green-800 border-green-200'
-                            }`}>
+                            <Badge variant="outline" className={`${entity.registerAs === 'Government'
+                              ? 'bg-purple-100 text-purple-800 border-purple-200'
+                              : 'bg-green-100 text-green-800 border-green-200'
+                              }`}>
                               {entity.registerAs}
                             </Badge>
                             {entity.workAsResponder && (
@@ -817,7 +801,7 @@ const handleStatusChange = (status) => {
                               </Badge>
                             )}
                           </div>
-                          
+
                           <div className="mt-3 flex justify-end">
                             <Button variant="outline" size="sm">
                               View Profile
@@ -831,7 +815,7 @@ const handleStatusChange = (status) => {
               </Tabs>
             </div>
           )}
-  
+
           {activeTab === 'settings' && (
             <div className="space-y-6">
               <Card>
@@ -856,7 +840,7 @@ const handleStatusChange = (status) => {
           )}
         </main>
       </div>
-  
+
       {/* Broadcast Dialog */}
       <Dialog open={showBroadcastDialog} onOpenChange={setShowBroadcastDialog}>
         <DialogContent className="sm:max-w-md max-w-[95vw] mx-auto">
@@ -896,7 +880,7 @@ const handleStatusChange = (status) => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Textarea 
+              <Textarea
                 placeholder="Enter your alert message here..."
                 value={broadcastMessage}
                 onChange={(e) => setBroadcastMessage(e.target.value)}
@@ -914,6 +898,33 @@ const handleStatusChange = (status) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    
+      {/* Confirmation Alert Dialog */}
+<AlertDialog open={confirmAssignmentId !== null} onOpenChange={() => setConfirmAssignmentId(null)}>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Confirm Assignment</AlertDialogTitle>
+      <AlertDialogDescription>
+        Are you sure you want to assign this help request to {selectedResponderForAssignment?.name}?
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction onClick={() => {
+        if (confirmAssignmentId && selectedResponderForAssignment) {
+          console.log("i am caleed at alert dialog action")
+          assignHelpRequest(confirmAssignmentId, selectedResponderForAssignment._id);
+          setConfirmAssignmentId(null);
+          setSelectedResponderForAssignment(null);
+        }
+      }}>
+        Confirm Assignment
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+    
+    
     </div>
   );
 }

@@ -438,3 +438,18 @@ export const checkAuth = (req, res) => {
   }
 };
 
+
+
+
+
+// What Is Secure in Cookies?
+// secure: true → This tells the browser:
+// "Only send this cookie over HTTPS, not plain HTTP."
+
+// Why? Because:
+
+// HTTP is insecure — data can be stolen ("man-in-the-middle" attacks).
+
+// HTTPS encrypts all communication between your browser and server.
+
+// So secure: true ensures that sensitive cookies (like auth tokens) are only shared over safe connections.

@@ -49,9 +49,10 @@ export const createHelpRequest = async (req, res) => {
 };
 
 // Get all pending help requests
-export const getAllPendingRequests = async (req, res) => {
+export const getAllRequests = async (req, res) => {
     try {
-        const requests = await HelpRequest.find({ status: "pending" }).populate("user", "name email");
+        const requests = await HelpRequest.find().populate("user", "firstName lastName email").populate("assignedTo","firstName lastName email");;
+         console.log(requests)
         res.status(200).json({ success: true, requests });
     } catch (err) {
         res.status(500).json({ success: false, message: "Error fetching requests" });
@@ -116,10 +117,11 @@ export const getAllVerifiedHelpRequests = async (req, res) => {
 // Assign request to responder
 export const assignHelpRequest = async (req, res) => {
     try {
+       console.log("i am assigning the help request")
         const { id } = req.params;
         const { responderId } = req.body;
-
-        const request = await HelpRequest.findById(id);
+    console.log(id , responderId);
+        let request = await HelpRequest.findById(id);
         if (!request) return res.status(404).json({ success: false, message: "Request not found" });
 
         request.status = "assigned";
@@ -128,16 +130,21 @@ export const assignHelpRequest = async (req, res) => {
 
         // TODO: Emit real-time socket event here
         // After saving request
-        const responderSocketId = getReceiverSocketId(responderId);
-        if (responderSocketId) {
-            io.to(responderSocketId).emit("helpAssigned", {
-                message: "You have been assigned a new help request.",
-                request,
-            });
-        }
-
-        res.status(200).json({ success: true, message: "Request assigned", request });
+        // const responderSocketId = getReceiverSocketId(responderId);
+        // if (responderSocketId) {
+        //     io.to(responderSocketId).emit("helpAssigned", {
+        //         message: "You have been assigned a new help request.",
+        //         request,
+        //     });
+        // }
+        const populatedRequest = await HelpRequest.findById(id)
+        .populate("assignedTo")
+        .populate("user");
+        console.log(populatedRequest)
+       console.log("request is assigned");
+        res.status(200).json({ success: true, message: "Request assigned", request:populatedRequest});
     } catch (err) {
+      console.log(err)
         res.status(500).json({ success: false, message: "Error assigning request" });
     }
 };

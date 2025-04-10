@@ -24,8 +24,8 @@ export const useHelpStore = create((set, get) => ({
 
       console.log("request submitted");
     } catch (err) {
-        console.log("error in creating request")
-        
+      console.log("error in creating request")
+
       set({ loading: false });
       toast.error(err)
 
@@ -34,21 +34,15 @@ export const useHelpStore = create((set, get) => ({
   },
 
   // Fetch requests based on status
-  fetchHelpRequests: async (type = "pending") => {
+  fetchHelpRequests: async () => {
     try {
       set({ loading: true });
 
-      const endpointMap = {
-        pending: "/help/pending",
-        verified: "/help/verified",
-        rejected: "/help/rejected",
-        assigned: "/help/assigned",
-      };
+      const res = await axiosInstance.get("/help/pending");
 
-      const res = await axiosInstance.get(endpointMap[type]);
       set({ requests: res.data.requests, loading: false });
     } catch (err) {
-    console.log(err)
+      console.log(err)
       set({ loading: false });
     }
   },
@@ -60,6 +54,15 @@ export const useHelpStore = create((set, get) => ({
 
       const res = await axiosInstance.put(`/help/verify/${id}`, { status });
       set({ loading: false });
+
+
+      // Update state after successful API call
+      set((state) => ({
+        requests: state.requests.map(request =>
+          request._id === id ? { ...request, status } : request
+        )
+      }));
+
       toast.success(res.data.message);
     } catch (err) {
       set({ error: "Failed to update request status", loading: false });
@@ -73,55 +76,62 @@ export const useHelpStore = create((set, get) => ({
       set({ loading: true, error: null });
 
       const res = await axiosInstance.put(`/help/assign/${id}`, { responderId });
-      set({  loading: false });
+      set({ loading: false });
+      // Update state after successful API call
+      set((state) => ({
+        requests: state.requests.map(request =>
+          request._id === id ? { ...request, status } : request
+        )
+      }));
+
       toast.success(res.data.message)
     } catch (err) {
-        set({ error: "Assignment failed", loading: false });
-        toast.error(err)
+      set({ error: "Assignment failed", loading: false });
+      toast.error(err)
     }
-},
+  },
 
-// Accept Help Request
-acceptHelpRequest: async (id) => {
+  // Accept Help Request
+  acceptHelpRequest: async (id) => {
     try {
-        set({ loading: true, error: null });
-        
-        const res = await axiosInstance.put(`/help/accept/${id}`);
-        set({  loading: false });
-        toast.success(res.data.message)
-        
+      set({ loading: true, error: null });
+
+      const res = await axiosInstance.put(`/help/accept/${id}`);
+      set({ loading: false });
+      toast.success(res.data.message)
+
     } catch (err) {
-        set({  loading: false });
-        toast.error(err)
+      set({ loading: false });
+      toast.error(err)
     }
-},
+  },
 
-// Reject Help Request
-rejectHelpRequest: async (id) => {
+  // Reject Help Request
+  rejectHelpRequest: async (id) => {
     try {
-        set({ loading: true, error: null });
-        
-        const res = await axiosInstance.put(`/help/reject/${id}`);
-        set({ loading: false });
-        toast.success(res.data.message)
-    } catch (err) {
-        set({ loading: false });
-        toast.error(err)
-    }
-},
+      set({ loading: true, error: null });
 
-// Complete Help Request
-completeHelpRequest: async (id) => {
-    try {
-        set({ loading: true, error: null });
-        
-        const res = await axiosInstance.put(`/help/complete/${id}`);
+      const res = await axiosInstance.put(`/help/reject/${id}`);
       set({ loading: false });
       toast.success(res.data.message)
     } catch (err) {
-        set({ loading: false });
-        toast.error(err)
+      set({ loading: false });
+      toast.error(err)
     }
-}
+  },
+
+  // Complete Help Request
+  completeHelpRequest: async (id) => {
+    try {
+      set({ loading: true, error: null });
+
+      const res = await axiosInstance.put(`/help/complete/${id}`);
+      set({ loading: false });
+      toast.success(res.data.message)
+    } catch (err) {
+      set({ loading: false });
+      toast.error(err)
+    }
+  }
 }));
 

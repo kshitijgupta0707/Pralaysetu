@@ -1,0 +1,26 @@
+import mongoose from 'mongoose';
+import dotenv from 'dotenv'
+ import { dbConnect } from '../config/database.js';
+import helpRequestModel from '../models/helpRequest.model.js';
+dotenv.config()
+    const deleteMessages = async () => {
+        try {
+            await dbConnect();  
+            await    helpRequestModel.deleteMany({})
+            .then(() => {
+                console.log('All requests have been deleted successfully.');
+                mongoose.disconnect();
+            })
+            .catch((error) => {
+              console.error('Error deleting messages:', error);
+              mongoose.disconnect();
+            });
+            console.log("Requests deleted successfully");
+        } catch (error) {
+            console.error("Error deleting database:", error);
+        }
+    };
+    deleteMessages()
+    // Call the function
+    export {deleteMessages};
+    

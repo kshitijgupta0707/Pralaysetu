@@ -42,3 +42,4 @@ const helpRequestSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("HelpRequest", helpRequestSchema);
+
