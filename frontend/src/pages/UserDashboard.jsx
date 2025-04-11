@@ -256,7 +256,7 @@ const UserDashboard = () => {
                   fire departments, and shelters in your area
                 </CardDescription>
               </CardHeader>
-              <CardContent className="h-[600px] p-0">
+              <CardContent className="p-0">
                 {userLocation && <EmergencyMap location={userLocation} height="600px" />}
               </CardContent>
             </Card>
