@@ -167,12 +167,15 @@ export const getAllRejectedHelpRequests = async (req, res) => {
 // Accept help request (responder)
 
 
+//below are the function for the respnoder
+
 export const getAssignedRequestsForResponder = async (req, res) => {
   try {
 
 
-    const requests = await HelpRequest.find({ assignedTo: req.user._id }).populate("user", "name email").populate("assignedTo", "name email");
-
+    const requests = await HelpRequest.find({ assignedTo: req.user._id }).populate("user", " firstName lastName email").populate("assignedTo", "firstName lastName email");
+    console.log("get assgined requests")
+    console.log(requests)
     res.status(200).json({
       success: true,
       requests,
@@ -210,30 +213,6 @@ export const acceptHelpRequest = async (req, res) => {
       res.status(500).json({ success: false, message: "Error accepting request" });
     }
   };
-
-export const rejectHelpRequest = async (req, res) => {
-try {
-    const { id } = req.params;
-
-    const request = await HelpRequest.findById(id);
-
-    if (!request || request.status !== "assigned") {
-    return res.status(400).json({ success: false, message: "Invalid request" });
-    }
-
-    if (request.assignedTo.toString() !== req.user._id.toString()) {
-    return res.status(403).json({ success: false, message: "Not authorized" });
-    }
-
-    request.status = "verified"; // Back to verified state to reassign
-    request.assignedTo = null;
-    await request.save();
-
-    res.status(200).json({ success: true, message: "Request rejected", request });
-} catch (err) {
-    res.status(500).json({ success: false, message: "Error rejecting request" });
-}
-};
 
 export const completeHelpRequest = async (req, res) => {
     try {

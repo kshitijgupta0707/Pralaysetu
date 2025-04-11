@@ -594,6 +594,7 @@ const AdminDashboard = () => {
                                           <AvatarFallback>{responder.firstName?.charAt(0) || 'R'}</AvatarFallback>
                                         </Avatar>
                                         <span>{responder.firstName + " " + responder.lastName}</span>
+                                        {/* <span>{"     " + responder.email}</span> */}
                                       </button>
                                     ))
                                 )}

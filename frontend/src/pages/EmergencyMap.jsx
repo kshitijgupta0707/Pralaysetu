@@ -10,9 +10,11 @@ const EmergencyMap = () => {
   const [directionsRenderer, setDirectionsRenderer] = useState(null);
   const [destination, setDestination] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const apiKey = "AlzaSytlaIg2Y8-EGR13buMnCr2pyvIbkj4yjax";
-  // const apiKey = "" 
+  // const apiKey = "AlzaSytlaIg2Y8-EGR13buMnCr2pyvIbkj4yjax";
+  const apiKey = "AlzaSyFRuu5m-z8UklOGolpZEzJpks2KjqjLJiL"
 
+ 
+  // const apiKey = "" 
   // Get user's current location
   useEffect(() => {
     if (navigator.geolocation) {
@@ -22,6 +24,7 @@ const EmergencyMap = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
+          console.log("lat lang" , userLocation.lat , userLocation.lng)
         },
         (error) => {
           console.error('Error fetching user location:', error);
@@ -50,6 +53,8 @@ const EmergencyMap = () => {
         },
       });
       setMap(newMap);
+      console.log("Map")
+      console.log(newMap)
       // Initialize DirectionsService and DirectionsRenderer
       const directionsServiceInstance = new google.maps.DirectionsService();
       const directionsRendererInstance = new google.maps.DirectionsRenderer();
@@ -60,6 +65,8 @@ const EmergencyMap = () => {
       // Initialize Autocomplete
       const input = document.getElementById('search-box');
       const autocompleteInstance = new google.maps.places.Autocomplete(input);
+      console.log("auto complete instance :")
+      console.log(autocompleteInstance)
       autocompleteInstance.setFields(['place_id', 'geometry', 'name']);
       autocompleteInstance.addListener('place_changed', () => {
         const place = autocompleteInstance.getPlace();
@@ -181,14 +188,8 @@ const EmergencyMap = () => {
       <div className='flex gap-5  ml-10'  style={{ marginBottom: '10px' }}>
         <button
           onClick={() => fetchNearbyPlaces('hospital', 5000)}
+          className='mt-1'
           style={{
-            margin: '5px',
-            padding: '10px',
-            fontSize: '16px',
-            backgroundColor: '#007BFF',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '5px',
             cursor: 'pointer',
           }}
         >
@@ -239,7 +240,7 @@ const EmergencyMap = () => {
           </span>
         </div>
       </div>
-      <div id="map" style={{ height: '70vh', width: '100%' }}></div>
+      <div id="map" style={{ height: '50vh', width: '100%' }}></div>
       <div style={{ padding: '10px' }}>
         <h3>Nearby Places:</h3>
         <ul>

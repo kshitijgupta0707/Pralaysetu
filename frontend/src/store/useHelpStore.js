@@ -7,6 +7,7 @@ export const useHelpStore = create((set, get) => ({
   error: null,
   success: null,
   requests: [],
+  requestsAssigned: [],
 
   // Create Help Request
   createHelpRequest: async (data) => {
@@ -91,6 +92,8 @@ export const useHelpStore = create((set, get) => ({
     }
   },
 
+
+
   // Accept Help Request
   acceptHelpRequest: async (id) => {
     try {
@@ -106,19 +109,26 @@ export const useHelpStore = create((set, get) => ({
     }
   },
 
-  // Reject Help Request
-  rejectHelpRequest: async (id) => {
-    try {
-      set({ loading: true, error: null });
 
-      const res = await axiosInstance.put(`/help/reject/${id}`);
-      set({ loading: false });
-      toast.success(res.data.message)
-    } catch (err) {
-      set({ loading: false });
-      toast.error(err)
-    }
-  },
+  // Accept Help Request
+getAllHelpRequest: async () => {
+  try {
+    set({ loading: true, error: null });
+
+    const res = await axiosInstance.get(`/help/assigned`);
+    set({ loading: false });
+
+  
+    // Set all requests
+    set({ requestsAssigned: res.data.requests });
+    
+    toast.success("Requests are fetched successfully ")
+  } catch (err) {
+    set({ loading: false });
+    toast.error(err.message || "Something went wrong");
+  }
+},
+
 
   // Complete Help Request
   completeHelpRequest: async (id) => {

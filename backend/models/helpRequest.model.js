@@ -28,6 +28,8 @@ const helpRequestSchema = new mongoose.Schema(
     photo: {
       type: String, // Cloudinary image URL
     },
+    //for responder there are only two option completed or accepted
+     // rest are for admin after assigned by admin to assignedTo
     status: {
       type: String,
       enum: ["pending", "verified" , "rejected", "assigned", "completed", "accepted"],

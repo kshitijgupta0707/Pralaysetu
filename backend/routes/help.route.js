@@ -5,7 +5,7 @@ import { createHelpRequest , verifyOrRejectHelpRequest , getAllVerifiedHelpReque
     getAssignedRequestsForResponder
 } from "../controllers/helpRequest.controller.js";
 import { authenticate , authorizeRoles } from "../middleware/auth.middleware.js";
-import { acceptHelpRequest , rejectHelpRequest , completeHelpRequest } from "../controllers/helpRequest.controller.js";
+import { acceptHelpRequest   , completeHelpRequest } from "../controllers/helpRequest.controller.js";
 
 
 
@@ -23,6 +23,9 @@ router.get("/pending", authenticate, authorizeRoles("Admin"), getAllRequests);
 router.put("/verify/:id", authenticate, authorizeRoles("Admin"), verifyOrRejectHelpRequest);
 
 router.get("/verified", authenticate, authorizeRoles("Admin"), getAllVerifiedHelpRequests);
+
+
+
 router.put("/assign/:id", authenticate, authorizeRoles("Admin"), assignHelpRequest);
 
 
@@ -33,12 +36,11 @@ router.put("/assign/:id", authenticate, authorizeRoles("Admin"), assignHelpReque
 
 
 //get all assigned requests for a specific responder
-router.get("/assigned", authenticate, authorizeRoles("Government", "Responder"), getAssignedRequestsForResponder);
+router.get("/assigned", authenticate, authorizeRoles("None" ,"Government", "Responder"), getAssignedRequestsForResponder);
 
 
-router.put("/accept/:id", authenticate, authorizeRoles("Government", "Responder"), acceptHelpRequest);
-router.put("/reject/:id", authenticate, authorizeRoles("Government", "Responder"), rejectHelpRequest);
-router.put("/complete/:id", authenticate, authorizeRoles("Government", "Responder"), completeHelpRequest);
+router.put("/accept/:id", authenticate, authorizeRoles("None","Government", "Responder"), acceptHelpRequest);
+router.put("/complete/:id", authenticate, authorizeRoles("None","Government", "Responder"), completeHelpRequest);
 
 
 export default router;

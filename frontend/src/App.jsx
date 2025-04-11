@@ -8,7 +8,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
 import { Toaster } from "react-hot-toast";
 import { Loader } from "lucide-react";
-
+import ResponderMap from "./pages/ResponderMap"
 import { useAuthStore } from "./store/useAuthstore";
 import { useEffect, useState } from "react";
 
@@ -89,6 +89,17 @@ function App() {
             )
           }
         />
+
+       <Route 
+  path="/responder/map" 
+  element={
+    <ResponderMap 
+      destinationCoords={location.state || { latitude: 0, longitude: 0 }} 
+    />
+  } 
+/>       
+   
+
       </Routes>
       <Toaster />
     </div>
