@@ -109,28 +109,29 @@ const UserDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Emergency Action Bar */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex justify-between items-center">
-          <div className="flex items-center">
-            <Avatar className="h-10 w-10 mr-2">
-              <AvatarImage src={userimage} alt={authUser?.name} />
-              <AvatarFallback>{authUser?.name?.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-medium">Hello, {authUser?.firstName + " " + authUser.lastName}</p>
-              <p className="text-sm text-gray-500">{authUser?.location?.city}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="destructive"
-              size="lg"
-              className="gap-2"
-              onClick={() => setActiveTab('help')}
-            >
-              <HelpCircle className="h-5 w-5" />
-              <span className="hidden sm:inline">Emergency Help</span>
-            </Button>
-          </div>
-        </div>
+  <div className="flex items-center">
+    <a href="/" className="flex items-center">
+      <Avatar className="h-10 w-10 mr-2">
+        <AvatarImage src={userimage} alt={authUser?.name} />
+        <AvatarFallback>{authUser?.name?.charAt(0)}</AvatarFallback>
+      </Avatar>
+      <div>
+        <p className="font-medium">Hello, {authUser?.firstName + " " + authUser.lastName}</p>
+      </div>
+    </a>
+  </div>
+  <div className="flex gap-2">
+    <Button
+      variant="destructive"
+      size="lg"
+      className="gap-2"
+      onClick={() => setActiveTab('help')}
+    >
+      <HelpCircle className="h-5 w-5" />
+      <span className="hidden sm:inline">Emergency Help</span>
+    </Button>
+  </div>
+</div>
 
         {/* Latest Alert Banner (if any critical alerts) */}
         {alerts.some(alert => alert.severity === 'critical') && (
