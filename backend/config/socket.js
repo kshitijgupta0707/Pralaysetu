@@ -1,42 +1,53 @@
-// config/socket.js
-import { Server } from "socket.io";
-import http from "http";
-import express from "express";
+// server
+import {Server} from "socket.io"
+import http from "http"
+import express from "express"
 
-const app = express();
-const server = http.createServer(app);
-
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || "*",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
+// We create an Express server to handle HTTP requests.
+// Then, we pass the server to Socket.IO to set up the WebSocket connection.
+const app = express()
+const server = http.createServer(app)
+const io = new Server(server ,{
+    cors: {
+        origin: ["http://localhost:5173"],
+        methods: ['GET', 'POST', 'PUT'],
+    },
 });
 
-const userSocketMap = {}; // { userId: socketId }
+
+// used to store online user
+const userSocketMap = {}  //{userId: SocketId}
 
 export function getReceiverSocketId(userId) {
-  return userSocketMap[userId];
-}
-
-io.on("connection", (socket) => {
-  console.log("New Client connected:", socket.id);
-
-  const userId = socket.handshake.query.userId;
-  const userName = socket.handshake.query.userName;
-  console.log(userName, "is online");
-
-  if (userId) {
-    userSocketMap[userId] = socket.id;
-    io.emit("getOnlineUsers", Object.keys(userSocketMap)); // broadcast user status
+    return userSocketMap[userId];
   }
+  
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id, "name:", userName);
-    delete userSocketMap[userId];
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
-  });
-});
+ io.on("connection", (socket) =>{
 
-export { io, server, app };
+    console.log("User connected" , socket.id)
+    console.log(socket.handshake.query)
+    const userId = socket.handshake.query.userId
+    const userName = socket.handshake.query.userName
+    console.log(userName , " is online ")
+    if(userId){
+        userSocketMap[userId] = socket.id
+    }
+    //used to send event to all the connected Client
+    //you can listen this event at the connect socket function in the store where you have 
+    //connected to the backend from frontend
+    io.emit("getOnlineUsers", Object.keys(userSocketMap))
+
+   console.log("Number of online users are" , Object.keys(userSocketMap).length)
+   
+
+    socket.on("disconnect" , () =>{
+        console.log("User disconnected with socket id = " , socket.id , " and name = ", userName)
+        delete userSocketMap[userId];
+        io.emit("getOnlineUsers", Object.keys(userSocketMap))
+    })
+})
+
+
+export {io , server,app}
+

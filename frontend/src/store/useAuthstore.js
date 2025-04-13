@@ -2,9 +2,10 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+import { Activity } from "lucide-react";
 
 
-// const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "/";
+const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/" : "/";
 export const useAuthStore = create((set, get) => ({
   authUser: null,
   formData: null,
@@ -21,7 +22,9 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.get("/auth/check");
       console.log(res)
       set({ authUser: res.data });
-      // get().connectSocket();
+      get().connectSocket();
+      console.log("connected to the socket")
+
     } catch (error) {
       console.log(error);
       set({ authUser: null });
@@ -85,7 +88,8 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data.responseUser });
 
       toast.success("Logged in successfully ");
-    //   get().connectSocket();
+      get().connectSocket();
+      console.log("connected to the socket")
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
@@ -98,36 +102,38 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: null });
       localStorage.removeItem("loggedInAs");
       toast.success("Logged out successfully");
-    //   get().disconnectSocket();
+      get().disconnectSocket();
     } catch (error) {
       toast.error(error.response.data.message);
     }
   },
-  // connectSocket: () => {
-  //   const { authUser } = get();
-  //   //alreadyConnected or not autheticated - not do it
-  //   if (!authUser || get().socket?.connected) return;
+  connectSocket: () => {
+    const { authUser } = get();
+    //alreadyConnected or not autheticated - not do it
+    if (!authUser || get().socket?.connected) return;
 
-  //   const socket = io(BASE_URL, {
-  //     // i am sending some data to the backend 
-  //     // sending the userId to know who is online
-  //     query: {
-  //       userId: authUser._id,
-  //       userName: authUser.firstName
-  //     },
-  //   }
-  //   );
-  //   //connection established by the user with io so it give notification to the backend 
-  //   //and you have written what to do now in backend
-  //   socket.connect();
+    const socket = io(BASE_URL, {
+      // i am sending some data to the backend 
+      // sending the userId to know who is online
+      query: {
+        userId: authUser._id,
+        userName: authUser.firstName,
+        registerAs: authUser.registerAs == "None"? "User": authUser.registerAs,
+        workAsResponder: authUser.workAsResponder == true ? "Yes" : "No"
+      },
+    }
+    );
+    //connection established by the user with io so it give notification to the backend 
+    //and you have written what to do now in backend
+    socket.connect();
 
-  //   set({ socket: socket });
+    set({ socket: socket });
 
-  //   socket.on("getOnlineUsers", (userIds) => {
-  //     set({ onlineUsers: userIds });
-  //   });
-  // },
-  // disconnectSocket: () => {
-  //   if (get().socket?.connected) get().socket.disconnect();
-  // },
+    socket.on("getOnlineUsers", (userIds) => {
+      set({ onlineUsers: userIds });
+    });
+  },
+  disconnectSocket: () => {
+    if (get().socket?.connected) get().socket.disconnect();
+  },
 }));

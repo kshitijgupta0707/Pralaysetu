@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useReportStore } from '@/store/useReportStore';
 import { useHelpStore } from '@/store/useHelpStore';
+import { useAuthStore } from '@/store/useAuthstore';
 import { Link } from 'react-router-dom';
 import {
   Popover,
@@ -33,6 +34,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const AdminDashboard = () => {
+  const {socket} = useAuthStore()
   const [activeTab, setActiveTab] = useState('reports');
   const [isLoading, setIsLoading] = useState(true);
   const [broadcastMessage, setBroadcastMessage] = useState('');
@@ -45,8 +47,6 @@ const AdminDashboard = () => {
   const [showSidebar, setShowSidebar] = useState(false);
   // Add these state variables to your component
   const [confirmAssignmentId, setConfirmAssignmentId] = useState(null);
-  const [selectedResponderForAssignment, setSelectedResponderForAssignment] = useState(null);
-  // Extract data and functions from adminStore
   const {
     pendingUsers,
     responders,
@@ -64,19 +64,42 @@ const AdminDashboard = () => {
     // verifiedReports, 
     isFetchingReports,
     getAllReports,
-    verifyReport
-  } = useReportStore();
-  useEffect(() => {
-    console.log("admin dashboard", responders)
-  }, [responders])
+    verifyReport,
 
-  const {
-    loading: helpLoading,
-    requests: helpRequests,
-    fetchHelpRequests,
-    verifyOrRejectRequest,
-    assignHelpRequest
-  } = useHelpStore();
+    // real time functions 
+  } = useReportStore();
+  
+    const {
+      loading: helpLoading,
+      requests: helpRequests,
+      fetchHelpRequests,
+      verifyOrRejectRequest,
+      assignHelpRequest,
+      addNewRequest
+  
+    } = useHelpStore();
+  const [selectedResponderForAssignment, setSelectedResponderForAssignment] = useState(null);
+  // Extract data and functions from adminStore
+
+
+  useEffect(() => {
+    if (!socket) return;
+
+    // 👂 Listen for new help request
+    socket.on("newHelpRequest", (newRequest) => {
+      console.log("Received new help request via socket:", newRequest);
+      addNewRequest(newRequest)
+    
+    });
+    console.log("Current listeners:", socket.listeners("newHelpRequest").length);
+     
+    return () => {
+      socket.off("newHelpRequest");
+    };
+  }, [socket]);
+
+
+
 
   useEffect(() => {
     // Fetch data from store
@@ -120,9 +143,9 @@ const AdminDashboard = () => {
   };
 
   const handleAssignHelpRequest = (id, responderId) => {
-    console.log("i am called");
-    console.log(id , responderId);
-    console.log(selectedResponderForAssignment)
+    // console.log("i am called");
+    // console.log(id , responderId);
+    // console.log(selectedResponderForAssignment)
     assignHelpRequest(id, responderId);
     setSelectedResponderForAssignment(null);
     setConfirmAssignmentId(null);
@@ -171,7 +194,7 @@ const AdminDashboard = () => {
 
 
   const filteredHelpRequests = helpRequests.filter(request => {
-    console.log(request)
+    // console.log(request)
     // const matchesSearch = request.reason?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       request.urgency?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (request.user && (request.user.firstName + " " + request.user.lastName).toLowerCase().includes(searchQuery.toLowerCase()));

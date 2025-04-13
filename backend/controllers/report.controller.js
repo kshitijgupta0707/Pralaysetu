@@ -48,6 +48,9 @@ export const createReport = async (req, res) => {
       imageUrl: mediaUrl,
     });
 
+        // EMIT event to admin
+    io.emit("newDisasterReport", report);
+
     res.status(201).json({
       success: true,
       message: "Disaster report submitted",

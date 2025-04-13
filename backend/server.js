@@ -45,16 +45,16 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
+
 app.use("/api/auth", authRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/help", helpRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoutes);
 
-
 const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
 
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
   dbConnect()
   connectCloudinary()

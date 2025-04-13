@@ -35,6 +35,9 @@ export const createHelpRequest = async (req, res) => {
         urgency,
         photo: photoUrl,
       });
+      
+    // EMIT socket event to admin
+    io.emit("newHelpRequest", helpRequest); // You can send full object or just _id, up to you
       console.log(2)
       res.status(201).json({
             success: true,

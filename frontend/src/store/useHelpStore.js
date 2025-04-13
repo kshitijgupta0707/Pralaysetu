@@ -142,6 +142,12 @@ getAllHelpRequest: async () => {
       set({ loading: false });
       toast.error(err)
     }
-  }
+  },
+
+  addNewRequest: (newRequest) => {
+    set((state) => ({
+      requests: [newRequest, ...state.requests],  // add to top
+    }));
+  },
 }));
 
