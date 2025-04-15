@@ -2,11 +2,12 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv'
  import { dbConnect } from '../config/database.js';
 import helpRequestModel from '../models/helpRequest.model.js';
+import { Token } from '../models/token.model.js';
 dotenv.config()
     const deleteMessages = async () => {
         try {
             await dbConnect();  
-            await    helpRequestModel.deleteMany({})
+            await Token.deleteMany({})
             .then(() => {
                 console.log('All requests have been deleted successfully.');
                 mongoose.disconnect();

@@ -11,11 +11,25 @@ import { Loader } from "lucide-react";
 import ResponderMap from "./pages/ResponderMap"
 import { useAuthStore } from "./store/useAuthstore";
 import { useEffect, useState } from "react";
-
+import NotificationBanner from "./pages/NotificationBanner";
+import { messaging, onMessage } from "./firebase";
+// import Notification from "./Notification";
+import NotificationSetup from "./pages/NotificationSetup";
 function App() {
+  // In your App.jsx or main.jsx
+
+
+
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
   const [actingAs, setActingAs] = useState(localStorage.getItem("loggedInAs"));
   const location = useLocation(); // detects route changes
+
+  // useEffect(() => {
+  //   onMessage(messaging, (payload) => {
+  //     console.log("Foreground Notification:", payload);
+  //     alert(payload.notification.title + ": " + payload.notification.body);
+  //   });
+  // }, []);
 
   // Check auth on mount
   useEffect(() => {
@@ -26,7 +40,7 @@ function App() {
   useEffect(() => {
     const storedRole = localStorage.getItem("loggedInAs");
     setActingAs(storedRole);
-    console.log("Updated actingAs:", storedRole);
+    // console.log("Updated actingAs:", storedRole);
   }, [location.pathname]);
 
   if (isCheckingAuth && !authUser) {
@@ -39,17 +53,21 @@ function App() {
 
   return (
     <div>
+      <NotificationBanner />
+      {/* <Notification /> */}
+      <NotificationSetup/>
+
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route 
-           path="/login" 
-           element={
-             !actingAs ?
-                  <LoginPage />
-                  :
-                  <Navigate to="/" />
-                  
-                  } />
+        <Route
+          path="/login"
+          element={
+            !actingAs ?
+              <LoginPage />
+              :
+              <Navigate to="/" />
+
+          } />
         <Route
           path="/signup"
           element={!authUser ? <SignupPage /> : <Navigate to="/" />}
@@ -59,8 +77,8 @@ function App() {
           path="/responder-dashboard"
           element={
             authUser &&
-            authUser?.registerAs === "None" &&
-            actingAs === "Responder" ? (
+              authUser?.registerAs === "None" &&
+              actingAs === "Responder" ? (
               <ResponderDashboard />
             ) : (
               <Navigate to="/" />
@@ -81,8 +99,8 @@ function App() {
           path="/user-dashboard"
           element={
             authUser &&
-            authUser.registerAs === "None" &&
-            actingAs === "User" ? (
+              authUser.registerAs === "None" &&
+              actingAs === "User" ? (
               <UserDashboard />
             ) : (
               <Navigate to="/" />
@@ -90,17 +108,19 @@ function App() {
           }
         />
 
-       <Route 
-  path="/responder/map" 
-  element={
-    <ResponderMap 
-      destinationCoords={location.state || { latitude: 0, longitude: 0 }} 
-    />
-  } 
-/>       
-   
+        <Route
+          path="/responder/map"
+          element={
+            <ResponderMap
+              destinationCoords={location.state || { latitude: 0, longitude: 0 }}
+            />
+          }
+        />
+
 
       </Routes>
+
+
       <Toaster />
     </div>
   );

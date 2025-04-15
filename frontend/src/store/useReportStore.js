@@ -81,5 +81,11 @@ verifyReport: async (reportId, status = 'verified') => {
         set({ isVerifyingReport: false });
     }
 },
+
+addNewReport: (newReport) => {
+  set((state) => ({
+    reports: [newReport, ...state.reports],  // add to top
+  }));
+},
 }));
 

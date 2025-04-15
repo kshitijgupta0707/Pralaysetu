@@ -96,6 +96,22 @@ export const useAuthStore = create((set, get) => ({
       set({ isLoggingIn: false });
     }
   },
+  loginwithgoogle: async (data) => {
+    set({ isLoggingIn: true });
+    try {
+      console.log(data);
+      const res = await axiosInstance.post("/auth/loginwithgoogle", data);
+      set({ authUser: res.data.responseUser });
+
+      toast.success("Logged in successfully ");
+      get().connectSocket();
+      console.log("connected to the socket")
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      set({ isLoggingIn: false });
+    }
+  },
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");

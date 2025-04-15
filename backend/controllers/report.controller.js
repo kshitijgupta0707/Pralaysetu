@@ -2,27 +2,28 @@
 import { Report } from "../models/report.model.js";
 import { getReceiverSocketId, io } from "../config/socket.js";
 import { uploadImageToCloudinary } from "../utils/imageUploader.js";
+import { sendNotificationToAll } from "./notification.controller.js";
 
 export const createReport = async (req, res) => {
   try {
-    console.log("body mei yeh hain",req.body)
-    const { disasterType, latitude ,longitude, description  } = req.body;
-    if(!disasterType || !latitude || !longitude || !description ) {
+    console.log("body mei yeh hain", req.body)
+    const { disasterType, latitude, longitude, description } = req.body;
+    if (!disasterType || !latitude || !longitude || !description) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
       });
     }
     console.log("yha tak agya")
-    if(latitude == 0 || longitude == 0){
+    if (latitude == 0 || longitude == 0) {
       return res.status(500).json({
-              success: false,
-              message: "Please send us the location"
+        success: false,
+        message: "Please send us the location"
       })
     }
-      let media = req.files?.media;
-      
-  
+    let media = req.files?.media;
+
+
 
 
     let mediaUrl = null;
@@ -42,13 +43,13 @@ export const createReport = async (req, res) => {
     const report = await Report.create({
       user: req.user._id,
       disasterType,
-      latitude ,
+      latitude,
       longitude,
       description,
       imageUrl: mediaUrl,
     });
 
-        // EMIT event to admin
+    // EMIT event to admin
     io.emit("newDisasterReport", report);
 
     res.status(201).json({
@@ -69,8 +70,6 @@ export const getAllReports = async (req, res) => {
     res.status(500).json({ success: false, message: "Unable to fetch reports" });
   }
 };
-
-
 // Get all verified reports for public view
 export const getVerifiedReports = async (req, res) => {
   try {
@@ -81,10 +80,12 @@ export const getVerifiedReports = async (req, res) => {
   }
 };
 
+
 export const verifyReport = async (req, res) => {
+  console.log("INSIDE VERIFY REPORT CONTORLLER");
   try {
     const { reportId, status } = req.body;
-    console.log(reportId , status);
+    console.log(reportId, status);
 
     if (!["verified", "rejected"].includes(status)) {
       return res.status(400).json({
@@ -100,11 +101,30 @@ export const verifyReport = async (req, res) => {
         message: "Report not found",
       });
     }
-  
+
     report.status = status;
     console.log("user ", req.user)
     report.verifiedBy = req.user._id; // Admin who verified
     await report.save();
+
+
+    console.log("sending notification");
+
+    try {
+      // Send notification to all users - using the updated function with lock mechanism
+      const notificationResult = await sendNotificationToAll(
+        `Report ${status}!`,
+        `The report regarding "${report.title}" has been ${status} by the admin.`,
+        { reportId: reportId.toString(), type: "report_status" }
+      );
+
+      console.log("Notification result:", notificationResult);
+    } catch (notificationError) {
+      // Log the error but don't fail the entire request
+      console.error("Failed to send notifications:", notificationError);
+    }
+
+
 
     // Send real-time notification
     // const receiverSocketId = getReceiverSocketId(report.user._id.toString());
@@ -129,5 +149,5 @@ export const verifyReport = async (req, res) => {
     });
   }
 };
-  
+
 

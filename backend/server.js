@@ -14,8 +14,9 @@ import { connectCloudinary } from "./config/cloudinary.js";
 import helpRoutes from "./routes/help.route.js"
 import dashboardRoutes from "./routes/dashboard.route.js";
 import adminRoutes from "./routes/admin.route.js"
-
-
+import notificationRoute from "./routes/notification.route.js"
+import { testAuth } from "./controllers/notification.controller.js";
+// import { deleteMessages } from "./seedss/deleteData.js";
 dotenv.config();
 
 
@@ -51,6 +52,7 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/help", helpRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/notification", notificationRoute);
 
 const PORT = process.env.PORT || 8080;
 
@@ -58,4 +60,6 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
   dbConnect()
   connectCloudinary()
+  // testAuth()
+  // deleteMessages()
 });

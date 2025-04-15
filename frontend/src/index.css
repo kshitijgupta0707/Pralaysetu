@@ -2,6 +2,9 @@
 @import "tw-animate-css";
 
 
+@plugin "daisyui";
+
+
 @media (max-width: 380px) {
   .text-xs-mobile {
     gap: 1;
@@ -161,3 +164,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+
+
+
+
