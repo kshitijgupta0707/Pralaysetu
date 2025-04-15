@@ -21,6 +21,32 @@ export const createReport = async (req, res) => {
         message: "Please send us the location"
       })
     }
+
+    //  // Check daily report limit
+    //  const startOfDay = new Date();
+    //  startOfDay.setHours(0, 0, 0, 0);
+
+    //  const endOfDay = new Date();
+    //  endOfDay.setHours(23, 59, 59, 999);
+
+    //  const todayReports = await Report.countDocuments({
+    //    user: req.user._id,
+    //    createdAt: { $gte: startOfDay, $lte: endOfDay }
+    //  });
+
+    //  if (todayReports >= 2) {
+    //    return res.status(429).json({
+    //      success: false,
+    //      message: "You can only submit 2 reports per day"
+    //    });
+    //  }
+
+
+
+
+
+
+
     let media = req.files?.media;
 
 
@@ -108,33 +134,39 @@ export const verifyReport = async (req, res) => {
     await report.save();
 
 
-    console.log("sending notification");
 
-    try {
-      // Send notification to all users - using the updated function with lock mechanism
-      const notificationResult = await sendNotificationToAll(
-        `Report ${status}!`,
-        `The report regarding "${report.title}" has been ${status} by the admin.`,
-        { reportId: reportId.toString(), type: "report_status" }
-      );
+    // try {
+    //   // Send notification to all users - using the updated function with lock mechanism
+    //   const notificationResult = await sendNotificationToAll(
+    //     `Report ${status}!`,
+    //     `The report regarding "${report.title}" has been ${status} by the admin.`,
+    //     { reportId: reportId.toString(), type: "report_status" }
+    //   );
 
-      console.log("Notification result:", notificationResult);
-    } catch (notificationError) {
-      // Log the error but don't fail the entire request
-      console.error("Failed to send notifications:", notificationError);
+    //   console.log("Notification result:", notificationResult);
+    // } catch (notificationError) {
+    //   // Log the error but don't fail the entire request
+    //   console.error("Failed to send notifications:", notificationError);
+    // }
+
+
+
+    // Send real-time notification to the perosn
+    console.log("sending notification in real time to");
+    const receiverSocketId = getReceiverSocketId(report.user._id);
+    console.log(receiverSocketId)
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("reportStatusUpdate", {
+
+        title: `Report ${status}`,
+        message: `Your report has been ${status} by admin`,
+        purpose: "report-status",
+        report,
+
+      });
     }
 
 
-
-    // Send real-time notification
-    // const receiverSocketId = getReceiverSocketId(report.user._id.toString());
-    // if (receiverSocketId) {
-    //   io.to(receiverSocketId).emit("reportStatusUpdate", {
-    //     reportId: report._id,
-    //     status: report.status,
-    //     message: `Your report has been ${status}`,
-    //   });
-    // }
 
     res.status(200).json({
       success: true,

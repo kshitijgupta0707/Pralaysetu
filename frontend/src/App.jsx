@@ -6,6 +6,7 @@ import OtpVerificationPage from "./pages/OtpVerificationPage";
 import ResponderDashboard from "./pages/ResponderDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
+import { ForgotPassword } from "./pages/ForgotPassword";
 import { Toaster } from "react-hot-toast";
 import { Loader } from "lucide-react";
 import ResponderMap from "./pages/ResponderMap"
@@ -15,12 +16,59 @@ import NotificationBanner from "./pages/NotificationBanner";
 import { messaging, onMessage } from "./firebase";
 // import Notification from "./Notification";
 import NotificationSetup from "./pages/NotificationSetup";
+import { ResetPassword } from "./pages/ResetPassword";
+import { useNotificationStore } from "./store/useNotificationStore";
 function App() {
   // In your App.jsx or main.jsx
 
 
 
-  const { authUser, checkAuth, isCheckingAuth , actingAs , setActingAs } = useAuthStore();
+
+  const { socket, authUser, checkAuth, isCheckingAuth , actingAs , setActingAs } = useAuthStore();
+
+  useEffect(() => {
+    if (!socket) return;
+   console.log("socket = " , socket)
+    //  Assigned help request (for responder)
+    socket.on("assignedHelpRequest", (payload) => {
+      const { title, message, purpose, request } = payload;
+      console.log("Real time Assigned to responder:", request);
+      useNotificationStore.getState().showNotification(title, message, purpose);
+    });
+  
+    // 🆕 Request status changed (for user)
+    socket.on("helpRequestStatusChanged", (payload) => {
+      
+      const { title, message, purpose, request } = payload;
+      console.log("Request status update:", request);
+      useNotificationStore.getState().showNotification(title, message, purpose);
+    });
+  
+    // 🆕 Request status changed (for user)
+    socket.on("reportStatusUpdate", (payload) => {
+      const { title, message, purpose, report } = payload;
+      console.log("(real time)Report status update:", report);
+      useNotificationStore.getState().showNotification(title, message, purpose);
+    });
+
+  
+    return () => {
+      socket.off("assignedHelpRequest");
+      socket.off("helpRequestStatusChanged");
+      socket.off("newHelpRequest");
+      socket.off("newDisasterReport");
+      socket.off("reportStatusUpdate")
+    };
+  }, [socket]);
+  
+
+
+
+
+
+
+
+
   useEffect(()=>{
      setActingAs(localStorage.getItem("loggedInAs"))
   },[])
@@ -66,6 +114,24 @@ function App() {
           element={
             !actingAs ?
               <LoginPage />
+              :
+              <Navigate to="/" />
+
+          } />
+        <Route
+          path="/forgot-password"
+          element={
+            !authUser ?
+              <ForgotPassword />
+              :
+              <Navigate to="/" />
+
+          } />
+        <Route
+          path="/reset-password"
+          element={
+            !authUser ?
+              <ResetPassword />
               :
               <Navigate to="/" />
 

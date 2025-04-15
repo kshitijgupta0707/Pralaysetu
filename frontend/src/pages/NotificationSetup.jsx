@@ -6,11 +6,11 @@ import { onMessage, messaging } from "@/firebase";
 const NotificationSetup = () => {
   const { authUser } = useAuthStore();
 
-  useEffect(() => {
-    if (authUser) {
-      requestNotificationPermission(authUser);
-    }
-  }, [authUser]);
+  // useEffect(() => {
+  //   if (authUser) {
+  //     requestNotificationPermission(authUser);
+  //   }
+  // }, [authUser]);
 
   // useEffect(() => {
   //   const unsubscribe = onMessage(messaging, (payload) => {

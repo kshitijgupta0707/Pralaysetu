@@ -98,19 +98,27 @@ const AdminDashboard = () => {
   
     socket.on("newHelpRequest", (newRequest) => {
       console.log("Received new help request via socket:", newRequest);
+      // console
       addNewRequest(newRequest);
       useNotificationStore.getState().showNotification(
         "New Help Request", 
-        `From ${newRequest.name} at ${newRequest.location}`
+        `From ${newRequest.user?.firstName + " " + newRequest.user?.lastName} --> ${newRequest.reason.slice(0,30)}`,
+         'request'
       );
     });
   
     socket.on("newDisasterReport", (newReport) => {
       console.log("New report received");
+      console.log(newReport)
+      console.log("--------------")
+      console.log(newReport.disasterType)
       addNewReport(newReport);
+    
       useNotificationStore.getState().showNotification(
         "New Disaster Report",
-        `Reported disaster: ${newReport.type}`
+        `Reported disaster: ${newReport.disasterType
+        }`,
+        'report'
       );
     });
   

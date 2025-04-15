@@ -5,7 +5,7 @@ import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 import {getAuth} from "firebase/auth"
 import {getFirestore} from "firebase/firestore"
-
+import { deleteToken } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -38,7 +38,7 @@ if ('serviceWorker' in navigator) {
 
  
 export {app , analytics  };
-export{messaging, getToken, onMessage}
+export{messaging, getToken, onMessage , deleteToken}
 
 
 // //this is for google login

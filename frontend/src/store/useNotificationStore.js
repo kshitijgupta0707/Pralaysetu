@@ -21,8 +21,12 @@ export const useNotificationStore = create((set) => ({
   title: '',
   message: '',
   show: false,
+  purpose: '',
 
-  showNotification: (title, message) => set({ title, message, show: true }),
+  showNotification: (title, message ,purpose) => {
+    console.log("noificsion show")
+    set({ title, message, show: true , purpose })
+  },
   hideNotification: () => set({ show: false }),
 
 

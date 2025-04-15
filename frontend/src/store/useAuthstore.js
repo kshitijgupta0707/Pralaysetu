@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import { Activity } from "lucide-react";
-
+import { deleteToken , messaging } from "@/firebase.js";
 
 const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/" : "/";
 export const useAuthStore = create((set, get) => ({
@@ -17,6 +17,8 @@ export const useAuthStore = create((set, get) => ({
   onlineUsers: [],
   socket: null,
   actingAs: null,
+  isResettingPassword: false,
+  isSendingLink: false,
   setFormData: (data) => set({ formData: data }),
   checkAuth: async () => {
     try {
@@ -121,16 +123,66 @@ export const useAuthStore = create((set, get) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
-      set({ authUser: null });
-      console.log("removed from local storage")
+      
+      
+      // Delete local FCM token from Firebase
+      // await deleteToken(messaging);
+      // console.log(" FCM token deleted");
+      // await axiosInstance.post("/notification/remove-token" , {userId: get().authUser._id})
+      // console.log("removed from local storage")
       localStorage.removeItem("loggedInAs");
       get().setActingAs(null)
       toast.success("Logged out successfully");
       get().disconnectSocket();
-
+      set({ authUser: null });
+      
       //removing it for the user
     } catch (error) {
       toast.error(error.response.data.message);
+    }
+  },
+  sendResetLink: async (data ,navigate) => {
+    console.log(data); // Log the data being sent
+    set({ isSendingLink: true });
+    try {
+      const res = await axiosInstance.post("/auth/forgot-password", data)
+      toast.success("Reset password link send on your mail");
+      set({ isSendingLink: false });
+
+      setTimeout(() => {
+        // Use React Router's navigate function to redirect and pass state
+        // console.log("Navigating to otp verification");
+        navigate('/login')
+      }, 1000); // Adjust delay as needed
+      get().connectSocket();
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      set({ isSendingLink: false });
+
+    }
+  },
+  resetPassword: async (data , navigate) => {
+    // console.log(data); // Log the data being sent
+    console.log("request comes here");
+
+    set({ isResettingPassword: true });
+    try {
+      const res = await axiosInstance.post("/auth/reset-password", data)
+      toast.success("Reset password link send on your mail");
+      set({ isResettingPassword: false });
+
+      setTimeout(() => {
+        // Use React Router's navigate function to redirect and pass state
+        // console.log("Navigating to otp verification");
+        navigate('/login')
+      }, 1000); // Adjust delay as needed
+      // get().connectSocket();
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      set({ isResettingPassword: false });
+
     }
   },
   connectSocket: () => {

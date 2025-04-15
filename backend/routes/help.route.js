@@ -1,6 +1,6 @@
 // routes/help.routes.js
 import express from "express";
-import { createHelpRequest , verifyOrRejectHelpRequest , getAllVerifiedHelpRequests, assignHelpRequest , getAllRequests
+import { createHelpRequest , verifyOrRejectHelpRequest , assignHelpRequest , getAllRequests
     ,getAllRejectedHelpRequests ,
     getAssignedRequestsForResponder
 } from "../controllers/helpRequest.controller.js";
@@ -22,7 +22,7 @@ router.get("/rejected", authenticate, authorizeRoles("Admin"), getAllRejectedHel
 router.get("/pending", authenticate, authorizeRoles("Admin"), getAllRequests);
 router.put("/verify/:id", authenticate, authorizeRoles("Admin"), verifyOrRejectHelpRequest);
 
-router.get("/verified", authenticate, authorizeRoles("Admin"), getAllVerifiedHelpRequests);
+// router.get("/verified", authenticate, authorizeRoles("Admin"), getAllVerifiedHelpRequests);
 
 
 

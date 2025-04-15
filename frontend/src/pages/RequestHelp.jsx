@@ -129,6 +129,7 @@ return {latitude ,longitude};
       setSubmitStatus('success');
     } catch (error) {
       console.error('Error submitting help request:', error);
+   
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -136,12 +137,7 @@ return {latitude ,longitude};
   };
   
   
-  const getCurrentLocationString = () => {
-    if (formData.location && formData.location?.lat && formData.location?.lng) {
-      return `${formData.location?.lat.toFixed(6)}, ${formData.location?.lng.toFixed(6)}`;
-    }
-    return 'Location not available';
-  };
+ 
   
   const getUrgencyColor = (urgency) => {
     switch (urgency) {
@@ -334,7 +330,7 @@ return {latitude ,longitude};
       <CardFooter className="flex flex-col gap-4">
         <Button 
           onClick={handleSubmit}
-          disabled={isSubmitting || !formData.reason}
+          disabled={isSubmitting || !formData.reason || submitStatus != null}
           className={`w-full py-6 ${formData.urgency === 'critical' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
         >
           {isSubmitting ? (

@@ -1,9 +1,9 @@
 import { useNotificationStore } from "../store/useNotificationStore";
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, AlertCircle, Info, CheckCircle, AlertTriangle } from "lucide-react";
 
 export default function NotificationBanner() {
-  const { title, message, show, hideNotification } = useNotificationStore();
+  const { purpose, title, message, show, hideNotification } = useNotificationStore();
   const [progress, setProgress] = useState(100);
   const [timeLeft, setTimeLeft] = useState(5); // 5 seconds notification display
 
@@ -26,7 +26,7 @@ export default function NotificationBanner() {
         
         setProgress((prev) => {
           if (prev >= 100) return 0;
-          return prev + 2; // decrease by 2% every 100ms
+          return prev + 2; // increase by 2% every 100ms
         });
       }, 100);
       
@@ -36,54 +36,89 @@ export default function NotificationBanner() {
 
   if (!show) return null;
   
- 
+  // Configure styles based on notification type
+  const styleConfig = {
+    report: {
+      bg: "bg-gray-900", // Dark blackish-gray background
+      text: "text-gray-100", // Light gray text for contrast
+      iconBg: "bg-gray-800", // Slightly lighter gray for icon background
+      icon: <AlertCircle className="h-6 w-6 text-gray-300" />, // Light gray icon
+      progressBg: "bg-gray-950", // Very dark gray for progress bg
+      progressFill: "bg-gray-500" // Medium gray for progress fill
+    },
+    request: {
+      bg: "bg-green-800",
+      text: "text-white",
+      iconBg: "bg-green-700",
+      icon: <CheckCircle className="h-6 w-6 text-green-200" />,
+      progressBg: "bg-green-900",
+      progressFill: "bg-green-400"
+    },
+    warning: {
+      bg: "bg-yellow-800",
+      text: "text-white",
+      iconBg: "bg-yellow-700",
+      icon: <AlertTriangle className="h-6 w-6 text-yellow-200" />,
+      progressBg: "bg-yellow-900",
+      progressFill: "bg-yellow-400"
+    },
+    error: {
+      bg: "bg-red-800",
+      text: "text-white",
+      iconBg: "bg-red-700",
+      icon: <AlertCircle className="h-6 w-6 text-red-200" />,
+      progressBg: "bg-red-900",
+      progressFill: "bg-red-400"
+    },
+    // Default style
+    info: {
+      bg: "bg-indigo-800",
+      text: "text-white",
+      iconBg: "bg-indigo-700",
+      icon: <Info className="h-6 w-6 text-indigo-200" />,
+      progressBg: "bg-indigo-900",
+      progressFill: "bg-indigo-400"
+    }
+  };
+
+  // Default to info if type is not specified
+  const styles = styleConfig[purpose] || styleConfig.info;
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 w-4/5 md:w-2/3 z-50 overflow-hidden pb-0">
-      <div className="bg-blue-100 rounded-lg border-l-4 border-blue-500 text-blue-900 shadow-lg p-4 flex flex-col relative pb-0">
+      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 w-4/5 md:w-2/3 lg:w-1/2 z-50 overflow-hidden">
+      <div className={`rounded-lg shadow-lg p-4 flex flex-col relative ${styles.bg} ${styles.text}`}>
         {/* Header with title and close button */}
         <div className="flex justify-between items-center mb-2">
-          <div className="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="stroke-blue-500 h-6 w-6 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
-            <h3 className="font-bold text-lg">{title}</h3>
+          <div className="flex items-center gap-2">
+            <div className={`p-1 rounded-full ${styles.iconBg}`}>
+              {styles.icon}
+            </div>
+            <h3 className="font-semibold text-lg">{title}</h3>
           </div>
           <button 
             onClick={hideNotification}
-            className="rounded-full p-1 hover:bg-blue-200 transition-colors"
+            className={`rounded-full p-1 hover:bg-opacity-80 transition-colors ${styles.iconBg}`}
             aria-label="Close notification"
           >
-            <X size={20} />
+            <X size={20} className="text-white" />
           </button>
         </div>
         
         {/* Message content */}
-        <div className="text-sm mb-3">{message}</div>
+        <div className="text-sm mb-3 opacity-90">{message}</div>
         
-        {/* Time display */}
-        {/* <div className="text-xs text-right text-blue-700 font-mono">
-          {formattedTime}
-        </div> */}
-        
-        {/* Progress bar */}
-        <div className="h-1 w-full bg-blue-200 mt-2 rounded-full overflow-hidden bottom-0">
+        {/* Progress bar at bottom */}
+        <div className={`h-1 w-full mt-4 rounded-full overflow-hidden absolute bottom-0 left-0 ${styles.progressBg}`}>
           <div 
-            className="h-full bg-blue-500 transition-all duration-100 ease-linear"
+            className={`h-full transition-all duration-100 ease-linear ${styles.progressFill}`}
             style={{ width: `${progress}%` }}
           ></div>
         </div>
       </div>
     </div>
+
+
+          
+     
   );
 }

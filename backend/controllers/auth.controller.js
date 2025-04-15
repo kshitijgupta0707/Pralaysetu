@@ -376,13 +376,13 @@ export const forgotPassword = async (req, res) => {
     // Generate secure random token
     const token = crypto.randomBytes(32).toString("hex");
 
-    // Set token and expiration (15 minutes)
+    // Set token and expiration (5 minutes)
     user.resetPasswordToken = token;
-    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+    user.resetPasswordExpires = Date.now() + 5 * 60 * 1000;
     await user.save();
 
     // Send email
-    const resetLink = `https://yourfrontend.com/reset-password?token=${token}&email=${email}`;
+    const resetLink = `http://localhost:5173/reset-password?token=${token}&email=${email}`;
     await mailSender(email, "Reset Your Password", resetTemplate(resetLink));
 
     res.status(200).json({

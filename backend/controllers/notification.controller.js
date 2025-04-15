@@ -22,70 +22,7 @@ const getAccessToken = async () => {
   return access_token;
 };
 let isProcessingNotifications = false;
-// const getAccessToken = async () => {
-//   const jwtClient = new JWT(
-//     process.env.CLIENT_EMAIL,
-//     null,
-//     process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
-//     ["https://www.googleapis.com/auth/firebase.messaging"]
-//   );
 
-//   const tokens = await jwtClient.authorize();
-//   return tokens.access_token;
-// };
-
-
-
-// async function getAccessToken() {
-//   const jwtClient = new google.auth.JWT(
-//     CLIENT_EMAIL,
-//     null,
-//     PRIVATE_KEY,
-//     SCOPES
-//   );
-
-//   const tokens = await jwtClient.authorize();
-//   return tokens.access_token;
-// }
-
-// export const sendNotification = async (title, body, data = {}) => {
-//   try {
-//     // Fetch all tokens from database
-//     const tokenRecords = await Token.find({});
-    
-//     if (tokenRecords.length === 0) {
-//       console.log("No FCM tokens found. Skipping notification.");
-//       return;
-//     }
-    
-//     console.log(`Sending notification to ${tokenRecords.length} devices`);
-    
-//     // Send notification to each token individually
-//     const sendPromises = tokenRecords.map(async (tokenRecord) => {
-//       try {
-//         await sendNotification(tokenRecord.token, title, body, data);
-//         return { success: true, token: tokenRecord.token };
-//       } catch (error) {
-//         // If a token is invalid, we might want to remove it from our database
-//         if (error.response?.data?.error?.message === 'The registration token is not a valid FCM registration token') {
-//           console.log(`Removing invalid token: ${tokenRecord.token}`);
-//           await Token.findByIdAndDelete(tokenRecord._id);
-//         }
-//         return { success: false, token: tokenRecord.token, error: error.message };
-//       }
-//     });
-    
-//     const results = await Promise.allSettled(sendPromises);
-    
-//     const successful = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
-//     console.log(`✅ Successfully sent notifications to ${successful}/${tokenRecords.length} devices`);
-    
-//     return results;
-//   } catch (error) {
-//     console.error("❌ Error sending notifications to all devices:", error);
-//     throw error;
-//   }
-// };
 export const sendNotificationToAll = async (title, body, data = {}) => {
   try {
     // Prevent concurrent execution
@@ -98,6 +35,62 @@ export const sendNotificationToAll = async (title, body, data = {}) => {
     
     // Fetch all tokens from database
     const tokenRecords = await Token.find({});
+    
+    if (tokenRecords.length === 0) {
+      console.log("No FCM tokens found. Skipping notification.");
+      isProcessingNotifications = false;
+      return { success: false, reason: "no-tokens" };
+    }
+    
+    console.log(`Sending notification to ${tokenRecords.length} devices`);
+    
+    // Send notification to each token individually
+    const sendPromises = tokenRecords.map(async (tokenRecord) => {
+      try {
+        await sendNotification(tokenRecord.token, title, body, data);
+        return { success: true, token: tokenRecord.token };
+      } catch (error) {
+        // If a token is invalid, we might want to remove it from our database
+        if (error.response?.data?.error?.message === 'The registration token is not a valid FCM registration token') {
+          console.log(`Removing invalid token: ${tokenRecord.token}`);
+          await Token.findByIdAndDelete(tokenRecord._id);
+        }
+        return { success: false, token: tokenRecord.token, error: error.message };
+      }
+    });
+    
+    const results = await Promise.all(sendPromises);
+    
+    const successful = results.filter(r => r.success).length;
+    console.log(`✅ Successfully sent notifications to ${successful}/${tokenRecords.length} devices`);
+    
+    // Release the lock
+    isProcessingNotifications = false;
+    
+    return { success: true, sentCount: successful, totalCount: tokenRecords.length };
+  } catch (error) {
+    console.error("❌ Error sending notifications to all devices:", error);
+    // Make sure to release the lock even if there's an error
+    isProcessingNotifications = false;
+    throw error;
+  }
+};
+export const sendNotificationToPerson= async (title, body, data = {}) => {
+  try {
+    // Prevent concurrent execution
+    if (isProcessingNotifications) {
+      console.log("⚠️ Notification sending already in progress. Skipping this request.");
+      return { skipped: true };
+    }
+    
+    isProcessingNotifications = true;
+    
+    // Fetch all tokens from database
+    let tokenRecords = []
+    if(data.userId){
+        tokenRecords = await Token.find({userId});
+    }else return;
+  
     
     if (tokenRecords.length === 0) {
       console.log("No FCM tokens found. Skipping notification.");
@@ -195,6 +188,7 @@ import { Token } from "../models/token.model.js";
 export const saveFcmToken = async (req, res) => {
   try {
     const { userId, token } = req.body;
+    console.log("Token is saved")
 
     if (!userId || !token) {
       return res.status(400).json({ msg: "Missing userId or token" });
@@ -213,6 +207,19 @@ export const saveFcmToken = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error" });
+  }
+};
+export const removeToken = async (req, res) => {
+  const { userId } = req.body;
+  console.log("yha tak aya")
+
+  try {
+    const result = await Token.deleteMany({ userId });
+    console.log("token reomved")
+    res.status(200).json({ success: true, message: "Token(s) removed", result });
+  } catch (error) {
+    console.error("Error removing token:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
