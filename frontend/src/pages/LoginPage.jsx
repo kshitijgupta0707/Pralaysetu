@@ -8,7 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthstore';
 import toast from 'react-hot-toast';
 import RegistrationRoleModal from './RegistrationRoleModel'; // Import the new component
-import { SignInWithGoogle } from '@/google/signinwithgoogle';
+import { SignInWithGoogle } from '../google/SignInWithGoogle';
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [showRoleModal, setShowRoleModal] = useState(false);
