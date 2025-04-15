@@ -6,9 +6,15 @@ export default function NotificationBanner() {
   const { purpose, title, message, show, hideNotification } = useNotificationStore();
   const [progress, setProgress] = useState(100);
   const [timeLeft, setTimeLeft] = useState(5); // 5 seconds notification display
+  const playNotificationSound = () => {
+    const audio = new Audio("/sounds/sound1.wav");
+    audio.play().catch((e) => console.error("Audio play failed:", e));
+  };
+  
 
   useEffect(() => {
     if (show) {
+      playNotificationSound(); //  Play sound once when shown
       // Reset progress when notification appears
       setProgress(0);
       setTimeLeft(5);
