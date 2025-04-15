@@ -18,6 +18,7 @@ import { messaging, onMessage } from "./firebase";
 import NotificationSetup from "./pages/NotificationSetup";
 import { ResetPassword } from "./pages/ResetPassword";
 import { useNotificationStore } from "./store/useNotificationStore";
+import {PralaySetuLoader} from "./pages/PralaysetuLoader";
 function App() {
   // In your App.jsx or main.jsx
 
@@ -96,12 +97,13 @@ function App() {
   if (isCheckingAuth && !authUser) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Loader className="size-10 animate-spin" />
+        {/* <Loader className="size-10 animate-spin" /> */}
+        <PralaySetuLoader  />
       </div>
     );
   }
 
-  return (
+    return (
     <div>
       <NotificationBanner />
       {/* <Notification /> */}
@@ -194,4 +196,4 @@ function App() {
   );
 }
 
-export default App;
+export default App
