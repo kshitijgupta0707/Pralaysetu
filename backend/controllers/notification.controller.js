@@ -142,7 +142,7 @@ export const sendNotificationToAll = async (title, body, data = {}) => {
 // Modify your sendNotification function to include better error handling
 export const sendNotification = async(token, title, body, data = {}) => {
   try {
-    // const accessToken = await getAccessToken();
+    const accessToken = await getAccessToken();
 
     // console.log("Got access token for FCM");
 

@@ -16,6 +16,7 @@ export const useAuthStore = create((set, get) => ({
   isCheckingAuth: true,
   onlineUsers: [],
   socket: null,
+  actingAs: null,
   setFormData: (data) => set({ formData: data }),
   checkAuth: async () => {
     try {
@@ -33,19 +34,21 @@ export const useAuthStore = create((set, get) => ({
     }
   },
   sendOtp: async (data, navigate) => {
-      console.log("Sending OTP with data:", data); // Log the data being sent
+    console.log("Sending OTP with data:", data); // Log the data being sent
     set({ isSendingOtp: true });
     try {
-      const res = await axiosInstance.post("/auth/sendOtp", data, { headers: {
-        'Content-Type': 'multipart/form-data',
-      }})
+      const res = await axiosInstance.post("/auth/sendOtp", data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      })
       toast.success("Otp Send on mail");
       set({ isSendingOtp: false });
-       // Save FormData to Zustand store
+      // Save FormData to Zustand store
       get().setFormData(data);
       setTimeout(() => {
         // Use React Router's navigate function to redirect and pass state
-        console.log("Navigating to otp verification"  );
+        console.log("Navigating to otp verification");
         navigate("/otp-verification");
       }, 2000); // Adjust delay as needed
       // get().connectSocket();
@@ -59,7 +62,7 @@ export const useAuthStore = create((set, get) => ({
   signup: async (data, navigate) => {
     set({ isSigningUp: true });
     try {
-      const res = await axiosInstance.post("/auth/signup", data , {
+      const res = await axiosInstance.post("/auth/signup", data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -112,13 +115,20 @@ export const useAuthStore = create((set, get) => ({
       set({ isLoggingIn: false });
     }
   },
+  setActingAs: (data) => {
+    set({ actingAs: data })
+  },
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
+      console.log("removed from local storage")
       localStorage.removeItem("loggedInAs");
+      get().setActingAs(null)
       toast.success("Logged out successfully");
       get().disconnectSocket();
+
+      //removing it for the user
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -134,7 +144,7 @@ export const useAuthStore = create((set, get) => ({
       query: {
         userId: authUser._id,
         userName: authUser.firstName,
-        registerAs: authUser.registerAs == "None"? "User": authUser.registerAs,
+        registerAs: authUser.registerAs == "None" ? "User" : authUser.registerAs,
         workAsResponder: authUser.workAsResponder == true ? "Yes" : "No"
       },
     }

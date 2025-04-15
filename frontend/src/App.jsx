@@ -20,8 +20,10 @@ function App() {
 
 
 
-  const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
-  const [actingAs, setActingAs] = useState(localStorage.getItem("loggedInAs"));
+  const { authUser, checkAuth, isCheckingAuth , actingAs , setActingAs } = useAuthStore();
+  useEffect(()=>{
+     setActingAs(localStorage.getItem("loggedInAs"))
+  },[])
   const location = useLocation(); // detects route changes
 
   // useEffect(() => {
