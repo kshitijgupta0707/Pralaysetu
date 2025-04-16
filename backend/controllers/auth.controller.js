@@ -382,7 +382,7 @@ export const forgotPassword = async (req, res) => {
     await user.save();
 
     // Send email
-    const resetLink = `http://localhost:5173/reset-password?token=${token}&email=${email}`;
+    const resetLink = `https://pralaysetu.vercel.app/?token=${token}&email=${email}`;
     await mailSender(email, "Reset Your Password", resetTemplate(resetLink));
 
     res.status(200).json({

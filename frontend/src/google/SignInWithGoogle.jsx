@@ -7,6 +7,7 @@ import { auth } from "@/firebase";
 import { useAuthStore } from "@/store/useAuthstore";
 import toast from "react-hot-toast";
 
+
 export const SignInWithGoogle = () => {
   const { loginwithOAuth } = useAuthStore();
 
@@ -60,7 +61,7 @@ export const SignInWithGoogle = () => {
             fill="#EA4335"
           />
         </svg>
-        <span className="font-medium">Sign in with Google</span>
+        <span className="font-medium"> Google</span>
       </button>
     </div>
   );
