@@ -15,6 +15,7 @@ import helpRoutes from "./routes/help.route.js"
 import dashboardRoutes from "./routes/dashboard.route.js";
 import adminRoutes from "./routes/admin.route.js"
 import notificationRoute from "./routes/notification.route.js"
+import paymentRoute from "./routes/payment.route.js"
 import { testAuth } from "./controllers/notification.controller.js";
 // import { deleteMessages } from "./seedss/deleteData.js";
 dotenv.config();
@@ -53,6 +54,11 @@ app.use("/api/help", helpRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notification", notificationRoute);
+app.use("/api", paymentRoute);
+
+app.get("/api/getkey", (req,res) => {
+    res.status(200).json({key: process.env.RAZORPAY_API_KEY});
+})
 
 const PORT = process.env.PORT || 8080;
 
