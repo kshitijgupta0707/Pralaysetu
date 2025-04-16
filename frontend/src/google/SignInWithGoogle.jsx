@@ -1,19 +1,31 @@
+
+
+//step 1 Create an instance of the Google provider object 
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+//this have all the configuration
 import { auth } from "@/firebase";
 import { useAuthStore } from "@/store/useAuthstore";
 import toast from "react-hot-toast";
 
 export const SignInWithGoogle = () => {
-  const { loginwithgoogle } = useAuthStore();
+  const { loginwithOAuth } = useAuthStore();
 
   async function googleLogin() {
     const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
+     // This gives you a Google Access Token. You can use it to access the Google API.
+     try {
+       // it shares thde compleete info in result.user
+       const result = await signInWithPopup(auth, provider); 
+       //  const credential = GoogleAuthProvider.credentialFromResult(result);
+       //  const token = credential.accessToken;
+
+      // The signed-in user info.
       const user = result.user;
       
+      
+      //now i got that person is verified so i am sending his email to my backend for login
       if (user) {
-        await loginwithgoogle({ email: user.email });
+        await loginwithOAuth({ email: user.email });
         // toast.success("Signed in successfully!");
       }
     } catch (error) {
@@ -24,15 +36,11 @@ export const SignInWithGoogle = () => {
 
   return (
     <div className="mb-2 flex flex-col items-center">
-      <div className="flex items-center justify-center w-full mb-4">
-        <div className="flex-grow h-px bg-gray-300"></div>
-        <p className="mx-4 text-sm text-gray-500 font-medium">or continue with</p>
-        <div className="flex-grow h-px bg-gray-300"></div>
-      </div>
+     
       
       <button
         onClick={googleLogin}
-        className="flex items-center justify-center gap-3 w-full max-w-xs py-3 px-4 bg-white text-gray-700 rounded-lg border border-gray-300 shadow-sm hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        className="flex items-center justify-center gap-3 w-full max-w-xs py-3 px-4 bg-white text-gray-700 rounded-lg border border-gray-300 shadow-sm hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-[15px]"
       >
         <svg width="20" height="20" viewBox="0 0 24 24">
           <path

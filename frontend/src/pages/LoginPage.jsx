@@ -9,10 +9,11 @@ import { useAuthStore } from '@/store/useAuthstore';
 import toast from 'react-hot-toast';
 import RegistrationRoleModal from './RegistrationRoleModel'; // Import the new component
 import { SignInWithGoogle } from '../google/SignInWithGoogle';
+import { SignInWithFacebook } from '@/google/SignInWithFacebook';
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [showRoleModal, setShowRoleModal] = useState(false);
-  const { login, isLoggingIn, authUser  } = useAuthStore();
+  const { login, isLoggingIn, authUser } = useAuthStore();
 
   const navigate = useNavigate();
 
@@ -37,7 +38,7 @@ const LoginPage = () => {
     e.preventDefault();
     const success = validateForm();
     if (!success) return;
-    
+
     login(loginData);
   };
 
@@ -58,7 +59,7 @@ const LoginPage = () => {
       <div className="hidden lg:flex lg:w-1/2 bg-blue-700 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-900 opacity-90"></div>
         <div className="absolute inset-0 bg-[url('/images/waves-pattern.svg')] opacity-10"></div>
-        
+
         <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white m-auto">
           <div className="mb-8">
             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -70,7 +71,7 @@ const LoginPage = () => {
           </div>
           <h1 className="text-5xl font-bold mb-4">PralaySetu</h1>
           <p className="text-xl mb-8">Bridging Crisis to Safety</p>
-          
+
           <div className="max-w-md text-center">
             <p className="text-lg mb-6">
               Your reliable partner in disaster management and emergency response.
@@ -90,13 +91,13 @@ const LoginPage = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="mt-auto text-sm opacity-80">
             © 2025 PralaySetu. All rights reserved.
           </div>
         </div>
       </div>
-      
+
       {/* Right side - Login Form */}
       <div className="w-full lg:w-1/2 bg-gradient-to-br from-blue-50 to-indigo-100/50 flex items-center justify-center p-6">
         <div className="max-w-md w-full">
@@ -126,12 +127,12 @@ const LoginPage = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-gray-700">Email</Label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="your.email@example.com" 
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@example.com"
                     value={loginData.email}
-                    onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+                    onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                     className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                     required
                   />
@@ -143,21 +144,21 @@ const LoginPage = () => {
                       Forgot password?
                     </Link>
                   </div>
-                  <Input 
-                    id="password" 
-                    type="password" 
-                    placeholder="••••••••" 
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
                     value={loginData.password}
-                    onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                     className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                     required
                   />
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col gap-4">
-                <Button 
-                  type="submit" 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6" 
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6"
                   disabled={isLoggingIn}
                 >
                   {isLoggingIn ? (
@@ -168,8 +169,17 @@ const LoginPage = () => {
                   ) : (
                     "Log in"
                   )}
-                </Button>  
-                 < SignInWithGoogle />
+                </Button>
+                <div className="flex items-center justify-center w-full ">
+                  <div className="flex-grow h-px bg-gray-300"></div>
+                  <p className="mx-4 text-sm text-gray-500 font-medium">or continue with</p>
+                  <div className="flex-grow h-px bg-gray-300"></div>
+                </div>
+                <div className='flex justify-center items-center gap-5' >
+                  < SignInWithGoogle />
+                  <SignInWithFacebook />
+
+                </div>
 
                 <div className="flex flex-col gap-2 text-center">
                   <p className="text-sm text-gray-600">
@@ -194,9 +204,9 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Role Selection Modal */}
-      <RegistrationRoleModal 
+      <RegistrationRoleModal
         isOpen={showRoleModal}
         onClose={() => setShowRoleModal(false)}
         onSelectRole={handleRoleSelection}

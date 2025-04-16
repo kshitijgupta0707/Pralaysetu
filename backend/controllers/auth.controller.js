@@ -438,7 +438,7 @@ export const checkAuth = (req, res) => {
   }
 };
 
-export const loginWithGoogle = async (req, res) => {
+export const loginwithOAuth = async (req, res) => {
   try {
     const { email } = req.body;
 

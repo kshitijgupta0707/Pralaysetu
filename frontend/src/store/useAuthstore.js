@@ -3,9 +3,9 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import { Activity } from "lucide-react";
-import { deleteToken , messaging } from "@/firebase.js";
+import { deleteToken, messaging } from "@/firebase.js";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/" : "/";
+const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/" : "https://pralaysetu-backend.onrender.com/";
 export const useAuthStore = create((set, get) => ({
   authUser: null,
   formData: null,
@@ -101,11 +101,11 @@ export const useAuthStore = create((set, get) => ({
       set({ isLoggingIn: false });
     }
   },
-  loginwithgoogle: async (data) => {
+  loginwithOAuth: async (data) => {
     set({ isLoggingIn: true });
     try {
       console.log(data);
-      const res = await axiosInstance.post("/auth/loginwithgoogle", data);
+      const res = await axiosInstance.post("/auth/loginwithOAuth", data);
       set({ authUser: res.data.responseUser });
 
       toast.success("Logged in successfully ");
@@ -123,8 +123,8 @@ export const useAuthStore = create((set, get) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
-      
-      
+
+
       // Delete local FCM token from Firebase
       // await deleteToken(messaging);
       // console.log(" FCM token deleted");
@@ -135,13 +135,13 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Logged out successfully");
       get().disconnectSocket();
       set({ authUser: null });
-      
+
       //removing it for the user
     } catch (error) {
       toast.error(error.response.data.message);
     }
   },
-  sendResetLink: async (data ,navigate) => {
+  sendResetLink: async (data, navigate) => {
     console.log(data); // Log the data being sent
     set({ isSendingLink: true });
     try {
@@ -162,7 +162,7 @@ export const useAuthStore = create((set, get) => ({
 
     }
   },
-  resetPassword: async (data , navigate) => {
+  resetPassword: async (data, navigate) => {
     // console.log(data); // Log the data being sent
     console.log("request comes here");
 

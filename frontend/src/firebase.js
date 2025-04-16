@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
-
+// import { getAuth } from "firebase/auth";
 import {getAuth} from "firebase/auth"
 import {getFirestore} from "firebase/firestore"
 import { deleteToken } from "firebase/messaging";
@@ -42,5 +42,7 @@ export{messaging, getToken, onMessage , deleteToken}
 
 
 // //this is for google login
-export const auth = getAuth()
+
+//this will be used for google , facebook etc login-------->
+export const auth = getAuth(app)
 export const db = getFirestore()
