@@ -18,6 +18,7 @@ import notificationRoute from "./routes/notification.route.js"
 import paymentRoute from "./routes/payment.route.js"
 import { testAuth } from "./controllers/notification.controller.js";
 // import { deleteMessages } from "./seedss/deleteData.js";
+import axios from "axios";
 dotenv.config();
 
 
@@ -53,7 +54,6 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/help", helpRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/notification", notificationRoute);
 app.use("/api", paymentRoute);
 
 app.get("/api/getkey", (req,res) => {
