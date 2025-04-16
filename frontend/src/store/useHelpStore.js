@@ -23,7 +23,7 @@ export const useHelpStore = create((set, get) => ({
       set({ success: res.data.message, loading: false });
       toast.success(res.data.message);
 
-      console.log("request submitted");
+      // console.log("request submitted");
     }  catch (err) {
       console.error("Error in creating request:", err);
       

@@ -154,7 +154,7 @@ const AdminDashboard = () => {
 
   const handleStatusChange = (status) => {
     setFilterStatus(status);
-    console.log(`Status filtered to: ${status}`);
+    // console.log(`Status filtered to: ${status}`);
   };
 
 
@@ -208,9 +208,9 @@ const AdminDashboard = () => {
     if (!broadcastMessage.trim()) return;
 
     // Simulate sending broadcast
-    console.log('Broadcasting message:', broadcastMessage);
-    console.log('Broadcast type:', broadcastType);
-    console.log('Broadcast region:', broadcastRegion);
+    // console.log('Broadcasting message:', broadcastMessage);
+    // console.log('Broadcast type:', broadcastType);
+    // console.log('Broadcast region:', broadcastRegion);
 
     alert(`${broadcastType.toUpperCase()} broadcast sent successfully to ${broadcastRegion === 'all' ? 'all regions' : broadcastRegion}!`);
     setBroadcastMessage('');
