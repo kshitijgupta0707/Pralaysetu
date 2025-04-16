@@ -94,6 +94,7 @@ const AdminDashboard = () => {
 
 
   useEffect(() => {
+    console.log("mene socket lagaana shuru kiaa")
     if (!socket) return;
   
     socket.on("newHelpRequest", (newRequest) => {
@@ -106,8 +107,9 @@ const AdminDashboard = () => {
          'request'
       );
     });
-  
+    console.log("bhai mene laga dia hain socket connection")
     socket.on("newDisasterReport", (newReport) => {
+      
       console.log("New report received");
       console.log(newReport)
       console.log("--------------")
