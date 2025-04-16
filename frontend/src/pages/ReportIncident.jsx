@@ -106,6 +106,7 @@ const ReportIncident = ({ userLocation }) => {
     e.preventDefault();
     setSubmitStatus(null);
     let location = await validated();
+    console.log(location)
     if (!location) {
       return;
     }
@@ -158,7 +159,7 @@ const ReportIncident = ({ userLocation }) => {
         {submitStatus === 'success' && (
           <Alert className="mb-6 bg-green-50 border-green-500 text-green-700">
             <Check className="h-4 w-4" />
-            <AlertTitle>Report Submitted Successfully</AlertTitle>
+            <AlertTitle>Report Submitted Successfully </AlertTitle>
             <AlertDescription>
               Thank you for your report. It has been submitted for review by our team.
               You will be notified once it's verified.
@@ -269,7 +270,7 @@ const ReportIncident = ({ userLocation }) => {
         </Button>
         <Button
           onClick={handleSubmit}
-          disabled={isCreatingReport || !formData.disasterType || !formData.description}
+          disabled={isCreatingReport || !formData.disasterType || !formData.description || submitStatus!= null}
           className="bg-blue-600 hover:bg-blue-700"
         >
           {isCreatingReport ? (

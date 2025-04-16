@@ -14,9 +14,10 @@ import { connectCloudinary } from "./config/cloudinary.js";
 import helpRoutes from "./routes/help.route.js"
 import dashboardRoutes from "./routes/dashboard.route.js";
 import adminRoutes from "./routes/admin.route.js"
+import notificationRoute from "./routes/notification.route.js"
+import { testAuth } from "./controllers/notification.controller.js";
+// import { deleteMessages } from "./seedss/deleteData.js";
 import axios from "axios";
-
-
 dotenv.config();
 
 
@@ -53,55 +54,12 @@ app.use("/api/help", helpRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Route to handle earthquake prediction
-app.post("/api/predict_earthquake", async (req, res) => {
-  try {
-      const response = await axios.post('http://localhost:5001/api/predict_earthquake', req.body);
-      res.json(response.data);
-  } catch (error) {
-      res.status(500).json({ error: "Error in prediction" });
-  }
-});
-
-// Route to handle flood prediction
-app.post("/api/predict_flood", async (req, res) => {
-  try {
-    const modifiedRequestBody = {
-      ...req.body,
-      MonsoonIntensity: 4.987700,
-      TopographyDrainage: 4.987400,
-      RiverManagement: 5.007850,
-      Deforestation: 5.010550,
-      Urbanization: 4.985425,
-      ClimateChange: 4.983300,
-      DamsQuality: 5.019000,
-      Siltation: 5.000300,
-      AgriculturalPractices: 5.004300,
-      Encroachments: 4.992725,
-      IneffectiveDisasterPreparedness: 5.002725,
-      DrainageSystems: 5.001850,
-      CoastalVulnerability: 4.987075,
-      Watersheds: 4.978125,
-      DeterioratingInfrastructure: 4.986325,
-      PopulationScore: 4.991500,
-      WetlandLoss: 5.002450,
-      InadequatePlanning: 5.003375,
-      PoliticalFactors: 4.992100
-    };
-
-    // TopographyDrainage, RiverManagement, DamsQuality, Encroachments, Landslides, DeterioratingInfrastructure, PopulationScore
-
-    const response = await axios.post('http://localhost:5001/api/predict_flood', modifiedRequestBody);
-    res.json(response.data);
-  } catch (error) {
-      res.status(500).json({ error: "Error in prediction" });
-  }
-});
-
 const PORT = process.env.PORT || 8080;
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
   dbConnect()
   connectCloudinary()
+  // testAuth()
+  // deleteMessages()
 });

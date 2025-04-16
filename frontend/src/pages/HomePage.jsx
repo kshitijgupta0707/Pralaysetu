@@ -215,7 +215,7 @@ const HomePage = () => {
                       {t.getStarted} <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
-                  <Link to="/responder/signup">
+                  <Link to="/signup">
                     <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white/10">
                       {t.joinAsResponder}
                     </Button>
@@ -888,11 +888,11 @@ const HomePage = () => {
             <div>
               <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
               <ul className="space-y-2">
-                <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors">About Us</Link></li>
-                <li><Link to="/services" className="text-gray-300 hover:text-white transition-colors">Our Services</Link></li>
-                <li><Link to="/responders" className="text-gray-300 hover:text-white transition-colors">Responder Network</Link></li>
-                <li><Link to="/resources" className="text-gray-300 hover:text-white transition-colors">Disaster Resources</Link></li>
-                <li><Link to="/blog" className="text-gray-300 hover:text-white transition-colors">Latest Updates</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">About Us</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Our Services</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Responder Network</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Disaster Resources</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Latest Updates</Link></li>
               </ul>
             </div>
 
@@ -900,11 +900,11 @@ const HomePage = () => {
             <div>
               <h4 className="font-semibold text-lg mb-4">Support</h4>
               <ul className="space-y-2">
-                <li><Link to="/faq" className="text-gray-300 hover:text-white transition-colors">FAQ</Link></li>
-                <li><Link to="/help-center" className="text-gray-300 hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link to="/safety-tips" className="text-gray-300 hover:text-white transition-colors">Safety Tips</Link></li>
-                <li><Link to="/training" className="text-gray-300 hover:text-white transition-colors">Training Resources</Link></li>
-                <li><Link to="/contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">FAQ</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Safety Tips</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Training Resources</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link></li>
               </ul>
             </div>
 
@@ -929,13 +929,13 @@ const HomePage = () => {
           </div>
 
           {/* Middle section with download app buttons */}
-          <div className="py-8 border-t border-b border-blue-800/50">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-              <div>
+          {/* <div className="py-8 border-t border-b border-blue-800/50"> */}
+            {/* <div className="flex flex-col md:flex-row justify-between items-center gap-6"> */}
+              {/* <div>
                 <h4 className="text-lg font-medium mb-2">Download Our Mobile App</h4>
                 <p className="text-gray-300 text-sm">Stay prepared with real-time alerts and emergency assistance on your phone.</p>
-              </div>
-              <div className="flex flex-wrap gap-4">
+              </div> */}
+              {/* <div className="flex flex-wrap gap-4">
                 <a href="#" className="bg-black/30 hover:bg-black/50 backdrop-blur-sm transition-colors flex items-center space-x-3 rounded-lg px-4 py-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.5 12c0 .3-.2.5-.5.5h-10c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h10c.3 0 .5.2.5.5zm-5-4c0 .3-.2.5-.5.5h-5c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h5c.3 0 .5.2.5.5zm5 8c0 .3-.2.5-.5.5h-10c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h10c.3 0 .5.2.5.5zm1.7-12h-14.4c-.7 0-1.3.6-1.3 1.3v13.4c0 .7.6 1.3 1.3 1.3h14.4c.7 0 1.3-.6 1.3-1.3v-13.4c0-.7-.6-1.3-1.3-1.3zm-14.4 1h14.4c.2 0 .3.1.3.3v13.4c0 .2-.1.3-.3.3h-14.4c-.2 0-.3-.1-.3-.3v-13.4c0-.2.1-.3.3-.3z" />
@@ -954,9 +954,9 @@ const HomePage = () => {
                     <div className="font-medium">App Store</div>
                   </div>
                 </a>
-              </div>
-            </div>
-          </div>
+              </div> */}
+            {/* </div> */}
+          {/* </div> */}
 
           {/* Bottom section with copyright and additional links */}
           <div className="pt-8 grid grid-cols-1 md:grid-cols-2 items-center">
@@ -964,11 +964,11 @@ const HomePage = () => {
               © 2025 PralaySetu. All rights reserved.
             </div>
             <div className="flex flex-wrap gap-4 text-xs text-gray-300 justify-start md:justify-end">
-              <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-              <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-              <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link>
-              <Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
-              <Link to="/accessibility" className="hover:text-white transition-colors">Accessibility</Link>
+              <Link to="/" className="hover:text-white transition-colors">Terms of Service</Link>
+              <Link to="/" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/" className="hover:text-white transition-colors">Cookie Policy</Link>
+              <Link to="/" className="hover:text-white transition-colors">Disclaimer</Link>
+              <Link to="/" className="hover:text-white transition-colors">Accessibility</Link>
             </div>
           </div>
         </div>

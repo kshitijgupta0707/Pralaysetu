@@ -376,13 +376,13 @@ export const forgotPassword = async (req, res) => {
     // Generate secure random token
     const token = crypto.randomBytes(32).toString("hex");
 
-    // Set token and expiration (15 minutes)
+    // Set token and expiration (5 minutes)
     user.resetPasswordToken = token;
-    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+    user.resetPasswordExpires = Date.now() + 5 * 60 * 1000;
     await user.save();
 
     // Send email
-    const resetLink = `https://yourfrontend.com/reset-password?token=${token}&email=${email}`;
+    const resetLink = `https://pralaysetu.vercel.app/?token=${token}&email=${email}`;
     await mailSender(email, "Reset Your Password", resetTemplate(resetLink));
 
     res.status(200).json({
@@ -438,6 +438,67 @@ export const checkAuth = (req, res) => {
   }
 };
 
+export const loginwithOAuth = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if both fields are provided
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email required" });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Please Sign up normally first" });
+    }
+
+   
+
+    //checking if the user exist if verified by the 
+    if (!user.isVerified || user.registrationStatus !== "approved") {
+      return res.status(403).json({ message: "Your account is pending approval by the admin. Please give us some time we will notify you soon" });
+    }
+
+    const payload = {
+      id: user._id,
+      email: user.email,
+    };
+
+    // Generate JWT token
+    const token = jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      //STRICT IF HOSTED TOGETHER
+       //Allow cross-site cookies
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    }
+
+    const responseUser = user;
+    responseUser.password = ""; // Remove password from response
+
+
+    // Send token in HTTP-only cookie
+    res.cookie("token", token, options).status(200).json({
+      success: true,
+      message: "Login successful",
+      token,
+      responseUser,
+      // location
+    });
+
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 
 
 

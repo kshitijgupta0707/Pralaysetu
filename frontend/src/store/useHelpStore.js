@@ -23,14 +23,20 @@ export const useHelpStore = create((set, get) => ({
       set({ success: res.data.message, loading: false });
       toast.success(res.data.message);
 
-      console.log("request submitted");
-    } catch (err) {
-      console.log("error in creating request")
-
-      set({ loading: false });
-      toast.error(err)
-
-
+      // console.log("request submitted");
+    }  catch (err) {
+      console.error("Error in creating request:", err);
+      
+      // Extract error message properly
+      const errorMessage = err.response?.data?.message || 
+                           err.message || 
+                           "Failed to submit help request";
+      
+      set({ loading: false, error: errorMessage });
+      toast.error(errorMessage);
+      
+      // Re-throw to allow component to handle
+      throw err;
     }
   },
 

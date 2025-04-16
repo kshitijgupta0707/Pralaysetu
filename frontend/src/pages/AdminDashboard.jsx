@@ -16,7 +16,17 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useReportStore } from '@/store/useReportStore';
 import { useHelpStore } from '@/store/useHelpStore';
 import { useAuthStore } from '@/store/useAuthstore';
+
 import { Link } from 'react-router-dom';
+
+
+import { useNotificationStore } from "../store/useNotificationStore";
+
+
+
+
+
+
 import {
   Popover,
   PopoverContent,
@@ -34,7 +44,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const AdminDashboard = () => {
-  const {socket} = useAuthStore()
+  const { socket } = useAuthStore()
   const [activeTab, setActiveTab] = useState('reports');
   const [isLoading, setIsLoading] = useState(true);
   const [broadcastMessage, setBroadcastMessage] = useState('');
@@ -65,38 +75,61 @@ const AdminDashboard = () => {
     isFetchingReports,
     getAllReports,
     verifyReport,
+    addNewReport
 
     // real time functions 
   } = useReportStore();
-  
-    const {
-      loading: helpLoading,
-      requests: helpRequests,
-      fetchHelpRequests,
-      verifyOrRejectRequest,
-      assignHelpRequest,
-      addNewRequest
-  
-    } = useHelpStore();
+
+  const {
+    loading: helpLoading,
+    requests: helpRequests,
+    fetchHelpRequests,
+    verifyOrRejectRequest,
+    assignHelpRequest,
+    addNewRequest
+
+  } = useHelpStore();
   const [selectedResponderForAssignment, setSelectedResponderForAssignment] = useState(null);
   // Extract data and functions from adminStore
 
 
   useEffect(() => {
+    console.log("mene socket lagaana shuru kiaa")
     if (!socket) return;
-
-    // 👂 Listen for new help request
+  
     socket.on("newHelpRequest", (newRequest) => {
       console.log("Received new help request via socket:", newRequest);
-      addNewRequest(newRequest)
-    
+      // console
+      addNewRequest(newRequest);
+      useNotificationStore.getState().showNotification(
+        "New Help Request", 
+        `From ${newRequest.user?.firstName + " " + newRequest.user?.lastName} --> ${newRequest.reason.slice(0,30)}`,
+         'request'
+      );
     });
-    console.log("Current listeners:", socket.listeners("newHelpRequest").length);
-     
+    console.log("bhai mene laga dia hain socket connection")
+    socket.on("newDisasterReport", (newReport) => {
+      
+      console.log("New report received");
+      console.log(newReport)
+      console.log("--------------")
+      console.log(newReport.disasterType)
+      addNewReport(newReport);
+    
+      useNotificationStore.getState().showNotification(
+        "New Disaster Report",
+        `Reported disaster: ${newReport.disasterType
+        }`,
+        'report'
+      );
+    });
+  
     return () => {
       socket.off("newHelpRequest");
+      socket.off("newDisasterReport");
     };
-  }, [socket]);
+  }, [socket, addNewRequest, addNewReport]);
+
 
 
 
@@ -121,7 +154,7 @@ const AdminDashboard = () => {
 
   const handleStatusChange = (status) => {
     setFilterStatus(status);
-    console.log(`Status filtered to: ${status}`);
+    // console.log(`Status filtered to: ${status}`);
   };
 
 
@@ -175,9 +208,9 @@ const AdminDashboard = () => {
     if (!broadcastMessage.trim()) return;
 
     // Simulate sending broadcast
-    console.log('Broadcasting message:', broadcastMessage);
-    console.log('Broadcast type:', broadcastType);
-    console.log('Broadcast region:', broadcastRegion);
+    // console.log('Broadcasting message:', broadcastMessage);
+    // console.log('Broadcast type:', broadcastType);
+    // console.log('Broadcast region:', broadcastRegion);
 
     alert(`${broadcastType.toUpperCase()} broadcast sent successfully to ${broadcastRegion === 'all' ? 'all regions' : broadcastRegion}!`);
     setBroadcastMessage('');
@@ -196,10 +229,10 @@ const AdminDashboard = () => {
   const filteredHelpRequests = helpRequests.filter(request => {
     // console.log(request)
     // const matchesSearch = request.reason?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      request.urgency?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    request.urgency?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (request.user && (request.user.firstName + " " + request.user.lastName).toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = filterStatus === 'all' ? true : request.status === filterStatus;
-    return  matchesStatus;
+    return matchesStatus;
   });
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -316,6 +349,8 @@ const AdminDashboard = () => {
           </ul>
         </nav>
       </div>
+
+   
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -604,7 +639,7 @@ const AdminDashboard = () => {
                                   <div className="px-4 py-2 text-sm text-gray-500">No available responders</div>
                                 ) : (
                                   responders
-                                   .map(responder => (
+                                    .map(responder => (
                                       <button
                                         key={responder._id}
                                         className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center"
@@ -922,41 +957,34 @@ const AdminDashboard = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    
+
       {/* Confirmation Alert Dialog */}
-<AlertDialog open={confirmAssignmentId !== null} onOpenChange={() => setConfirmAssignmentId(null)}>
-  <AlertDialogContent>
-    <AlertDialogHeader>
-      <AlertDialogTitle>Confirm Assignment</AlertDialogTitle>
-      <AlertDialogDescription>
-        Are you sure you want to assign this help request to {selectedResponderForAssignment?.name}?
-      </AlertDialogDescription>
-    </AlertDialogHeader>
-    <AlertDialogFooter>
-      <AlertDialogCancel>Cancel</AlertDialogCancel>
-      <AlertDialogAction onClick={() => {
-        if (confirmAssignmentId && selectedResponderForAssignment) {
-          console.log("i am caleed at alert dialog action")
-          assignHelpRequest(confirmAssignmentId, selectedResponderForAssignment._id);
-          setConfirmAssignmentId(null);
-          setSelectedResponderForAssignment(null);
-        }
-      }}>
-        Confirm Assignment
-      </AlertDialogAction>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>
-    
-    
+      <AlertDialog open={confirmAssignmentId !== null} onOpenChange={() => setConfirmAssignmentId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Assignment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to assign this help request to {selectedResponderForAssignment?.name}?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              if (confirmAssignmentId && selectedResponderForAssignment) {
+                console.log("i am caleed at alert dialog action")
+                assignHelpRequest(confirmAssignmentId, selectedResponderForAssignment._id);
+                setConfirmAssignmentId(null);
+                setSelectedResponderForAssignment(null);
+              }
+            }}>
+              Confirm Assignment
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
 
 export default AdminDashboard;
-
-
-
-
-
-

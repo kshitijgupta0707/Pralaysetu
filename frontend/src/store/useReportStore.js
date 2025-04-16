@@ -38,11 +38,11 @@ export const useReportStore = create((set) => ({
   // 2. Get All Reports (Admin)
   getAllReports: async () => {
     set({ isFetchingReports: true });
-    console.log("get all reports called");
+    // console.log("get all reports called");
     try {
       const res = await axiosInstance.get('/reports/getAllReports');
       set({ reports: res.data.reports || [] });
-      console.log(res.data.reports);
+      // console.log(res.data.reports);
     } catch (err) {
       toast.error('Failed to fetch all reports');
       console.error(err);
@@ -80,6 +80,12 @@ verifyReport: async (reportId, status = 'verified') => {
     } finally {
         set({ isVerifyingReport: false });
     }
+},
+
+addNewReport: (newReport) => {
+  set((state) => ({
+    reports: [newReport, ...state.reports],  // add to top
+  }));
 },
 }));
 

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Loader2, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Loader2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,50 +7,24 @@ import { Label } from '@/components/ui/label';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthstore';
 import toast from 'react-hot-toast';
-import RegistrationRoleModal from './RegistrationRoleModel'; // Import the new component
-import { SignInWithGoogle } from '../google/SignInWithGoogle';
-import { SignInWithFacebook } from '@/google/SignInWithFacebook';
-const LoginPage = () => {
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [showRoleModal, setShowRoleModal] = useState(false);
-  const { login, isLoggingIn, authUser } = useAuthStore();
 
+export const ForgotPassword = () => {
+  const [email, setEmail] = useState('');
+  const { sendResetLink, isSendingLink } = useAuthStore();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check if user is logged in and needs to select a role
-    if (authUser && authUser.registerAs === 'None') {
-      setShowRoleModal(true);
-    } else if (authUser) {
-      // If user is logged in and already has a role, navigate to home
-      navigate('/');
-    }
-  }, [authUser, navigate]);
-
   const validateForm = () => {
-    if (!loginData.email.trim()) return toast.error("Email is required");
-    if (!/\S+@\S+\.\S+/.test(loginData.email)) return toast.error("Invalid email format");
-    if (!loginData.password) return toast.error("Password is required");
+    if (!email.trim()) return toast.error("Email is required");
+    if (!/\S+@\S+\.\S+/.test(email)) return toast.error("Invalid email format");
     return true;
   };
 
-  const handleLoginSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const success = validateForm();
     if (!success) return;
-
-    login(loginData);
-  };
-
-  const handleRoleSelection = (role) => {
-    // Update user profile with selected role
-    // This would typically call an API to update the user's role
-    toast.success(`You've logged in as a ${role === 'normalUser' ? 'User' : 'Responder'}`);
-    // Close the modal
-    setShowRoleModal(false);
-    localStorage.setItem("loggedInAs", role === 'normalUser' ? 'User' : 'Responder');
-    // Navigate to appropriate dashboard or onboarding flow based on role    
-    navigate('/');
+    
+    sendResetLink({ email }, navigate);
   };
 
   return (
@@ -59,7 +33,7 @@ const LoginPage = () => {
       <div className="hidden lg:flex lg:w-1/2 bg-blue-700 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-900 opacity-90"></div>
         <div className="absolute inset-0 bg-[url('/images/waves-pattern.svg')] opacity-10"></div>
-
+        
         <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white m-auto">
           <div className="mb-8">
             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -71,7 +45,7 @@ const LoginPage = () => {
           </div>
           <h1 className="text-5xl font-bold mb-4">PralaySetu</h1>
           <p className="text-xl mb-8">Bridging Crisis to Safety</p>
-
+          
           <div className="max-w-md text-center">
             <p className="text-lg mb-6">
               Your reliable partner in disaster management and emergency response.
@@ -91,14 +65,14 @@ const LoginPage = () => {
               </div>
             </div>
           </div>
-
+          
           <div className="mt-auto text-sm opacity-80">
             © 2025 PralaySetu. All rights reserved.
           </div>
         </div>
       </div>
-
-      {/* Right side - Login Form */}
+      
+      {/* Right side - Forgot Password Form */}
       <div className="w-full lg:w-1/2 bg-gradient-to-br from-blue-50 to-indigo-100/50 flex items-center justify-center p-6">
         <div className="max-w-md w-full">
           {/* Mobile Logo - Only visible on small screens */}
@@ -115,85 +89,55 @@ const LoginPage = () => {
             <p className="text-gray-600">Bridging Crisis to Safety</p>
           </div>
 
-          {/* Login Card */}
+          {/* Forgot Password Card */}
           <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-            <form onSubmit={handleLoginSubmit}>
+            <form onSubmit={handleSubmit}>
               <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
-                <CardDescription className="text-center">
-                  Enter your credentials to access your account
+                <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
+                <CardDescription className="text-center mb-3">
+                  Enter your email address and we'll send you a link to reset your password
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-gray-700">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your.email@example.com"
-                    value={loginData.email}
-                    onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div className="space-y-2 my-3">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="text-gray-700">Password</Label>
-                    <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={loginData.password}
-                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="your.email@example.com" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 mb-3"
                     required
                   />
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col gap-4">
-                <Button
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6"
-                  disabled={isLoggingIn}
+                <Button 
+                  type="submit" 
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6" 
+                  disabled={isSendingLink}
                 >
-                  {isLoggingIn ? (
+                  {isSendingLink ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Logging in...
+                      Sending reset link...
                     </>
                   ) : (
-                    "Log in"
+                    "Send reset link"
                   )}
                 </Button>
-                <div className="flex items-center justify-center w-full ">
-                  <div className="flex-grow h-px bg-gray-300"></div>
-                  <p className="mx-4 text-sm text-gray-500 font-medium">or continue with</p>
-                  <div className="flex-grow h-px bg-gray-300"></div>
-                </div>
-                <div className='flex justify-center items-center gap-5' >
-                  < SignInWithGoogle />
-                  <SignInWithFacebook />
-
-                </div>
-
-                <div className="flex flex-col gap-2 text-center">
-                  <p className="text-sm text-gray-600">
-                    Don't have an account?{" "}
-                    <Link to="/signup" className="text-blue-600 hover:text-blue-800 font-medium">
-                      Sign up
-                    </Link>
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <Link to="/signup" className="text-blue-600 hover:text-blue-800">
-                      Join as a responder
-                    </Link>
-                  </p>
-                </div>
+                
+                <Link to="/login" className="w-full">
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    className="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to login
+                  </Button>
+                </Link>
               </CardFooter>
             </form>
           </Card>
@@ -204,15 +148,6 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
-
-      {/* Role Selection Modal */}
-      <RegistrationRoleModal
-        isOpen={showRoleModal}
-        onClose={() => setShowRoleModal(false)}
-        onSelectRole={handleRoleSelection}
-      />
     </div>
   );
 };
-
-export default LoginPage;
