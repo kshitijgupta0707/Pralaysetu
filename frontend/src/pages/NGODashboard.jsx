@@ -82,6 +82,25 @@ const NGODashboard = () => {
         updateFundraiser
     } = useNgoStore();
 
+    const [ngoFundraisers , setNgoFundraisers] = useState([])
+    const [activeFundraisers , setActiveFundraisers] = useState([])
+    const [inactiveFundraisers , setInactiveFundraisers]= useState([])
+    const [expiredFundraisers , setExpiredFundraisers]= useState([])
+    
+    const calculateFundraiserForNgo = () => {
+        let ngoFundraisers = fundraisers.filter(
+            fundraiser => fundraiser.ngoId._id === (ngo?._id || "")
+        );
+    
+        // Get active, inactive, and expired fundraisers
+        let activeFundraisers = ngoFundraisers.filter(f => f.isActive && !f.isExpired);
+        let inactiveFundraisers = ngoFundraisers.filter(f => !f.isActive && !f.isExpired);
+        let expiredFundraisers = ngoFundraisers.filter(f => f.isExpired);
+        setNgoFundraisers(ngoFundraisers)
+        setActiveFundraisers(activeFundraisers)
+        setInactiveFundraisers(inactiveFundraisers)
+        setExpiredFundraisers(expiredFundraisers)
+    }
     //   const ngo = ngos[0] || null;
 
     // Fetch NGO data on component mount
@@ -90,9 +109,12 @@ const NGODashboard = () => {
         if (authUser?._id) {
             fetchNGOById(authUser.ngoId);
             fetchFundraisers();
-            console.log("fundraisers: ", fundraisers);
+           
         }
     }, [authUser, fetchNGOById, fetchFundraisers]);
+    useEffect(() => {
+        calculateFundraiserForNgo()
+    },[fundraisers])
 
     // Update profile form when ngo changes
     useEffect(() => {
@@ -107,15 +129,15 @@ const NGODashboard = () => {
         }
     }, [ngo]);
 
-    // Filter fundraisers by NGO ID
-    const ngoFundraisers = fundraisers.filter(
-        fundraiser => fundraiser.ngoId._id === (ngo?._id || "")
-    );
+    // // Filter fundraisers by NGO ID
+    // let ngoFundraisers = fundraisers.filter(
+    //     fundraiser => fundraiser.ngoId._id === (ngo?._id || "")
+    // );
 
-    // Get active, inactive, and expired fundraisers
-    const activeFundraisers = ngoFundraisers.filter(f => f.isActive && !f.isExpired);
-    const inactiveFundraisers = ngoFundraisers.filter(f => !f.isActive && !f.isExpired);
-    const expiredFundraisers = ngoFundraisers.filter(f => f.isExpired);
+    // // Get active, inactive, and expired fundraisers
+    // let activeFundraisers = ngoFundraisers.filter(f => f.isActive && !f.isExpired);
+    // let inactiveFundraisers = ngoFundraisers.filter(f => !f.isActive && !f.isExpired);
+    // let expiredFundraisers = ngoFundraisers.filter(f => f.isExpired);
 
     // Form handlers
     const handleProfileChange = (e) => {
@@ -179,8 +201,9 @@ const NGODashboard = () => {
             ngoId: ngo._id
         };
 
-        await createFundraiser(fundraiserData);
-
+       await createFundraiser(fundraiserData);
+       
+       calculateFundraiserForNgo()
         // Reset form
         setFundraiserForm({
             title: "",
@@ -248,23 +271,11 @@ const NGODashboard = () => {
 
                 
             </div>}
-            { sidebarOpen && <div className="md:hidden fixed top-3  left-52 z-50 ">
-                <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setSidebarOpen(!sidebarOpen)}
-                    className="rounded-full shadow-md bg-white"
-                >
-                     <X className="h-5 w-5" />
-                </Button>
-
-                
-            </div>}
-
+         
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                    className="fixed inset-0    bg-opacity-50  backdrop-blur-xs  z-40 md:hidden"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
@@ -327,6 +338,19 @@ const NGODashboard = () => {
                         </Button>
                     </div>
                 </div>
+                { sidebarOpen && <div className="md:hidden fixed top-2   left-52 -right-6 z-50 ">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    className="rounded-full shadow-md bg-white"
+                >
+                     <X className="h-5 w-5" />
+                </Button>
+
+                
+            </div>}
+ 
             </div>
 
             {/* Main Content */}

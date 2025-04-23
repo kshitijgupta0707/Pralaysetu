@@ -49,7 +49,7 @@ const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [userLocation, setUserLocation] = useState(null);
   const [donationAmounts, setDonationAmounts] = useState({});
-  const [donorEmail, setDonorEmail] = useState('');
+  const [donorEmail, setDonorEmail] = useState(authUser?.email || '');  
   const [isProcessing, setIsProcessing] = useState(false);
 
   console.log("user", authUser);
@@ -430,12 +430,13 @@ const UserDashboard = () => {
                             onChange={(e) => handleAmountChange(fundraiser._id, e.target.value)}
                             className="mb-2"
                           />
-                          <Input
+                          {/* <Input
                             type="email"
                             placeholder="Your email"
+                            required
                             value={donorEmail}
                             onChange={(e) => setDonorEmail(e.target.value)}
-                          />
+                          /> */}
                         </div>
                       </CardContent>
 

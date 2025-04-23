@@ -83,6 +83,7 @@ export const useNgoStore = create((set) => ({
         fundraisers: [...state.fundraisers, response.data],
         loading: false,
       }));
+      return response.data;
     } catch (error) {
       toast.error(error.response.data.message);
       set({ error: error.message, loading: false });

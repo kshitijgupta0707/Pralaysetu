@@ -166,7 +166,7 @@ const Sidebar = ({
                         <path d="M12 19.5a2.5 2.5 0 0 0-4.96-.46 2.5 2.5 0 0 0-1.98 3 2.5 2.5 0 0 0 3.32 3.32 2.5 2.5 0 0 0 3.62-5.86Z"></path>
                         <path d="m8 22 2.5-2.5"></path>
                       </svg>
-                      Admin Portal
+                      Ngo Portal
                     </Link>
                   )}
                 </nav>
