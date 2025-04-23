@@ -18,6 +18,7 @@ import notificationRoute from "./routes/notification.route.js"
 import stripeRoutes from "./routes/stripe.route.js"
 import {fundraiserRoutes} from "./routes/fundraiser.route.js"
 import { ngoRoutes } from "./routes/ngo.route.js";
+import { stripeWebhookHandler } from "./controllers/stripe.controller.js";
 // import { donationRoutes } from "./routes/donation.route.js";
 // import paymentRoute from "./routes/payment.route.js"
 import { testAuth } from "./controllers/notification.controller.js";
@@ -45,7 +46,10 @@ app.use(cors(
 
   }
 ))
-//so you can send json response and request
+
+// When using stripe.webhooks.constructEvent, Stripe needs the raw request body, not the parsed JSON.
+app.post("/webhook", express.raw({ type: "application/json" }), stripeWebhookHandler);
+
 app.use(express.json());
 
 //so that we can access the data in the cookie file
