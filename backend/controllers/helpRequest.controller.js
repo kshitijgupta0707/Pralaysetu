@@ -7,9 +7,7 @@ import { sendNotificationToPerson } from "./notification.controller.js";
 // Create Help Request
 export const createHelpRequest = async (req, res) => {
   try {
-    console.log(1)
-    console.log("creating the help request")
-    console.log("Creating help request:", req.body);
+
     const { latitude, longitude, reason, urgency } = req.body;
 
     if (!latitude || !longitude || !urgency || !reason) {
@@ -81,7 +79,7 @@ export const createHelpRequest = async (req, res) => {
 export const getAllRequests = async (req, res) => {
   try {
     const requests = await HelpRequest.find().populate("user", "firstName lastName email").populate("assignedTo", "firstName lastName email");;
-    console.log(requests)
+    // console.log(requests)
     res.status(200).json({ success: true, requests });
   } catch (err) {
     res.status(500).json({ success: false, message: "Error fetching requests" });

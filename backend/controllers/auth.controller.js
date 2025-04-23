@@ -2,6 +2,7 @@
 // Updated Auth Controller
 import bcrypt from "bcryptjs";
 import { User } from "../models/user.model.js";
+import NGO from "../models/ngo.model.js";
 import { OTP } from "../models/otp.model.js";
 import otpGenerator from "otp-generator";
 import jwt from "jsonwebtoken";
@@ -92,7 +93,12 @@ export const sendOtp = async (req, res) => {
 }
 export const signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, registerAs, workAsResponder, password, confirmPassword, otp, location } = req.body;
+    const { firstName, lastName, email, registerAs, workAsResponder, password, confirmPassword, otp, location,
+      ngoName,
+      ngoDescription,
+      ngoPhone,
+      ngoAddress
+    } = req.body;
 
     let governmentDocument = req.files?.governmentDocument;
     // let media = req.files?.media;
@@ -111,6 +117,15 @@ export const signup = async (req, res) => {
           success: false,
           message: "Government document is required"
         })
+      }
+    }
+    // Additional validation for NGO fields
+    if (registerAs === "NGO") {
+      if (!ngoName || !ngoPhone || !ngoAddress || !ngoDescription) {
+        return res.status(400).json({
+          success: false,
+          message: "NGO name, phone, description and address are required"
+        });
       }
     }
 
@@ -232,6 +247,32 @@ export const signup = async (req, res) => {
       password: hashedPassword,
       governmentDocument
     })
+
+
+    if (registerAs === "NGO") {
+      try {
+        // Create an NGO entry linked to the user
+        const ngo = await NGO.create({
+          name: ngoName,
+          description: ngoDescription || "",
+          email: email,
+          phone: ngoPhone,
+          address: ngoAddress,
+          registeredBy: user._id
+        });
+
+        console.log("NGO created:", ngo);
+        // Update the user with the NGO reference
+        await User.findByIdAndUpdate(user._id, {
+          ngoId: ngo._id
+        });
+      } catch (ngoError) {
+        console.error("Error creating NGO:", ngoError);
+        // We won't fail the registration process if NGO creation fails
+        // Just log the error and continue
+      }
+    }
+
     if (registerAs === "NGO" || registerAs === "Government") {
       // Save the registration with status "pending"
       // Notify admin via email / dashboard
@@ -320,7 +361,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       //STRICT IF HOSTED TOGETHER
-       //Allow cross-site cookies
+      //Allow cross-site cookies
       sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     }
@@ -351,7 +392,7 @@ export const logout = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Strict",
       expires: new Date(0), // Alternatively to maxAge
     });
-     //expire immediattely get removed by maxage , erased by " "
+    //expire immediattely get removed by maxage , erased by " "
 
     res.status(200).json({
       success: true,
@@ -431,6 +472,7 @@ export const checkAuth = (req, res) => {
   try {
     console.log("Checking authentication status...");
     console.log(req.user)
+    console.log("User ID:", req.user);
     res.status(200).json(req.user);
   } catch (error) {
     console.log("Error in checkAuth controller", error.message);
@@ -453,7 +495,7 @@ export const loginwithOAuth = async (req, res) => {
       return res.status(404).json({ success: false, message: "Please Sign up normally first" });
     }
 
-   
+
 
     //checking if the user exist if verified by the 
     if (!user.isVerified || user.registrationStatus !== "approved") {
@@ -476,7 +518,7 @@ export const loginwithOAuth = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       //STRICT IF HOSTED TOGETHER
-       //Allow cross-site cookies
+      //Allow cross-site cookies
       sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     }

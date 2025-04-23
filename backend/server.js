@@ -16,8 +16,12 @@ import dashboardRoutes from "./routes/dashboard.route.js";
 import adminRoutes from "./routes/admin.route.js"
 import notificationRoute from "./routes/notification.route.js"
 import stripeRoutes from "./routes/stripe.route.js"
+import {fundraiserRoutes} from "./routes/fundraiser.route.js"
+import { ngoRoutes } from "./routes/ngo.route.js";
+// import { donationRoutes } from "./routes/donation.route.js";
 // import paymentRoute from "./routes/payment.route.js"
 import { testAuth } from "./controllers/notification.controller.js";
+import "./cron/expiredFundraiser.js"
 // import { deleteMessages } from "./seedss/deleteData.js";
 import axios from "axios";
 dotenv.config();
@@ -55,7 +59,9 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/help", helpRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoutes);
-app.use('/api/stripe', stripeRoutes);
+app.use('/api/payment', stripeRoutes);
+app.use("/api/fundraiser", fundraiserRoutes);
+app.use("/api/ngo", ngoRoutes);
 // app.use("/api", paymentRoute);
 
 // app.get("/api/getkey", (req,res) => {

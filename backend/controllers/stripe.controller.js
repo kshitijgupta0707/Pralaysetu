@@ -7,8 +7,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-10-16", // or latest supported version
 });
  const createCheckoutSession = async (req, res) => {
-  const { amount , ngoId , donorEmail } = req.body;
-  if(!amount || !ngoId || !donorEmail) {
+  const { amount , ngoId , donorEmail , fundraiserId } = req.body;
+  if(!amount || !ngoId || !donorEmail || !fundraiserId) {
     return res.status(400).json({ error: "Missing required fields" });    
   }
 console.log("Amount received:", amount);
@@ -31,7 +31,8 @@ console.log("Amount received:", amount);
       cancel_url: 'http://localhost:5173/cancel',
       customer_email: donorEmail, // Optional: pre-fill email
       metadata: {
-        ngoId: ngoId, // Pass NGO ID for later use in webhook
+        ngoId, // Pass NGO ID for later use in webhook
+        fundraiserId
       },
     });
 
@@ -39,7 +40,8 @@ console.log("Amount received:", amount);
 
 
 
-    console.log("Stripe session created:", session);
+    // console.log("Stripe session created:", session);
+    console.log("Send the data to the frontend about the payment" )
     res.json({ id: session.id });
   } catch (error) {
     console.error('Stripe Error:', error.message);
@@ -69,20 +71,25 @@ const stripeWebhookHandler = async(req, res) => {
     const session = event.data.object;
     
     // Example metadata you added during checkout
-    const { ngoId } = session.metadata;
+    const { ngoId , fundraiserId } = session.metadata;
     
     // Save donation in DB
     await Donation.create({
       ngoId,
+      fundraiserId,
       donorEmail: session.customer_email,
       amount: session.amount_total / 100,
       stripeSessionId: session.id,
     });
+    //update the fundraiser amount
+    const fundraiser = await Fundraiser.findById(fundraiserId);
+    fundraiser.raisedAmount += session.amount_total / 100; 
+    await fundraiser.save();
+    console.log("Fundraiser updated:", fundraiser);
     
     console.log("✅ Donation recorded:", session.id);
   }
 
   res.status(200).send("Received");
 }
-
   export {createCheckoutSession , stripeWebhookHandler}

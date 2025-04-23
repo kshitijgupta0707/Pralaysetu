@@ -47,6 +47,10 @@ const userSchema = mongoose.Schema(
     ],
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    ngoId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "NGO",
+    },
   },
   { timestamps: true }
 );

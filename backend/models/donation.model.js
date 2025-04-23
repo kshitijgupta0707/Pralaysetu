@@ -7,6 +7,12 @@ const donationSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  fundraiserId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Fundraiser",
+    required: true,
+  }
+,
   donorEmail: String,
   amount: Number,
   stripeSessionId: String,
