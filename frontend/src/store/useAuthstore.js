@@ -91,16 +91,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       
       const res = await axiosInstance.post("/auth/login", data);
-      if(res.data.responseUser.registerAs === "NGO"){ 
-        // i will delete on thing
-        const ngoData = await useNgoStore.getState().getNGOById(res.data.responseUser.ngoId);
-        await useNgoStore.getState().setNGOs(ngoData)
-        console.log(ngoData)
-        set({ authUser: { ...res.data.responseUser, ngoData } });
-      }
-      else{
         set({ authUser: res.data.responseUser });
-      }
 
       toast.success("Logged in successfully ");
       get().connectSocket();
