@@ -57,13 +57,11 @@ const createCheckoutSession = async (req, res) => {
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 const stripeWebhookHandler = async (req, res) => {
-  console.log("REquest from stripe server", req.body)
-  console.log("Webhook received:", req.body);
   const sig = req.headers["stripe-signature"];
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
     console.error("Webhook error:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
