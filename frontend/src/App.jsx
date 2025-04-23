@@ -18,33 +18,36 @@ import { messaging, onMessage } from "./firebase";
 import NotificationSetup from "./pages/NotificationSetup";
 import { ResetPassword } from "./pages/ResetPassword";
 import { useNotificationStore } from "./store/useNotificationStore";
-import {PralaySetuLoader} from "./pages/PralaysetuLoader";
+import { PralaySetuLoader } from "./pages/PralaysetuLoader";
+import Success from "./pages/Success";
+import Cancel from "./pages/Cancel";
+import DonationPage from "./pages/Donation";
 function App() {
   // In your App.jsx or main.jsx
 
 
 
 
-  const { socket, authUser, checkAuth, isCheckingAuth , actingAs , setActingAs } = useAuthStore();
+  const { socket, authUser, checkAuth, isCheckingAuth, actingAs, setActingAs } = useAuthStore();
 
   useEffect(() => {
     if (!socket) return;
-   console.log("socket = " , socket)
+    console.log("socket = ", socket)
     //  Assigned help request (for responder)
     socket.on("assignedHelpRequest", (payload) => {
       const { title, message, purpose, request } = payload;
       console.log("Real time Assigned to responder:", request);
       useNotificationStore.getState().showNotification(title, message, purpose);
     });
-  
+
     // 🆕 Request status changed (for user)
     socket.on("helpRequestStatusChanged", (payload) => {
-      
+
       const { title, message, purpose, request } = payload;
       console.log("Request status update:", request);
       useNotificationStore.getState().showNotification(title, message, purpose);
     });
-  
+
     // 🆕 Request status changed (for user)
     socket.on("reportStatusUpdate", (payload) => {
       const { title, message, purpose, report } = payload;
@@ -52,7 +55,7 @@ function App() {
       useNotificationStore.getState().showNotification(title, message, purpose);
     });
 
-  
+
     return () => {
       socket.off("assignedHelpRequest");
       socket.off("helpRequestStatusChanged");
@@ -61,7 +64,6 @@ function App() {
       socket.off("reportStatusUpdate")
     };
   }, [socket]);
-  
 
 
 
@@ -70,9 +72,10 @@ function App() {
 
 
 
-  useEffect(()=>{
-     setActingAs(localStorage.getItem("loggedInAs"))
-  },[])
+
+  useEffect(() => {
+    setActingAs(localStorage.getItem("loggedInAs"))
+  }, [])
   const location = useLocation(); // detects route changes
 
   // useEffect(() => {
@@ -98,16 +101,16 @@ function App() {
     return (
       <div className="flex items-center justify-center h-screen">
         {/* <Loader className="size-10 animate-spin" /> */}
-        <PralaySetuLoader  />
+        <PralaySetuLoader />
       </div>
     );
   }
 
-    return (
+  return (
     <div>
       <NotificationBanner />
       {/* <Notification /> */}
-      <NotificationSetup/>
+      <NotificationSetup />
 
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -186,6 +189,10 @@ function App() {
             />
           }
         />
+        <Route path="/donate" element={<DonationPage />} />
+        <Route path="/success" element={<Success />} />
+        <Route path="/cancel" element={<Cancel />} />
+
 
 
       </Routes>

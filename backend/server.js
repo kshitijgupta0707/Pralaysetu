@@ -15,6 +15,7 @@ import helpRoutes from "./routes/help.route.js"
 import dashboardRoutes from "./routes/dashboard.route.js";
 import adminRoutes from "./routes/admin.route.js"
 import notificationRoute from "./routes/notification.route.js"
+import stripeRoutes from "./routes/stripe.route.js"
 // import paymentRoute from "./routes/payment.route.js"
 import { testAuth } from "./controllers/notification.controller.js";
 // import { deleteMessages } from "./seedss/deleteData.js";
@@ -54,6 +55,7 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/help", helpRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoutes);
+app.use('/api/stripe', stripeRoutes);
 // app.use("/api", paymentRoute);
 
 // app.get("/api/getkey", (req,res) => {
