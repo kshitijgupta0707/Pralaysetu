@@ -22,7 +22,8 @@ import { PralaySetuLoader } from "./pages/PralaysetuLoader";
 import Success from "./pages/Success";
 import Cancel from "./pages/Cancel";
 import DonationPage from "./pages/Donation";
-import NGODashboard from "./pages/Ngo";
+// import NGODashboard from "./pages/Ngo";
+import { NGODashboard } from "./pages/NgoDashboard";
 function App() {
   // In your App.jsx or main.jsx
 
@@ -193,7 +194,8 @@ function App() {
         <Route path="/donate" element={<DonationPage />} />
         <Route path="/success" element={<Success />} />
         <Route path="/cancel" element={<Cancel />} />
-        <Route path="/ngo" element={<NGODashboard />} />
+        {/* <Route path="/ngo" element={<NGODashboard />} /> */}
+        <Route path="/ngo-dashboard" element={<NGODashboard />} />
 
 
 

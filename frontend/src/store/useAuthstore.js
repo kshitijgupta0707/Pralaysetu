@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import { Activity } from "lucide-react";
 import { deleteToken, messaging } from "@/firebase.js";
+import { useNgoStore } from "./useNgoStore.js";
 
 const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/" : "https://pralaysetu-backend.onrender.com/";
 export const useAuthStore = create((set, get) => ({
@@ -88,9 +89,18 @@ export const useAuthStore = create((set, get) => ({
   login: async (data) => {
     set({ isLoggingIn: true });
     try {
-      console.log(data);
+      
       const res = await axiosInstance.post("/auth/login", data);
-      set({ authUser: res.data.responseUser });
+      if(res.data.responseUser.registerAs === "NGO"){ 
+        // i will delete on thing
+        const ngoData = await useNgoStore.getState().getNGOById(res.data.responseUser.ngoId);
+        await useNgoStore.getState().setNGOs(ngoData)
+        console.log(ngoData)
+        set({ authUser: { ...res.data.responseUser, ngoData } });
+      }
+      else{
+        set({ authUser: res.data.responseUser });
+      }
 
       toast.success("Logged in successfully ");
       get().connectSocket();

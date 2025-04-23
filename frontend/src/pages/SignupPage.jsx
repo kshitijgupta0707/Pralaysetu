@@ -26,13 +26,19 @@ const SignupPage = () => {
     location: '',
     registerAs: 'None', // Default: None
     workAsResponder: false, // Default: No
-    governmentDocument: null
+    governmentDocument: null,
+
+    // only if someone chooses NGO
+    ngoName: '',
+    ngoDescription: '',
+    ngoPhone: '',
+    ngoAddress: ''
   });
 
   const { isSigningUp, sendOtp, isSendingOtp } = useAuthStore();
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [documentFileName, setDocumentFileName] = useState(''); // To display file name
-  
+
   // Step validation functions
   const validateStep1 = () => {
     if (!registerData.firstName.trim()) {
@@ -51,7 +57,7 @@ const SignupPage = () => {
       toast.error("Invalid email format");
       return false;
     }
-    
+
     console.log("validated 1");
     return true;
   };
@@ -60,15 +66,35 @@ const SignupPage = () => {
       toast.error("Location is required");
       return false;
     }
-    
-    if (
-      (registerData.registerAs === 'Government' || registerData.registerAs === 'NGO') &&
-      !registerData.governmentDocument
-    ) {
-      toast.error(`Please upload an identification document for ${registerData.registerAs} verification`);
+
+    if (registerData.registerAs === 'NGO') {
+      if (!registerData.ngoName.trim()) {
+        toast.error("NGO name is required");
+        return false;
+      }
+      if (!registerData.ngoDescription.trim()) {
+        toast.error("NGO description is required");
+        return false;
+      }
+      if (!registerData.ngoPhone.trim()) {
+        toast.error("NGO phone number is required");
+        return false;
+      }
+      if (!registerData.ngoAddress.trim()) {
+        toast.error("NGO address is required");
+        return false;
+      }
+      if (!registerData.governmentDocument) {
+        toast.error("Please upload NGO Registration Certificate");
+        return false;
+      }
+    }
+
+    if (registerData.registerAs === 'Government' && !registerData.governmentDocument) {
+      toast.error("Please upload a Government identification document");
       return false;
     }
-    
+
     console.log("validated 2");
     return true;
   };
@@ -93,69 +119,76 @@ const SignupPage = () => {
       toast.error("Please accept the terms and conditions");
       return false;
     }
-    
+
     return true;
   };
-  
+
   const nextStep = () => {
     let isValid = false;
-    
-    switch(currentStep) {
+
+    switch (currentStep) {
       case 1:
         isValid = validateStep1();
         break;
-        case 2: 
+      case 2:
         isValid = validateStep2();
         break;
-        default:
+      default:
         isValid = true;
-      }
-      
-      
-      if (isValid) {
-        console.log("Go ahead");
-        setCurrentStep(prev => Math.min(prev + 1, totalSteps));
-        return;
-      }
-      
-      
-      console.log("NOt go ahead")
-    };
-    
-    const prevStep = () => {
-      setCurrentStep(prev => Math.max(prev - 1, 1));
-    };
-    
-    const navigate = useNavigate();
-    const handleRegisterSubmit = (e) => {
-      e.preventDefault();
-    
-      const isValid = validateStep3();
-      if (!isValid) return;
-    
-      console.log('Form is valid, preparing FormData...');
-    
-      const formData = new FormData();
-      formData.append("firstName", registerData.firstName);
-      formData.append("lastName", registerData.lastName);
-      formData.append("email", registerData.email);
-      formData.append("password", registerData.password);
-      formData.append("confirmPassword", registerData.confirmPassword);
-      formData.append("location", registerData.location);
-      formData.append("registerAs", registerData.registerAs);
-      formData.append("workAsResponder", registerData.workAsResponder);
-      
-      if (registerData.governmentDocument) {
-        formData.append("governmentDocument", registerData.governmentDocument);
-      }
-    
-      // Optionally add OTP here if needed
-      // formData.append("otp", otp);
-    
-      // Pass FormData instead of plain JSON
-      sendOtp(formData, navigate); // Make sure sendOtp handles FormData now
-    };
-    
+    }
+
+
+    if (isValid) {
+      console.log("Go ahead");
+      setCurrentStep(prev => Math.min(prev + 1, totalSteps));
+      return;
+    }
+
+
+    console.log("NOt go ahead")
+  };
+
+  const prevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
+  const navigate = useNavigate();
+  const handleRegisterSubmit = (e) => {
+    e.preventDefault();
+
+    const isValid = validateStep3();
+    if (!isValid) return;
+
+    console.log('Form is valid, preparing FormData...');
+
+    const formData = new FormData();
+    formData.append("firstName", registerData.firstName);
+    formData.append("lastName", registerData.lastName);
+    formData.append("email", registerData.email);
+    formData.append("password", registerData.password);
+    formData.append("confirmPassword", registerData.confirmPassword);
+    formData.append("location", registerData.location);
+    formData.append("registerAs", registerData.registerAs);
+    formData.append("workAsResponder", registerData.workAsResponder);
+
+    if (registerData.registerAs === 'NGO') {
+      formData.append("ngoName", registerData.ngoName);
+      formData.append("ngoDescription", registerData.ngoDescription);
+      formData.append("ngoPhone", registerData.ngoPhone);
+      formData.append("ngoAddress", registerData.ngoAddress);
+    }
+
+    if (registerData.governmentDocument) {
+      formData.append("governmentDocument", registerData.governmentDocument);
+    }
+
+    // Optionally add OTP here if needed
+    // formData.append("otp", otp);
+
+    // Pass FormData instead of plain JSON
+    sendOtp(formData, navigate); // Make sure sendOtp handles FormData now
+  };
+
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -185,21 +218,21 @@ const SignupPage = () => {
           const stepNum = index + 1;
           const isActive = stepNum === currentStep;
           const isCompleted = stepNum < currentStep;
-          
+
           return (
             <div key={stepNum} className="flex items-center">
               {/* Step circle */}
-              <div 
+              <div
                 className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors
-                  ${isActive ? 'bg-blue-600 text-white' : 
+                  ${isActive ? 'bg-blue-600 text-white' :
                     isCompleted ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}`}
               >
                 {isCompleted ? <Check size={16} /> : stepNum}
               </div>
-              
+
               {/* Connecting line */}
               {stepNum < totalSteps && (
-                <div 
+                <div
                   className={`w-12 h-1 mx-1 
                     ${stepNum < currentStep ? 'bg-green-500' : 'bg-gray-200'}`}
                 ></div>
@@ -318,7 +351,7 @@ const SignupPage = () => {
                   {/* Step indicators */}
                   {renderStepIndicators()}
                 </CardHeader>
-                
+
                 <CardContent>
                   {/* Step 1: Basic Information */}
                   {currentStep === 1 && (
@@ -379,7 +412,7 @@ const SignupPage = () => {
                           required
                         />
                       </div>
-                      
+
                       {/* Organization Type */}
                       <div className="space-y-2">
                         <Label htmlFor="registerAs" className="text-gray-700">Are you registering as</Label>
@@ -387,7 +420,7 @@ const SignupPage = () => {
                           value={registerData.registerAs}
                           onValueChange={(value) => {
                             setRegisterData(prev => ({
-                              ...prev, 
+                              ...prev,
                               registerAs: value,
                               // Reset document when changing type
                               governmentDocument: null
@@ -410,8 +443,8 @@ const SignupPage = () => {
                       {(registerData.registerAs === 'Government' || registerData.registerAs === 'NGO') && (
                         <div className="space-y-2">
                           <Label htmlFor="documentUpload" className="text-gray-700">
-                            {registerData.registerAs === 'Government' 
-                              ? 'Upload Government ID or Authorization Letter' 
+                            {registerData.registerAs === 'Government'
+                              ? 'Upload Government ID or Authorization Letter'
                               : 'Upload NGO Registration Certificate'}
                           </Label>
                           <div className="mt-1 flex items-center">
@@ -447,13 +480,74 @@ const SignupPage = () => {
                         </div>
                       )}
 
+
+
+                      {/* Conditional NGO Fields */}
+{registerData.registerAs === 'NGO' && (
+  <div className="space-y-4 pt-2 pb-2 border-t border-gray-200 mt-4">
+    <h3 className="font-medium text-gray-700">NGO Details</h3>
+    
+    <div className="max-h-64 overflow-y-auto pr-2 space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="ngoName" className="text-gray-700">NGO Name</Label>
+        <Input
+          id="ngoName"
+          type="text"
+          placeholder="Enter NGO name"
+          value={registerData.ngoName}
+          onChange={handleInputChange}
+          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          required
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="ngoDescription" className="text-gray-700">NGO Description</Label>
+        <textarea
+          id="ngoDescription"
+          placeholder="Brief description of your NGO"
+          value={registerData.ngoDescription}
+          onChange={handleInputChange}
+          className="w-full min-h-[100px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="ngoPhone" className="text-gray-700">NGO Phone Number</Label>
+        <Input
+          id="ngoPhone"
+          type="tel"
+          placeholder="Phone number"
+          value={registerData.ngoPhone}
+          onChange={handleInputChange}
+          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          required
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="ngoAddress" className="text-gray-700">NGO Address</Label>
+        <textarea
+          id="ngoAddress"
+          placeholder="Complete address"
+          value={registerData.ngoAddress}
+          onChange={handleInputChange}
+          className="w-full min-h-[80px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
+      </div>
+    </div>
+  </div>
+)}
+
                       {/* Emergency Responder Availability */}
                       <div className="space-y-2 mb-6">
                         <Label className="text-gray-700">Would you like to work as a responder in case of emergency/disaster?</Label>
-                        <RadioGroup 
+                        <RadioGroup
                           defaultValue="no"
                           onValueChange={(value) => setRegisterData(prev => ({
-                            ...prev, 
+                            ...prev,
                             workAsResponder: value === "yes"
                           }))}
                           className="flex space-x-4 pt-2"
@@ -527,10 +621,10 @@ const SignupPage = () => {
                         Back
                       </Button>
                     )}
-                    
+
                     {/* Spacer if back button isn't shown */}
                     {currentStep === 1 && <div></div>}
-                    
+
                     {/* Next/Submit button */}
                     {currentStep < totalSteps ? (
                       <Button
@@ -539,7 +633,7 @@ const SignupPage = () => {
                         className="bg-blue-600 hover:bg-blue-700 text-white px-4 flex items-center"
                       >
                         Next
-                        <ArrowRight size={16} className="ml-2"/>
+                        <ArrowRight size={16} className="ml-2" />
                       </Button>
                     ) : (
                       <Button
@@ -558,7 +652,7 @@ const SignupPage = () => {
                       </Button>
                     )}
                   </div>
-                  
+
                   <div className="text-center text-sm text-gray-600">
                     Already have an account?{" "}
                     <Link to="/login" className="text-blue-600 hover:text-blue-800 font-medium">

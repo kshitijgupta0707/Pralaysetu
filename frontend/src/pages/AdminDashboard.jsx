@@ -49,7 +49,7 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('pending');
   const [selectedResponder, setSelectedResponder] = useState('');
   const [showBroadcastDialog, setShowBroadcastDialog] = useState(false);
   const [broadcastType, setBroadcastType] = useState('alert');
@@ -96,26 +96,26 @@ const AdminDashboard = () => {
   useEffect(() => {
     console.log("mene socket lagaana shuru kiaa")
     if (!socket) return;
-  
+
     socket.on("newHelpRequest", (newRequest) => {
       console.log("Received new help request via socket:", newRequest);
       // console
       addNewRequest(newRequest);
       useNotificationStore.getState().showNotification(
-        "New Help Request", 
-        `From ${newRequest.user?.firstName + " " + newRequest.user?.lastName} --> ${newRequest.reason.slice(0,30)}`,
-         'request'
+        "New Help Request",
+        `From ${newRequest.user?.firstName + " " + newRequest.user?.lastName} --> ${newRequest.reason.slice(0, 30)}`,
+        'request'
       );
     });
     console.log("bhai mene laga dia hain socket connection")
     socket.on("newDisasterReport", (newReport) => {
-      
+
       console.log("New report received");
       console.log(newReport)
       console.log("--------------")
       console.log(newReport.disasterType)
       addNewReport(newReport);
-    
+
       useNotificationStore.getState().showNotification(
         "New Disaster Report",
         `Reported disaster: ${newReport.disasterType
@@ -123,7 +123,7 @@ const AdminDashboard = () => {
         'report'
       );
     });
-  
+
     return () => {
       socket.off("newHelpRequest");
       socket.off("newDisasterReport");
@@ -143,6 +143,7 @@ const AdminDashboard = () => {
     // Simulate API calls for reports and help requests (keeping original)
     getAllReports();
     fetchHelpRequests();
+    console.log("pedning users", pendingUsers)
   }, []);
   // Set the loading state based on the store
   useEffect(() => {
@@ -350,7 +351,7 @@ const AdminDashboard = () => {
         </nav>
       </div>
 
-   
+
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -738,9 +739,39 @@ const AdminDashboard = () => {
                                 <span className="text-sm font-medium">Phone:</span>
                                 <p>{"95555XXXX8"}</p>
                               </div>
+
+                              {/* NGO Specific Details */}
+                              {registration.registerAs === 'NGO' && (
+                                <div >
+
+                                  <div className="mt-4 pt-3 border-t">
+                                    <span className="text-sm font-medium text-blue-600">NGO Details</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium">NGO Name:</span>
+                                    <p>{registration.ngoId?.name}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium">NGO Phone:</span>
+                                    <p>{registration.ngoId?.phone}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium">NGO Address:</span>
+                                    <p className="text-sm">{registration.ngoId?.address}</p>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div>
+                            {/* Description section for NGO */}
+                            {registration.registerAs === 'NGO' && (
+                              <div className="space-y-2 mb-4">
+                                <span className="text-sm font-medium">NGO Description:</span>
+                                <p className="text-sm bg-gray-50 p-3 rounded border">{registration.ngoId?.description}</p>
+                              </div>
+                            )}
+
                             <div className="space-y-2">
                               <div>
                                 <span className="text-sm font-medium">ID Proof:</span>

@@ -138,6 +138,9 @@ const HomePage = () => {
             { authUser && authUser.registerAs == "Admin" && <Link to="/admin-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors hidden lg:block ">
               Admin Portal
             </Link>}
+            { authUser && authUser.registerAs == "NGO" && <Link to="/ngo-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors hidden lg:block ">
+              NGO Portal
+            </Link>}
           
           </nav>
 
