@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import Donation from "../models/donation.model.js";
+import Fundraiser from "../models/fundraiser.model.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -57,6 +58,8 @@ const createCheckoutSession = async (req, res) => {
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 const stripeWebhookHandler = async (req, res) => {
+  console.log("Webhook received:", req.body);
+
   const sig = req.headers["stripe-signature"];
   let event;
 
@@ -67,20 +70,25 @@ const stripeWebhookHandler = async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
+  console.log("Webhook event type:", event.type);
+
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
 
     // Example metadata you added during checkout
     const { ngoId, fundraiserId } = session.metadata;
+    console.log("NGO ID:", ngoId);
+    console.log("Fundraiser ID:", fundraiserId);
 
     // Save donation in DB
-    await Donation.create({
+    const donation = await Donation.create({
       ngoId,
       fundraiserId,
       donorEmail: session.customer_email,
       amount: session.amount_total / 100,
       stripeSessionId: session.id,
     });
+    console.log("Donation recorded:", donation);
     //update the fundraiser amount
     const fundraiser = await Fundraiser.findById(fundraiserId);
     fundraiser.raisedAmount += session.amount_total / 100;
