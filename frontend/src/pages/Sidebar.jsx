@@ -18,14 +18,14 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-const Sidebar = ({ 
-  isOpen, 
-  setIsOpen, 
-  authUser, 
-  actingAs, 
-  language, 
+const Sidebar = ({
+  isOpen,
+  setIsOpen,
+  authUser,
+  actingAs,
+  language,
   setLanguage,
-  logout 
+  logout
 }) => {
   const closeSheet = () => setIsOpen(false);
 
@@ -45,15 +45,15 @@ const Sidebar = ({
             <span className="text-xl font-bold text-blue-800">PralaySetu</span>
           </SheetTitle>
         </SheetHeader>
-        
+
         <ScrollArea className="h-[calc(100vh-80px)]">
           <div className="py-4">
             {/* Navigation Links */}
             <div className="px-3 py-2">
               <h3 className="mb-2 px-4 text-sm font-semibold text-gray-500">Navigation</h3>
               <nav className="space-y-1">
-                <a 
-                  href="#features" 
+                <a
+                  href="#features"
                   onClick={closeSheet}
                   className="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                 >
@@ -62,8 +62,8 @@ const Sidebar = ({
                   </svg>
                   Features
                 </a>
-                <a 
-                  href="#how-it-works" 
+                <a
+                  href="#how-it-works"
                   onClick={closeSheet}
                   className="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                 >
@@ -72,8 +72,8 @@ const Sidebar = ({
                   </svg>
                   How It Works
                 </a>
-                <a 
-                  href="/#about" 
+                <a
+                  href="/#about"
                   onClick={closeSheet}
                   className="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                 >
@@ -84,8 +84,8 @@ const Sidebar = ({
                   </svg>
                   About
                 </a>
-                <a 
-                  href="/#contact" 
+                <a
+                  href="/#contact"
                   onClick={closeSheet}
                   className="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                 >
@@ -96,17 +96,17 @@ const Sidebar = ({
                 </a>
               </nav>
             </div>
-            
+
             <Separator className="my-4" />
-            
+
             {/* Portal Access Section - Conditional based on user role */}
             {authUser && (
               <div className="px-3 py-2">
                 <h3 className="mb-2 px-4 text-sm font-semibold text-gray-500">Portal Access</h3>
                 <nav className="space-y-1">
                   {authUser && authUser.registerAs === "None" && actingAs === "User" && (
-                    <Link 
-                      to="/user-dashboard" 
+                    <Link
+                      to="/user-dashboard"
                       onClick={closeSheet}
                       className="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                     >
@@ -119,10 +119,10 @@ const Sidebar = ({
                       User Portal
                     </Link>
                   )}
-                  
+
                   {authUser && authUser.registerAs === "None" && actingAs === "Responder" && (
-                    <Link 
-                      to="/responder-dashboard" 
+                    <Link
+                      to="/responder-dashboard"
                       onClick={closeSheet}
                       className="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                     >
@@ -134,10 +134,27 @@ const Sidebar = ({
                       Responder Portal
                     </Link>
                   )}
-                  
+
                   {authUser && authUser.registerAs === "Admin" && (
-                    <Link 
-                      to="/admin-dashboard" 
+                    <Link
+                      to="/admin-dashboard"
+                      onClick={closeSheet}
+                      className="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 4.5a2.5 2.5 0 0 0-4.96-.46 2.5 2.5 0 0 0-1.98 3 2.5 2.5 0 0 0 3.32 3.32 2.5 2.5 0 0 0 3.62-5.86Z"></path>
+                        <path d="m8 8 2.5 2.5"></path>
+                        <path d="M19.5 9.5a2.5 2.5 0 0 0-4.96-.46 2.5 2.5 0 0 0-1.98 3 2.5 2.5 0 0 0 3.32 3.32 2.5 2.5 0 0 0 3.62-5.86Z"></path>
+                        <path d="m15.5 15.5 2.5 2.5"></path>
+                        <path d="M12 19.5a2.5 2.5 0 0 0-4.96-.46 2.5 2.5 0 0 0-1.98 3 2.5 2.5 0 0 0 3.32 3.32 2.5 2.5 0 0 0 3.62-5.86Z"></path>
+                        <path d="m8 22 2.5-2.5"></path>
+                      </svg>
+                      Admin Portal
+                    </Link>
+                  )}
+                  {authUser && authUser.registerAs === "NGO" && (
+                    <Link
+                      to="/ngo-dashboard"
                       onClick={closeSheet}
                       className="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                     >
@@ -153,11 +170,11 @@ const Sidebar = ({
                     </Link>
                   )}
                 </nav>
-                
+
                 <Separator className="my-4" />
               </div>
             )}
-            
+
             {/* Settings Section */}
             <div className="px-3 py-2">
               <Accordion type="single" collapsible className="w-full">
@@ -186,7 +203,7 @@ const Sidebar = ({
                           {/* Add more language options as needed */}
                         </select>
                       </div>
-                      
+
                       {/* Theme or other settings could go here */}
                     </div>
                   </AccordionContent>
@@ -194,20 +211,20 @@ const Sidebar = ({
               </Accordion>
             </div>
           </div>
-          
+
           {/* Account Actions at the bottom */}
           <div className="absolute bottom-0 left-0 right-0 border-t p-4 bg-white">
             {!authUser ? (
               <div className="flex flex-col space-y-2">
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/login"
                   onClick={closeSheet}
                   className="flex justify-center items-center px-4 py-2 text-blue-600 hover:text-blue-800 border border-blue-600 rounded-md font-medium transition-colors"
                 >
                   Log in
                 </Link>
-                <Link 
-                  to="/signup" 
+                <Link
+                  to="/signup"
                   onClick={closeSheet}
                   className="w-full"
                 >
@@ -218,24 +235,24 @@ const Sidebar = ({
               </div>
             ) : (
               <div>
-                <Button 
+                <Button
                   onClick={() => {
                     logout();
                     closeSheet();
-                  }} 
-                  variant="destructive" 
+                  }}
+                  variant="destructive"
                   className="w-full"
                 >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    width="16" 
-                    height="16" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     className="mr-2"
                   >
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
