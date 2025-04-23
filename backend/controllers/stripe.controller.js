@@ -7,9 +7,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-10-16", // or latest supported version
 });
  const createCheckoutSession = async (req, res) => {
-  const { amount } = req.body;
+  const { amount , ngoId , donorEmail } = req.body;
+  if(!amount || !ngoId || !donorEmail) {
+    return res.status(400).json({ error: "Missing required fields" });    
+  }
 console.log("Amount received:", amount);
   try {
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
@@ -25,7 +29,16 @@ console.log("Amount received:", amount);
       mode: 'payment',
       success_url: 'http://localhost:5173/success',
       cancel_url: 'http://localhost:5173/cancel',
+      customer_email: donorEmail, // Optional: pre-fill email
+      metadata: {
+        ngoId: ngoId, // Pass NGO ID for later use in webhook
+      },
     });
+
+
+
+
+
     console.log("Stripe session created:", session);
     res.json({ id: session.id });
   } catch (error) {

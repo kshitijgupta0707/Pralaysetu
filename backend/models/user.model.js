@@ -39,6 +39,12 @@ const userSchema = mongoose.Schema(
       default: false
     },
     fcmTokens: [String],// Store an array of tokens for each user
+    donationsRecieved: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Donation",
+      },
+    ],
     resetPasswordToken: String,
     resetPasswordExpires: Date,
   },

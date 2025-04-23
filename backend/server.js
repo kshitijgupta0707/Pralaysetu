@@ -65,6 +65,7 @@ app.use('/api/stripe', stripeRoutes);
 app.post("/api/predict_earthquake", async (req, res) => {
   try {
       const response = await axios.post('http://localhost:5001/api/predict_earthquake', req.body);
+      console.log(response.data)
       res.json(response.data);
   } catch (error) {
       res.status(500).json({ error: "Error in prediction" });
