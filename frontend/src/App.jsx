@@ -23,7 +23,7 @@ import Success from "./pages/Success";
 import Cancel from "./pages/Cancel";
 import DonationPage from "./pages/Donation";
 // import NGODashboard from "./pages/Ngo";
-import { NGODashboard } from "./pages/NgoDashboard";
+import { NGODashboard } from "./pages/NGODashboard";
 function App() {
   // In your App.jsx or main.jsx
 
