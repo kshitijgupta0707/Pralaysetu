@@ -1,20 +1,30 @@
-// models/ngo.model.js
 import mongoose from "mongoose";
 
 const ngoSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
+  name: {
+    type: String,
+    required: true,
   },
-  name: String,
   description: String,
-  location: String,
-  contact: String,
-  totalReceived: {
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  phone: String,
+  address: String,
+  registeredBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // Who created this NGO
+  },
+  totalFundsReceived: {
     type: Number,
-    default: 0
-  }
+    default: 0,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 export default mongoose.model("NGO", ngoSchema);
