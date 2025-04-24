@@ -128,10 +128,10 @@ const HomePage = ({language}) => {
                   <div className="space-y-4">
                     <div className="bg-white/20 p-4 rounded-lg">
                       <div className="flex justify-between mb-2">
-                        <span className="font-semibold">Flood Warning</span>
+                        <span className="font-semibold">Earthquake Warning</span>
                         <Badge className="bg-yellow-500">High Risk</Badge>
                       </div>
-                      <p className="text-sm">Heavy rainfall expected in Mumbai region. Prepare for potential flooding in low-lying areas.</p>
+                      <p className="text-sm">High magnitude earthquake expected in Mumbai region. Prepare for it accordingly</p>
                     </div>
                     <div className="bg-white/20 p-4 rounded-lg">
                       <div className="flex justify-between mb-2">
