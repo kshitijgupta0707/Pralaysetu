@@ -73,6 +73,7 @@ const NGODashboard = () => {
         ngo,
         setNGO,
         fundraisers,
+        getUpdatedFundraiser,
         loading,
         error,
         fetchNGOById,
@@ -88,9 +89,11 @@ const NGODashboard = () => {
     const [expiredFundraisers , setExpiredFundraisers]= useState([])
     
     const calculateFundraiserForNgo = () => {
+        console.log("Calculating fundraisers for NGO ", fundraisers)
         let ngoFundraisers = fundraisers.filter(
             fundraiser => fundraiser.ngoId._id === (ngo?._id || "")
         );
+        console.log("ngo fundraisers are ", ngoFundraisers)
     
         // Get active, inactive, and expired fundraisers
         let activeFundraisers = ngoFundraisers.filter(f => f.isActive && !f.isExpired);
@@ -202,8 +205,6 @@ const NGODashboard = () => {
         };
 
        await createFundraiser(fundraiserData);
-       
-       calculateFundraiserForNgo()
         // Reset form
         setFundraiserForm({
             title: "",
@@ -212,6 +213,8 @@ const NGODashboard = () => {
             deadline: ""
         });
         setIsNewFundraiserOpen(false);
+
+        
     };
 
 
@@ -235,9 +238,15 @@ const NGODashboard = () => {
     };
 
     const handleToggleFundraiserStatus = async (fundraiser) => {
+
+        console.log("Hanle toggle fundraiser status")
+        console.log(fundraiser);
         await updateFundraiser(fundraiser._id, {
             isActive: !fundraiser.isActive
         });
+
+        
+        
     };
 
 
@@ -257,9 +266,9 @@ const NGODashboard = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50 ">
+        <div className="flex flex-col min-h-screen bg-gray-50 relative ">
             {/* Mobile Menu Button */}
-            { !sidebarOpen && <div className="md:hidden fixed top-6 left-3 z-50 ">
+            { !sidebarOpen && <div className="md:hidden absolute top-6 left-3 z-50 ">
                 <Button
                     variant="outline"
                     size="icon"
@@ -281,7 +290,7 @@ const NGODashboard = () => {
             )}
 
             {/* Sidebar */}
-            <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out`}>
+            <div className={`absolute inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out`}>
                 <div className="h-full flex flex-col overflow-y-auto">
                     <Link to={"/"} >
                     <div className="p-6 border-b">
@@ -413,7 +422,7 @@ const NGODashboard = () => {
                     </Card>
 
                     {/* Fundraisers Tabs */}
-                    <Tabs defaultValue="all" className="mb-6" onValueChange={setActiveTab}>
+                    <Tabs defaultValue="all" className="mb-6 flex justify-between items-center" onValueChange={setActiveTab}>
                         <TabsList className="grid grid-cols-4 mb-4">
                             <TabsTrigger value="all">All</TabsTrigger>
                             <TabsTrigger value="active">Active</TabsTrigger>
@@ -437,7 +446,7 @@ const NGODashboard = () => {
                             </div>
                         </Card>
                     ) : (
-                        <div className="space-y-6">
+                        <div className="space-y-6  sm:w-[100%]">
                             {displayFundraisers().map((fundraiser) => (
                                 <Card key={fundraiser._id} className="shadow-md">
                                     <CardHeader className="pb-3">

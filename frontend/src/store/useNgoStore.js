@@ -2,8 +2,10 @@
 import {create} from 'zustand';
 import { axiosInstance } from '../lib/axios'; // Adjust the import path as necessary
 import toast from 'react-hot-toast';
-export const useNgoStore = create((set) => ({
+// import { c } from 'vite/dist/node/moduleRunnerTransport.d-CXw_Ws6P';
+export const useNgoStore = create((set ,get) => ({
   ngo: {},
+  ngos: [],
   fundraisers: [],
   loading: false,
   error: null, // To capture any errors during API calls
@@ -60,14 +62,22 @@ export const useNgoStore = create((set) => ({
   updateNGO: async (id, updatedData) => {
     set({ loading: true });
     try {
+      console.log("updating ngo with id ", id)
       const response = await axiosInstance.put(`/ngo/${id}`, updatedData);
+      console.log("updated ngo is ", response.data)
       set((state) => ({
-        ngos: state.ngos.map((ngo) =>
-          ngo._id === id ? response.data : ngo
+        ngos: state.ngos.map((ng) =>
+          ng._id === id ? response.data : ng
         ),
+        ngo: response.data, // optionally update the currently selected NGO as well
         loading: false,
       }));
+      
+       toast.success("NGO updated successfully");
+      console.log(get().fundraisers)
     } catch (error) {
+      toast.error("Error in updating NGO");
+      console.log("error is ", error)
       set({ error: error.message, loading: false });
     }
   },
@@ -78,14 +88,20 @@ export const useNgoStore = create((set) => ({
   createFundraiser: async (fundraiserData) => {
     set({ loading: true });
     try {
+      // i am sharing the expanded ngoid
       const response = await axiosInstance.post('/fundraiser/create', fundraiserData);
+      console.log("created fundraiser is ", response.data)
       set((state) => ({
-        fundraisers: [...state.fundraisers, response.data],
+        fundraisers: [ response.data,...state.fundraisers],
         loading: false,
       }));
+      console.log(get().fundraisers)
+      console.log("Fundraiser created successfully");
+      toast.success("Fundraiser created successfully");
       return response.data;
     } catch (error) {
-      toast.error(error.response.data.message);
+
+      toast.error("Error in creating fundraiser");
       set({ error: error.message, loading: false });
     }
   },
@@ -130,12 +146,18 @@ export const useNgoStore = create((set) => ({
     set({ loading: true });
     try {
       const response = await axiosInstance.put(`/fundraiser/${id}`, updatedData);
+      
+      console.log("updated fundraiser is ", response.data)
+      
+      // Update the fundraisers in the store to update the UI
       set((state) => ({
         fundraisers: state.fundraisers.map((fundraiser) =>
           fundraiser._id === id ? response.data : fundraiser
         ),
-        loading: false,
       }));
+
+      console.log(get().fundraisers)
+      toast.success("Fundraiser updated successfully");
     } catch (error) {
       set({ error: error.message, loading: false });
     }

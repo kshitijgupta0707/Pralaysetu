@@ -31,7 +31,6 @@ import ReportIncident from './ReportIncident';
 import RequestHelp from './RequestHelp';
 import { useAuthStore } from '@/store/useAuthstore';
 import { useNgoStore } from '@/store/useNgoStore';
-import { axiosInstance } from '@/lib/axios';
 import { userimage } from '../assets/index.js';
 import { Alert } from '@/components/ui/alert';
 import { toast } from 'react-hot-toast';
@@ -200,8 +199,9 @@ const UserDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100/50">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pt-4">
         {/* Emergency Action Bar */}
+        {/* <Header /> */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex justify-between items-center">
           <div className="flex items-center">
             <a href="/" className="flex items-center">
@@ -253,7 +253,7 @@ const UserDashboard = () => {
             <TabsTrigger value="map">Map</TabsTrigger>
             <TabsTrigger value="report">Report</TabsTrigger>
             <TabsTrigger value="help">Help</TabsTrigger>
-            <TabsTrigger value="fundraisers">Fundraisers</TabsTrigger>
+            <TabsTrigger value="fundraisers">Donate</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -359,9 +359,9 @@ const UserDashboard = () => {
 
           {/* Fundraisers Tab */}
           <TabsContent value="fundraisers">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2">Support Disaster Relief Fundraisers</h2>
-              <p className="text-gray-600">
+            <div className="mb-6 flex flex-col items-center">
+              <h2 className="text-2xl font-bold mb-2  text-center">Support Disaster Relief Fundraisers</h2>
+              <p className="text-gray-600 text-center">
                 Help communities recover from disasters by contributing to these ongoing fundraisers.
               </p>
             </div>

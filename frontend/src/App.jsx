@@ -24,6 +24,8 @@ import Cancel from "./pages/Cancel";
 import DonationPage from "./pages/Donation";
 // import NGODashboard from "./pages/Ngo";
 import { NGODashboard } from "./pages/NGODashboard";
+// import { Header } from "@radix-ui/react-accordion";
+import Header from "./components/ui/Header";
 function App() {
   // In your App.jsx or main.jsx
 
@@ -68,7 +70,7 @@ function App() {
   }, [socket]);
 
 
-
+ const [language, setLanguage] = useState('en');
 
 
 
@@ -114,8 +116,10 @@ function App() {
       {/* <Notification /> */}
       <NotificationSetup />
 
+      <Header language={language}  setLanguage={setLanguage} />
+
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<HomePage language={language} />} />
         <Route
           path="/login"
           element={

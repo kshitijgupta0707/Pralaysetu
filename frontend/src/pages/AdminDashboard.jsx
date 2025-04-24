@@ -278,78 +278,93 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
-      {/* Sidebar - becomes top navigation on mobile */}
-      <div className={`w-full lg:w-64 bg-white shadow-md ${showSidebar ? 'block' : 'hidden lg:block'}`}>
-        <Link to={"/"}>
-          <div className="p-4 border-b flex items-center justify-between">
-            <h2 className="text-xl font-bold">PralaySetu Admin</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="lg:hidden"
-              onClick={() => setShowSidebar(false)}
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-        </Link>
-        <nav className="p-2">
-          <ul className="space-y-1">
-            <li>
-              <Button
-                variant={activeTab === 'reports' ? "default" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => {
-                  setActiveTab('reports');
-                  setShowSidebar(false);
-                }}
-              >
-                <FileText className="mr-2 h-4 w-4" />
-                Reports
-              </Button>
-            </li>
-            <li>
-              <Button
-                variant={activeTab === 'help' ? "default" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => {
-                  setActiveTab('help');
-                  setShowSidebar(false);
-                }}
-              >
-                <AlertTriangle className="mr-2 h-4 w-4" />
-                Help Requests
-              </Button>
-            </li>
-            <li>
-              <Button
-                variant={activeTab === 'responders' ? "default" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => {
-                  setActiveTab('responders');
-                  setShowSidebar(false);
-                }}
-              >
-                <Users className="mr-2 h-4 w-4" />
-                Responders
-              </Button>
-            </li>
-            <li>
-              <Button
-                variant={activeTab === 'settings' ? "default" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => {
-                  setActiveTab('settings');
-                  setShowSidebar(false);
-                }}
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
-            </li>
-          </ul>
-        </nav>
-      </div>
+{/* Admin Sidebar */}
+<div className={`absolute inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-300 ease-in-out`}>
+  <div className="h-full flex flex-col overflow-y-auto">
+    <div className="p-4 border-b flex items-center justify-between">
+      <h2 className="text-2xl font-bold text-blue-800">PralaySetu Admin</h2>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="lg:hidden"
+        onClick={() => setShowSidebar(false)}
+      >
+        {/* <X className="h-5 w-5" /> */}
+      </Button>
+    </div>
+
+    <nav className="p-2 flex-1">
+      <ul className="space-y-1">
+        <li>
+          <Button
+            variant={activeTab === 'reports' ? "default" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => {
+              setActiveTab('reports');
+              setShowSidebar(false);
+            }}
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            Reports
+          </Button>
+        </li>
+        <li>
+          <Button
+            variant={activeTab === 'help' ? "default" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => {
+              setActiveTab('help');
+              setShowSidebar(false);
+            }}
+          >
+            <AlertTriangle className="mr-2 h-4 w-4" />
+            Help Requests
+          </Button>
+        </li>
+        <li>
+          <Button
+            variant={activeTab === 'responders' ? "default" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => {
+              setActiveTab('responders');
+              setShowSidebar(false);
+            }}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            Responders
+          </Button>
+        </li>
+        <li>
+          <Button
+            variant={activeTab === 'settings' ? "default" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => {
+              setActiveTab('settings');
+              setShowSidebar(false);
+            }}
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
+          </Button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  {showSidebar && (
+    <div className="lg:hidden fixed top-2 left-52 -right-6 z-50">
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={() => setShowSidebar(false)}
+        className="rounded-full shadow-md bg-white"
+      >
+        <X className="h-5 w-5" />
+      </Button>
+    </div>
+  )}
+</div>
+
 
 
 
