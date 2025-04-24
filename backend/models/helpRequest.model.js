@@ -26,7 +26,7 @@ const helpRequestSchema = new mongoose.Schema(
       default: "medium",
     },
     photo: {
-      type: String, // Cloudinary image URL
+      type: String, 
     },
     //for responder there are only two option completed or accepted
      // rest are for admin after assigned by admin to assignedTo

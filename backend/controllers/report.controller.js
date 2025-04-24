@@ -6,7 +6,6 @@ import { sendNotificationToAll } from "./notification.controller.js";
 
 export const createReport = async (req, res) => {
   try {
-    console.log("body mei yeh hain", req.body)
     const { disasterType, latitude, longitude, description } = req.body;
     if (!disasterType || !latitude || !longitude || !description) {
       return res.status(400).json({
@@ -14,7 +13,6 @@ export const createReport = async (req, res) => {
         message: "All fields are required",
       });
     }
-    console.log("yha tak agya")
     if (latitude == 0 || longitude == 0) {
       return res.status(500).json({
         success: false,
@@ -42,16 +40,7 @@ export const createReport = async (req, res) => {
     //  }
 
 
-
-
-
-
-
     let media = req.files?.media;
-
-
-
-
     let mediaUrl = null;
     if (media) {
       const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
@@ -105,13 +94,9 @@ export const getVerifiedReports = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to fetch verified reports" });
   }
 };
-
-
 export const verifyReport = async (req, res) => {
-  console.log("INSIDE VERIFY REPORT CONTORLLER");
   try {
     const { reportId, status } = req.body;
-    console.log(reportId, status);
 
     if (!["verified", "rejected"].includes(status)) {
       return res.status(400).json({
@@ -129,7 +114,6 @@ export const verifyReport = async (req, res) => {
     }
 
     report.status = status;
-    console.log("user ", req.user)
     report.verifiedBy = req.user._id; // Admin who verified
     await report.save();
 
@@ -152,9 +136,7 @@ export const verifyReport = async (req, res) => {
 
 
     // Send real-time notification to the perosn
-    console.log("sending notification in real time to");
     const receiverSocketId = getReceiverSocketId(report.user._id);
-    console.log(receiverSocketId)
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("reportStatusUpdate", {
 
@@ -165,8 +147,6 @@ export const verifyReport = async (req, res) => {
 
       });
     }
-
-
 
     res.status(200).json({
       success: true,
@@ -181,5 +161,3 @@ export const verifyReport = async (req, res) => {
     });
   }
 };
-
-

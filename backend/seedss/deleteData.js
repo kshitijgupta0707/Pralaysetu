@@ -3,6 +3,12 @@ import dotenv from 'dotenv'
  import { dbConnect } from '../config/database.js';
 import helpRequestModel from '../models/helpRequest.model.js';
 import { Token } from '../models/token.model.js';
+import fundraiserModel from '../models/fundraiser.model.js';
+import { Report } from '../models/report.model.js';
+import { OTP } from '../models/otp.model.js';
+import helpRequestModel from '../models/helpRequest.model.js';
+
+
 dotenv.config()
     const deleteMessages = async () => {
         try {

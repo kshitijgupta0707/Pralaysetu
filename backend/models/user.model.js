@@ -6,10 +6,6 @@ const userSchema = mongoose.Schema(
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, minLength: 6 },
-    profilePic: {
-      type: String,
-      default: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
-    },
     registerAs: {
       type: String,
       enum: ["Admin", "NGO" , "Government", "None"],
@@ -29,7 +25,7 @@ const userSchema = mongoose.Schema(
         return this.registerAs === "NGO" || this.registerAs === "Government" ? false : true;
       }
     },
-    //only for Govenemrnt , Ngo verifiucaiton
+    //only for Government and ngo verification
     governmentDocument: {
       type: String,
       default: ""
@@ -39,12 +35,6 @@ const userSchema = mongoose.Schema(
       default: false
     },
     fcmTokens: [String],// Store an array of tokens for each user
-    donationsRecieved: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Donation",
-      },
-    ],
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     ngoId: {

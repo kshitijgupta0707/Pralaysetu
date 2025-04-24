@@ -12,7 +12,6 @@ const createCheckoutSession = async (req, res) => {
   if (!amount || !ngoId || !donorEmail || !fundraiserId) {
     return res.status(400).json({ error: "Missing required fields" });
   }
-  console.log("Amount received:", amount);
   try {
 
     const session = await stripe.checkout.sessions.create({
@@ -36,29 +35,16 @@ const createCheckoutSession = async (req, res) => {
         fundraiserId
       },
     });
-
-
-
-
-
-    // console.log("Stripe session created:", session);
-    console.log("Send the data to the frontend about the payment")
     res.json({ id: session.id });
   } catch (error) {
     console.error('Stripe Error:', error.message);
     res.status(500).json({ error: error.message });
   }
 };
-
-
-
-
 // controllers/stripe.webhook.js
 
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
 const stripeWebhookHandler = async (req, res) => {
-  console.log("Webhook received:", req.body);
+  console.log("Webhook received:");
 
   const sig = req.headers["stripe-signature"];
   let event;
@@ -70,15 +56,12 @@ const stripeWebhookHandler = async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  console.log("Webhook event type:", event.type);
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
 
     // Example metadata you added during checkout
     const { ngoId, fundraiserId } = session.metadata;
-    console.log("NGO ID:", ngoId);
-    console.log("Fundraiser ID:", fundraiserId);
 
     // Save donation in DB
     const donation = await Donation.create({
@@ -88,14 +71,10 @@ const stripeWebhookHandler = async (req, res) => {
       amount: session.amount_total / 100,
       stripeSessionId: session.id,
     });
-    console.log("Donation recorded:", donation);
     //update the fundraiser amount
     const fundraiser = await Fundraiser.findById(fundraiserId);
     fundraiser.raisedAmount += session.amount_total / 100;
     await fundraiser.save();
-    console.log("Fundraiser updated:", fundraiser);
-
-    console.log("✅ Donation recorded:", session.id);
   }
 
   res.status(200).send("Received");

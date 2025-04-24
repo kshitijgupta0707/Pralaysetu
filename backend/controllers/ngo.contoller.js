@@ -24,10 +24,7 @@ export const getAllNGOs = async (req, res) => {
 // READ ONE
 export const getNGOById = async (req, res) => {
   try {
-    // console.log("called get ngo by id")
-    // console.log("req.params.id", req.params.id);
     const ngo = await NGO.findById(req.params.id).populate("registeredBy", "firstName lastName email");
-    // console.log("ngo is ", ngo)
     if (!ngo) return res.status(404).json({ message: "NGO not found" });
     res.json(ngo);
   } catch (err) {
@@ -38,23 +35,9 @@ export const getNGOById = async (req, res) => {
 // UPDATE
 export const updateNGO = async (req, res) => {
   try {
-    // console.log("called update ngo")
-
     const ngo = await NGO.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    // console.log("updated ngo is ", ngo)
     if (!ngo) return res.status(404).json({ message: "NGO not found" });
     res.json(ngo);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// DELETE
-export const deleteNGO = async (req, res) => {
-  try {
-    const ngo = await NGO.findByIdAndDelete(req.params.id);
-    if (!ngo) return res.status(404).json({ message: "NGO not found" });
-    res.json({ message: "NGO deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

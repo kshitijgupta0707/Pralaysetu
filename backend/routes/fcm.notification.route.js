@@ -1,8 +1,8 @@
 
 import express from "express";
 import { saveFcmToken  , removeToken} from "../controllers/notification.controller.js";
-const router = express.Router();
 
+const router = express.Router();
 
 router.post("/save-token", saveFcmToken);
 router.post('/remove-token', removeToken)

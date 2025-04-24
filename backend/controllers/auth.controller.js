@@ -11,16 +11,15 @@ import { resetTemplate } from "../templates/reset.template.js";
 import { otpTemplate } from "../templates/otp.template.js";
 import crypto from "crypto";
 import { uploadImageToCloudinary } from "../utils/imageUploader.js";
+import { registrationRequestTemplate ,thankYouTemplate} from "../templates/register.template.js";
 
 export const sendOtp = async (req, res) => {
   try {
-    //fetch email from the request body
     const { email } = req.body;
 
     //check if user already exists
     const existingUser = await User.findOne({ email });
 
-    //if user already exist , then return a respoonse
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -34,7 +33,6 @@ export const sendOtp = async (req, res) => {
       specialChars: false,
       lowerCaseAlphabets: false,
     });
-    console.log("otp generated ", otp);
 
     //check unique otp or not
     let result = await OTP.findOne({ otp });
@@ -44,14 +42,12 @@ export const sendOtp = async (req, res) => {
         specialChars: false,
         lowerCaseAlphabets: false,
       });
-      console.log("otp generated ", otp);
       result = await OTP.findOne({ otp });
     }
 
     //create an entry in db for otp
     const otpPayLoad = { email, otp };
     const otpBody = await OTP.create(otpPayLoad);
-    console.log(otpBody);
     //check if otp is saved in db or not    
     if (!otpBody) {
       return res.status(400).json({
@@ -99,18 +95,17 @@ export const signup = async (req, res) => {
       ngoPhone,
       ngoAddress
     } = req.body;
-
+    //this is how document , images are fetched from form data
     let governmentDocument = req.files?.governmentDocument;
-    // let media = req.files?.media;
-
     //check if some data is missing
-    console.log(req.body)
     if (!firstName || !lastName || !email || !registerAs || !workAsResponder || !password || !otp) {
       return res.status(400).json({
         success: false,
         message: "All fields are required"
       });
     }
+
+    //check for government/ngo document if register as government or ngo
     if (registerAs == "Government" || registerAs == "NGO") {
       if (!governmentDocument) {
         return res.status(400).json({
@@ -157,6 +152,7 @@ export const signup = async (req, res) => {
         message: "Password must be at least 6 characters"
       });
     }
+
     if (password !== confirmPassword) {
       return res.status(400).json({
         success: false,
@@ -164,12 +160,8 @@ export const signup = async (req, res) => {
       });
     }
 
-    //check if user already exist
-    //use find one it gives an single object
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      // console.log("User already exists");
-      // console.log(existingUser);
       return res.status(400).json({
         success: false,
         message: "User already exists",
@@ -206,35 +198,19 @@ export const signup = async (req, res) => {
       });
     }
 
-
-
-
-
     //secure the password
 
-    //optimal round jaida heavy hoga //if kam then can be hacked------------>
-    // AES ke bre mein padhoo //worth it very interesting
-    //Retry startegy to hash password for atleast three times
-    let tryy = 0;
     let hashedPassword;
-    while (tryy < 3) {
-      try {
-        hashedPassword = await bcrypt.hash(password, 10);
-        if (hashedPassword) break;
-      } catch (e) {
-        tryy++;
-        if (tryy == 3) {
-          return res.status(500).json({
-            success: false,
-            data: "Error in hashing passwrord",
-          });
-        }
-      }
+
+    try {
+      hashedPassword = await bcrypt.hash(password, 10);
+    } catch (e) {
+      return res.status(500).json({
+        success: false,
+        data: "Error in hashing passwrord",
+      });
+
     }
-
-
-
-
 
     //entry in db
 
@@ -261,25 +237,26 @@ export const signup = async (req, res) => {
           registeredBy: user._id
         });
 
-        console.log("NGO created:", ngo);
         // Update the user with the NGO reference
         await User.findByIdAndUpdate(user._id, {
           ngoId: ngo._id
         });
       } catch (ngoError) {
         console.error("Error creating NGO:", ngoError);
-        // We won't fail the registration process if NGO creation fails
-        // Just log the error and continue
       }
     }
 
     if (registerAs === "NGO" || registerAs === "Government") {
       // Save the registration with status "pending"
       // Notify admin via email / dashboard
-      const sendMail = mailSender(email, "Registration Request", `Your request to register as a ${registerAs} has been recieved . We will notify you soon`);
+      await mailSender(email, "Registration Request", registrationRequestTemplate(registerAs));
       return res.status(200).json({
         message: "Your registration request has been received and is pending admin approval.",
       });
+    }
+    else{
+      // Send a success email to the user
+      await mailSender(email, "Registration Successful", thankYouTemplate(firstName));
     }
 
 
@@ -321,30 +298,6 @@ export const login = async (req, res) => {
       return res.status(403).json({ message: "Your account is pending approval by the admin. Please give us some time we will notify you soon" });
     }
 
-    // 👉 Get client IP
-    // const rawIp =
-    //   req.headers["x-forwarded-for"]?.split(",")[0] ||
-    //   req.connection.remoteAddress;
-    // const ip = rawIp?.replace("::ffff:", "") || "0.0.0.0";
-
-    // // 👉 Get location from IP
-    // let location = {};
-    // try {
-    //   const locationRes = await axios.get(`https://ipapi.co/${ip}/json/`);
-    //   location = {
-    //     ip,
-    //     city: locationRes.data.city,
-    //     region: locationRes.data.region,
-    //     country: locationRes.data.country_name,
-    //     latitude: locationRes.data.latitude,
-    //     longitude: locationRes.data.longitude,
-    //     method: "ip",
-    //   };
-    // } catch (locErr) {
-    //   console.log("Failed to fetch IP location:", locErr.message);
-    //   location = { ip, method: "ip", error: "Location fetch failed" };
-    // }
-    // console.log("User location:", location);
     const payload = {
       id: user._id,
       email: user.email,
@@ -369,14 +322,12 @@ export const login = async (req, res) => {
     const responseUser = user;
     responseUser.password = ""; // Remove password from response
 
-
     // Send token in HTTP-only cookie
     res.cookie("token", token, options).status(200).json({
       success: true,
       message: "Login successful",
       token,
       responseUser,
-      // location
     });
 
   } catch (error) {
@@ -423,7 +374,7 @@ export const forgotPassword = async (req, res) => {
     await user.save();
 
     // Send email
-    const resetLink = `https://pralaysetu.vercel.app//reset-password/?token=${token}&email=${email}`;
+    const resetLink = `https://pralaysetu.vercel.app/reset-password/?token=${token}&email=${email}`;
     await mailSender(email, "Reset Your Password", resetTemplate(resetLink));
 
     res.status(200).json({
@@ -476,7 +427,6 @@ export const checkAuth = (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 export const loginwithOAuth = async (req, res) => {
   try {
     const { email } = req.body;
@@ -538,7 +488,6 @@ export const loginwithOAuth = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
-
 
 
 

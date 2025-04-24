@@ -1,4 +1,3 @@
-// cronJob.js
 import cron from "node-cron";
 import Fundraiser from "../models/fundraiser.model.js"; // Adjust the path as necessary
 

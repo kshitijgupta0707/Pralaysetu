@@ -1,19 +1,15 @@
-//creating an instance of mongoose
 import mongoose from "mongoose";
-
-//for fetching information from env file
-import dotenv from 'dotenv'
-
-const dbConnect = async() =>{
-    try{
-    //    dotenv.config({ path: '../.env' });
+const dbConnect = async () => {
+    try {
+        //if you are making your environment variable in a root folder, then uncomment the below line a
+        //dotenv.config({ path: '../.env' });
         await mongoose.connect(process.env.DATABASE_URL);
         console.log("Database connected successfully")
     }
-    catch(error){
+    catch (error) {
         console.log("Db connection error");
         console.error(error);
         process.exit(1);
-   } 
+    }
 }
-export {dbConnect};
+export { dbConnect };

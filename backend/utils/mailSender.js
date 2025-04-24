@@ -19,8 +19,6 @@ const mailSender = async (email, title, body) => {
 
     //send mail
     let info = await transporter.sendMail(mailOptions);
-
-    console.log(info);
     return info;
   } catch (e) {
     console.log("Issue in sending the mail");

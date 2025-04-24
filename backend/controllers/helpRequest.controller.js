@@ -37,19 +37,15 @@ export const createHelpRequest = async (req, res) => {
 
 
 
-
-
     let photoUrl = "";
 
     // Optional image upload to Cloudinary
     if (req.files && req.files.photo) {
-      console.log("i am not inside the if block")
       const result = await cloudinary.uploader.upload(req.files.photo.tempFilePath, {
         folder: "pralaysetu/helpRequests",
       });
       photoUrl = result.secure_url;
     }
-    console.log("user id", req.user)
     const helpRequest = await HelpRequest.create({
       user: req.user._id,
       latitude,
@@ -62,7 +58,6 @@ export const createHelpRequest = async (req, res) => {
 
     // EMIT socket event to admin
     io.emit("newHelpRequest", newHelpRequest); // You can send full object or just _id, up to you
-    console.log(2)
     res.status(201).json({
       success: true,
       message: "Help request created successfully.",
@@ -79,7 +74,6 @@ export const createHelpRequest = async (req, res) => {
 export const getAllRequests = async (req, res) => {
   try {
     const requests = await HelpRequest.find().populate("user", "firstName lastName email").populate("assignedTo", "firstName lastName email");;
-    // console.log(requests)
     res.status(200).json({ success: true, requests });
   } catch (err) {
     res.status(500).json({ success: false, message: "Error fetching requests" });
@@ -87,7 +81,6 @@ export const getAllRequests = async (req, res) => {
 };
 
 // Verify a help request
-
 export const verifyOrRejectHelpRequest = async (req, res) => {
   try {
     const { id } = req.params;
@@ -108,13 +101,8 @@ export const verifyOrRejectHelpRequest = async (req, res) => {
       });
     }
 
-    console.log(" Yaha tak aa gaya")
-
     request.status = status;
     await request.save();
-
-
-
 
     //  Real-time notify the user
     const userSocketId = getReceiverSocketId(request.user._id);
@@ -143,12 +131,6 @@ export const verifyOrRejectHelpRequest = async (req, res) => {
     //   console.error("Failed to send notifications:", notificationError);
     // }
 
-
-
-
-
-
-
     res.status(200).json({
       success: true,
       message: `Help request ${status} successfully.`,
@@ -159,31 +141,12 @@ export const verifyOrRejectHelpRequest = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-// controllers/helpRequest.controller.js
-
-// export const getAllVerifiedHelpRequests = async (req, res) => {
-//     try {
-//       const verifiedRequests = await HelpRequest.find({ status: "verified" })
-//         .populate("user", "name email");
-
-//       res.status(200).json({
-//         success: true,
-//         requests: verifiedRequests,
-//       });
-//     } catch (error) {
-//       console.error("Error fetching verified help requests:", error);
-//       res.status(500).json({ success: false, message: "Server error" });
-//     }
-//   };
-
 
 // Assign request to responder
 export const assignHelpRequest = async (req, res) => {
   try {
-    console.log("i am assigning the help request")
     const { id } = req.params;
     const { responderId } = req.body;
-    console.log(id, responderId);
     let request = await HelpRequest.findById(id);
     if (!request) return res.status(404).json({ success: false, message: "Request not found" });
 
@@ -192,12 +155,9 @@ export const assignHelpRequest = async (req, res) => {
     await request.save();
 
 
-
     const populatedRequest = await HelpRequest.findById(id)
       .populate("assignedTo")
       .populate("user");
-    console.log(populatedRequest)
-    console.log("request is assigned");
 
 
     //  Notify responder
@@ -222,23 +182,16 @@ export const assignHelpRequest = async (req, res) => {
       });
     }
 
-
-
-
-
-
     res.status(200).json({ success: true, message: "Request assigned", request: populatedRequest });
   } catch (err) {
     console.log(err)
     res.status(500).json({ success: false, message: "Error assigning request" });
   }
 };
-// controllers/helpRequest.controller.js
 
 export const getAllRejectedHelpRequests = async (req, res) => {
   try {
     const rejectedRequests = await HelpRequest.find({ status: "rejected" }).populate("user", "name email");
-
     res.status(200).json({
       success: true,
       requests: rejectedRequests,
@@ -250,17 +203,11 @@ export const getAllRejectedHelpRequests = async (req, res) => {
 };
 
 // Accept help request (responder)
-
-
 //below are the function for the respnoder
 
 export const getAssignedRequestsForResponder = async (req, res) => {
   try {
-
-
     const requests = await HelpRequest.find({ assignedTo: req.user._id }).populate("user", " firstName lastName email").populate("assignedTo", "firstName lastName email");
-    console.log("get assgined requests")
-    console.log(requests)
     res.status(200).json({
       success: true,
       requests,
@@ -284,7 +231,6 @@ export const acceptHelpRequest = async (req, res) => {
       return res.status(403).json({ success: false, message: "Not authorized to accept this request" });
     }
 
-    console.log("Request accepted by user:", req.user._id);
 
     // const responderSocketId = getReceiverSocketId(responderId);
     // if (responderSocketId) {
@@ -308,16 +254,8 @@ export const acceptHelpRequest = async (req, res) => {
         request: request,
       });
     }
-
-
-
     request.status = "accepted";
     await request.save();
-    console.log("Request accepted:", request);
-
-    
-
-
     res.status(200).json({ success: true, message: "Request accepted", request });
   } catch (err) {
     console.error("Error accepting request:", err);

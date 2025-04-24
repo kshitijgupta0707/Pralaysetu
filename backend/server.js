@@ -1,9 +1,6 @@
-
 import express from "express";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import path from "path";
 import { dbConnect } from "./config/database.js";
 import authRoutes from "./routes/auth.route.js";
 import reportRoutes from "./routes/report.route.js";
@@ -12,24 +9,19 @@ import cookieParser from "cookie-parser";
 import { app, server } from "./config/socket.js";
 import { connectCloudinary } from "./config/cloudinary.js";
 import helpRoutes from "./routes/help.route.js"
-import dashboardRoutes from "./routes/dashboard.route.js";
 import adminRoutes from "./routes/admin.route.js"
-import notificationRoute from "./routes/notification.route.js"
 import stripeRoutes from "./routes/stripe.route.js"
-import {fundraiserRoutes} from "./routes/fundraiser.route.js"
-import { ngoRoutes } from "./routes/ngo.route.js";
+import fundraiserRoutes from "./routes/fundraiser.route.js"
+import  ngoRoutes  from "./routes/ngo.route.js";
 import { stripeWebhookHandler } from "./controllers/stripe.controller.js";
-// import { donationRoutes } from "./routes/donation.route.js";
-// import paymentRoute from "./routes/payment.route.js"
-import { testAuth } from "./controllers/notification.controller.js";
 import "./cron/expiredFundraiser.js"
-// import { deleteMessages } from "./seedss/deleteData.js";
 import axios from "axios";
+
+//to get data from the .env file
 dotenv.config();
 
 
-// Middleware
-//to remove cors error
+
 // Middleware for parsing files
 app.use(
   fileUpload({
@@ -39,39 +31,35 @@ app.use(
 );
 app.use(cors(
   {
-
     origin: ["http://localhost:5173",
       "https://pralaysetu.vercel.app"],
     credentials: true
-
   }
 ))
 
 // When using stripe.webhooks.constructEvent, Stripe needs the raw request body, not the parsed JSON.
 app.post("/webhook", express.raw({ type: "application/json" }), stripeWebhookHandler);
 
+//to parse the json data in the request body
 app.use(express.json());
 
 //so that we can access the data in the cookie file
-
 app.use(cookieParser());
 
 // Routes
-
 app.use("/api/auth", authRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/help", helpRoutes);
-app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoutes);
 app.use('/api/payment', stripeRoutes);
 app.use("/api/fundraiser", fundraiserRoutes);
 app.use("/api/ngo", ngoRoutes);
-// app.use("/api", paymentRoute);
 
-// app.get("/api/getkey", (req,res) => {
-//     res.status(200).json({key: process.env.RAZORPAY_API_KEY});
-// })
 
+
+//ML model prediction routes
+
+// Route to handle earthquake prediction
 app.post("/api/predict_earthquake", async (req, res) => {
   try {
       const response = await axios.post('http://localhost:5001/api/predict_earthquake', req.body);
@@ -123,6 +111,4 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
   dbConnect()
   connectCloudinary()
-  // testAuth()
-  // deleteMessages()
 });
