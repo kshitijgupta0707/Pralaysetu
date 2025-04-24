@@ -89,11 +89,9 @@ const NGODashboard = () => {
     const [expiredFundraisers , setExpiredFundraisers]= useState([])
     
     const calculateFundraiserForNgo = () => {
-        console.log("Calculating fundraisers for NGO ", fundraisers)
         let ngoFundraisers = fundraisers.filter(
             fundraiser => fundraiser.ngoId._id === (ngo?._id || "")
         );
-        console.log("ngo fundraisers are ", ngoFundraisers)
     
         // Get active, inactive, and expired fundraisers
         let activeFundraisers = ngoFundraisers.filter(f => f.isActive && !f.isExpired);
@@ -166,7 +164,6 @@ const NGODashboard = () => {
         if (!ngo?._id) return;
 
         const { title, description, goalAmount, deadline } = fundraiserForm;
-        console.log(deadline)
         if (!title || !description || !goalAmount || !deadline) {
             toast.error("All fields are required");
             return;
@@ -239,8 +236,6 @@ const NGODashboard = () => {
 
     const handleToggleFundraiserStatus = async (fundraiser) => {
 
-        console.log("Hanle toggle fundraiser status")
-        console.log(fundraiser);
         await updateFundraiser(fundraiser._id, {
             isActive: !fundraiser.isActive
         });

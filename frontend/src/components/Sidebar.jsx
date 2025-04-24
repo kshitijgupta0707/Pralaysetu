@@ -200,11 +200,9 @@ const Sidebar = ({
                         >
                           <option value="en">English</option>
                           <option value="hi">हिंदी</option>
-                          {/* Add more language options as needed */}
                         </select>
                       </div>
 
-                      {/* Theme or other settings could go here */}
                     </div>
                   </AccordionContent>
                 </AccordionItem>

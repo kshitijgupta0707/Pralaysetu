@@ -1,42 +1,37 @@
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
+import LoginPage from "./pages/auth/LoginPage";
+import SignupPage from "./pages/auth/SignupPage";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import OtpVerificationPage from "./pages/OtpVerificationPage";
-import ResponderDashboard from "./pages/ResponderDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import UserDashboard from "./pages/UserDashboard";
-import { ForgotPassword } from "./pages/ForgotPassword";
+import OtpVerificationPage from "./pages/auth/OtpVerificationPage";
+import ResponderDashboard from "./pages/dashboards/ResponderDashboard";
+import AdminDashboard from "./pages/dashboards/AdminDashboard";
+import UserDashboard from "./pages/dashboards/UserDashboard";
+import { ForgotPassword } from "./pages/auth/ForgotPassword";
 import { Toaster } from "react-hot-toast";
 import { Loader } from "lucide-react";
-import ResponderMap from "./pages/ResponderMap"
+import ResponderMap from "./pages/map/ResponderMap"
 import { useAuthStore } from "./store/useAuthstore";
 import { useEffect, useState } from "react";
-import NotificationBanner from "./pages/NotificationBanner";
+import NotificationBanner from "./pages/notifications/NotificationBanner";
 import { messaging, onMessage } from "./firebase";
 // import Notification from "./Notification";
-import NotificationSetup from "./pages/NotificationSetup";
-import { ResetPassword } from "./pages/ResetPassword";
+import NotificationSetup from "./pages/notifications/NotificationSetup";
+import { ResetPassword } from "./pages/auth/ResetPassword";
 import { useNotificationStore } from "./store/useNotificationStore";
-import { PralaySetuLoader } from "./pages/PralaysetuLoader";
-import Success from "./pages/Success";
-import Cancel from "./pages/Cancel";
-import DonationPage from "./pages/Donation";
+import { PralaySetuLoader } from "./components/PralaysetuLoader";
+import Success from "./pages/payment/Success";
+import Cancel from "./pages/payment/Cancel";
+// import DonationPage from "./pages/Donation";
 // import NGODashboard from "./pages/Ngo";
-import { NGODashboard } from "./pages/NGODashboard";
+import { NGODashboard } from "./pages/dashboards/NGODashboard";
 // import { Header } from "@radix-ui/react-accordion";
-import Header from "./components/ui/Header";
+import Header from "./components/Header";
 function App() {
-  // In your App.jsx or main.jsx
-
-
-
 
   const { socket, authUser, checkAuth, isCheckingAuth, actingAs, setActingAs } = useAuthStore();
 
   useEffect(() => {
     if (!socket) return;
-    console.log("socket = ", socket)
     //  Assigned help request (for responder)
     socket.on("assignedHelpRequest", (payload) => {
       const { title, message, purpose, request } = payload;
@@ -70,7 +65,7 @@ function App() {
   }, [socket]);
 
 
- const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState('en');
 
 
 
@@ -113,10 +108,9 @@ function App() {
   return (
     <div>
       <NotificationBanner />
-      {/* <Notification /> */}
       <NotificationSetup />
 
-      <Header language={language}  setLanguage={setLanguage} />
+      <Header language={language} setLanguage={setLanguage} />
 
       <Routes>
         <Route path="/" element={<HomePage language={language} />} />
@@ -195,11 +189,20 @@ function App() {
             />
           }
         />
-        <Route path="/donate" element={<DonationPage />} />
+        {/* <Route path="/donate" element={<DonationPage />} /> */}
         <Route path="/success" element={<Success />} />
         <Route path="/cancel" element={<Cancel />} />
         {/* <Route path="/ngo" element={<NGODashboard />} /> */}
-        <Route path="/ngo-dashboard" element={<NGODashboard />} />
+        <Route
+          path="/ngo-dashboard"
+          element={
+            authUser?.registerAs === "NGO" ? (
+              <NGODashboard />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
 
 
 

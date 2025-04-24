@@ -1,4 +1,4 @@
-import { useNotificationStore } from "../store/useNotificationStore";
+import { useNotificationStore } from "@/store/useNotificationStore";
 import { useState, useEffect } from "react";
 import { X, AlertCircle, Info, CheckCircle, AlertTriangle } from "lucide-react";
 

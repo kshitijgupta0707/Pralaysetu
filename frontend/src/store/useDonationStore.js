@@ -6,7 +6,7 @@ import { loadStripe } from '@stripe/stripe-js';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
-export const useDonationStore = create((set, get) => ({
+export const useDonationStore = create((set) => ({
   donations: [],
   loading: false,
   error: null,
@@ -40,7 +40,6 @@ export const useDonationStore = create((set, get) => ({
         toast.error('Invalid fundraiser information');
         return;
       }
-      console.log("processing the payment :", paymentData)
 
       // Create Stripe checkout session
       const response = await axiosInstance.post('/payment/create-checkout-session', {
@@ -49,12 +48,12 @@ export const useDonationStore = create((set, get) => ({
         fundraiserId,
         donorEmail
       });
-      console.log(response);
 
       // Handle successful session creation
       if (response.data && response.data.id) {
         console.log('Payment session response:', response.data);
         console.log(response);
+        console.log("stripe rpomise", stripePromise)
         const stripe = await stripePromise;
         console.log(stripe);
         await stripe.redirectToCheckout({ sessionId: response.data.id });

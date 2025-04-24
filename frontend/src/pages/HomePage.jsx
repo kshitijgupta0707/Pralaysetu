@@ -7,8 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthstore';
 import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin } from 'lucide-react'
-import Sidebar from './Sidebar';
-const HomePage = ({language}) => {
+import Sidebar from '../components/Sidebar';
+const HomePage = ({ language }) => {
 
 
 
@@ -85,10 +85,10 @@ const HomePage = ({language}) => {
 
   const t = translations[language];
 
-  
+
   return (
     <div className="flex flex-col min-h-screen">
-    
+
 
       <main >
         {/* Hero Section */}
@@ -825,12 +825,12 @@ const HomePage = ({language}) => {
 
           {/* Middle section with download app buttons */}
           {/* <div className="py-8 border-t border-b border-blue-800/50"> */}
-            {/* <div className="flex flex-col md:flex-row justify-between items-center gap-6"> */}
-              {/* <div>
+          {/* <div className="flex flex-col md:flex-row justify-between items-center gap-6"> */}
+          {/* <div>
                 <h4 className="text-lg font-medium mb-2">Download Our Mobile App</h4>
                 <p className="text-gray-300 text-sm">Stay prepared with real-time alerts and emergency assistance on your phone.</p>
               </div> */}
-              {/* <div className="flex flex-wrap gap-4">
+          {/* <div className="flex flex-wrap gap-4">
                 <a href="#" className="bg-black/30 hover:bg-black/50 backdrop-blur-sm transition-colors flex items-center space-x-3 rounded-lg px-4 py-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.5 12c0 .3-.2.5-.5.5h-10c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h10c.3 0 .5.2.5.5zm-5-4c0 .3-.2.5-.5.5h-5c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h5c.3 0 .5.2.5.5zm5 8c0 .3-.2.5-.5.5h-10c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h10c.3 0 .5.2.5.5zm1.7-12h-14.4c-.7 0-1.3.6-1.3 1.3v13.4c0 .7.6 1.3 1.3 1.3h14.4c.7 0 1.3-.6 1.3-1.3v-13.4c0-.7-.6-1.3-1.3-1.3zm-14.4 1h14.4c.2 0 .3.1.3.3v13.4c0 .2-.1.3-.3.3h-14.4c-.2 0-.3-.1-.3-.3v-13.4c0-.2.1-.3.3-.3z" />
@@ -850,7 +850,7 @@ const HomePage = ({language}) => {
                   </div>
                 </a>
               </div> */}
-            {/* </div> */}
+          {/* </div> */}
           {/* </div> */}
 
           {/* Bottom section with copyright and additional links */}

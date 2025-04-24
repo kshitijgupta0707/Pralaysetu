@@ -1,47 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Bell, AlertTriangle, FileText, Users, Settings, LogOut, Search, Filter, X, Check, MapPin, Clock, User, MessageSquare
-  , Menu
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Bell, AlertTriangle, FileText, Users, Settings, Search, Filter, X, Check, MapPin, User, Menu } from 'lucide-react';
+// ui components
+import { Button , Input, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Tabs, TabsContent, TabsList, TabsTrigger, Badge, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, Avatar, AvatarFallback, AvatarImage, Popover, PopoverContent, PopoverTrigger, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,} 
+from '@/components/ui-kit';
+
+//store
 import { useAdminStore } from '@/store/useAdminStore';
 import { useReportStore } from '@/store/useReportStore';
 import { useHelpStore } from '@/store/useHelpStore';
 import { useAuthStore } from '@/store/useAuthstore';
+import { useNotificationStore } from "../../store/useNotificationStore";
 
-import { Link } from 'react-router-dom';
-
-
-import { useNotificationStore } from "../store/useNotificationStore";
-
-
-
-
-
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 const AdminDashboard = () => {
   const { socket } = useAuthStore()
@@ -50,12 +19,10 @@ const AdminDashboard = () => {
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('pending');
-  const [selectedResponder, setSelectedResponder] = useState('');
   const [showBroadcastDialog, setShowBroadcastDialog] = useState(false);
   const [broadcastType, setBroadcastType] = useState('alert');
   const [broadcastRegion, setBroadcastRegion] = useState('all');
   const [showSidebar, setShowSidebar] = useState(false);
-  // Add these state variables to your component
   const [confirmAssignmentId, setConfirmAssignmentId] = useState(null);
   const {
     pendingUsers,
@@ -94,12 +61,8 @@ const AdminDashboard = () => {
 
 
   useEffect(() => {
-    console.log("mene socket lagaana shuru kiaa")
     if (!socket) return;
-
     socket.on("newHelpRequest", (newRequest) => {
-      console.log("Received new help request via socket:", newRequest);
-      // console
       addNewRequest(newRequest);
       useNotificationStore.getState().showNotification(
         "New Help Request",
@@ -107,15 +70,8 @@ const AdminDashboard = () => {
         'request'
       );
     });
-    console.log("bhai mene laga dia hain socket connection")
     socket.on("newDisasterReport", (newReport) => {
-
-      console.log("New report received");
-      console.log(newReport)
-      console.log("--------------")
-      console.log(newReport.disasterType)
       addNewReport(newReport);
-
       useNotificationStore.getState().showNotification(
         "New Disaster Report",
         `Reported disaster: ${newReport.disasterType
@@ -130,36 +86,24 @@ const AdminDashboard = () => {
     };
   }, [socket, addNewRequest, addNewReport]);
 
-
-
-
-
   useEffect(() => {
     // Fetch data from store
     fetchPendingUsers();
     fetchAllResponders();
     fetchAllVerifiedEntities();
-
-    // Simulate API calls for reports and help requests (keeping original)
     getAllReports();
     fetchHelpRequests();
-    console.log("pedning users", pendingUsers)
-  }, []);
+  }, [fetchPendingUsers, fetchAllResponders, fetchAllVerifiedEntities, getAllReports, fetchHelpRequests]);
   // Set the loading state based on the store
   useEffect(() => {
     setIsLoading(isFetchingReports);
-  }, [isFetchingReports])
-  useEffect(() => {
     setIsLoading(helpLoading);
-  }, [helpLoading]);
+  }, [isFetchingReports, helpLoading])
 
   const handleStatusChange = (status) => {
     setFilterStatus(status);
     // console.log(`Status filtered to: ${status}`);
   };
-
-
-
 
   const handleVerifyReport = (id) => {
     verifyReport(id, 'verified');
@@ -176,20 +120,12 @@ const AdminDashboard = () => {
     verifyOrRejectRequest(id, 'rejected');
   };
 
-  const handleAssignHelpRequest = (id, responderId) => {
-    // console.log("i am called");
-    // console.log(id , responderId);
-    // console.log(selectedResponderForAssignment)
-    assignHelpRequest(id, responderId);
-    setSelectedResponderForAssignment(null);
-    setConfirmAssignmentId(null);
-  };
   const handleApproveRegistration = async (id) => {
     try {
       await approveUser(id);
       // Refresh data after approval
-      fetchPendingUsers();
-      fetchAllVerifiedEntities();
+      // fetchPendingUsers();
+      // fetchAllVerifiedEntities();
     } catch (error) {
       console.error("Error approving user:", error);
     }
@@ -199,7 +135,7 @@ const AdminDashboard = () => {
     try {
       await rejectUser(id);
       // Refresh pending users after rejection
-      fetchPendingUsers();
+      // fetchPendingUsers();
     } catch (error) {
       console.error("Error rejecting user:", error);
     }
@@ -208,10 +144,6 @@ const AdminDashboard = () => {
   const handleBroadcast = () => {
     if (!broadcastMessage.trim()) return;
 
-    // Simulate sending broadcast
-    // console.log('Broadcasting message:', broadcastMessage);
-    // console.log('Broadcast type:', broadcastType);
-    // console.log('Broadcast region:', broadcastRegion);
 
     alert(`${broadcastType.toUpperCase()} broadcast sent successfully to ${broadcastRegion === 'all' ? 'all regions' : broadcastRegion}!`);
     setBroadcastMessage('');
@@ -228,8 +160,6 @@ const AdminDashboard = () => {
 
 
   const filteredHelpRequests = helpRequests.filter(request => {
-    // console.log(request)
-    // const matchesSearch = request.reason?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     request.urgency?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (request.user && (request.user.firstName + " " + request.user.lastName).toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = filterStatus === 'all' ? true : request.status === filterStatus;
@@ -277,14 +207,22 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100 ">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100 relative ">
 
+
+      {/* Mobile Sidebar Overlay */}
+      {showSidebar && (
+        <div
+          className="fixed inset-0    bg-opacity-50  backdrop-blur-xs  z-40 md:hidden"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
       <div
-        className={`${showSidebar ? 'fixed' : 'hidden'
-          } lg:block lg:static inset-y-0 z-50 w-64 bg-white shadow-lg transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'
-          } lg:translate-x-0 transition-transform duration-300 ease-in-out`}
+        className={`${showSidebar ? 'fixed' : 'hidden'} lg:flex lg:static inset-y-0 z-50 w-64 bg-white shadow-lg transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'} 
+  lg:translate-x-0 transition-transform duration-300 ease-in-out 
+   overflow-hidden lg:absolute top-0`}
       >
-        <div className="h-full flex flex-col overflow-y-auto">
+        <div className="h-full flex flex-col lg:overflow-hidden overflow-y-auto">
           <div className="p-4 border-b flex items-center justify-between">
             <h2 className="text-2xl font-bold text-blue-800">PralaySetu Admin</h2>
             <Button
@@ -297,7 +235,7 @@ const AdminDashboard = () => {
             </Button>
           </div>
 
-          <nav className="p-2 flex-1">
+          <nav className="p-2 flex-1 lg:h-[calc(100%-64px)]">
             <ul className="space-y-1">
               <li>
                 <Button

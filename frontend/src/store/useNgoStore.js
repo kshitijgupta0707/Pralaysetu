@@ -62,9 +62,7 @@ export const useNgoStore = create((set ,get) => ({
   updateNGO: async (id, updatedData) => {
     set({ loading: true });
     try {
-      console.log("updating ngo with id ", id)
       const response = await axiosInstance.put(`/ngo/${id}`, updatedData);
-      console.log("updated ngo is ", response.data)
       set((state) => ({
         ngos: state.ngos.map((ng) =>
           ng._id === id ? response.data : ng
@@ -74,10 +72,8 @@ export const useNgoStore = create((set ,get) => ({
       }));
       
        toast.success("NGO updated successfully");
-      console.log(get().fundraisers)
     } catch (error) {
       toast.error("Error in updating NGO");
-      console.log("error is ", error)
       set({ error: error.message, loading: false });
     }
   },
@@ -90,13 +86,10 @@ export const useNgoStore = create((set ,get) => ({
     try {
       // i am sharing the expanded ngoid
       const response = await axiosInstance.post('/fundraiser/create', fundraiserData);
-      console.log("created fundraiser is ", response.data)
       set((state) => ({
         fundraisers: [ response.data,...state.fundraisers],
         loading: false,
       }));
-      console.log(get().fundraisers)
-      console.log("Fundraiser created successfully");
       toast.success("Fundraiser created successfully");
       return response.data;
     } catch (error) {
@@ -111,8 +104,6 @@ export const useNgoStore = create((set ,get) => ({
     set({ loading: true });
     try {
       const response = await axiosInstance.get('/fundraiser');
-      console.log("fundraisers are ", response.data)
-      // console.log(response.data)
       set({ fundraisers: response.data, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
@@ -146,17 +137,12 @@ export const useNgoStore = create((set ,get) => ({
     set({ loading: true });
     try {
       const response = await axiosInstance.put(`/fundraiser/${id}`, updatedData);
-      
-      console.log("updated fundraiser is ", response.data)
-      
       // Update the fundraisers in the store to update the UI
       set((state) => ({
         fundraisers: state.fundraisers.map((fundraiser) =>
           fundraiser._id === id ? response.data : fundraiser
         ),
       }));
-
-      console.log(get().fundraisers)
       toast.success("Fundraiser updated successfully");
     } catch (error) {
       set({ error: error.message, loading: false });

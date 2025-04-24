@@ -2,18 +2,15 @@ import React from 'react'
 import { useAuthStore } from '@/store/useAuthstore';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Sidebar from '@/pages/Sidebar';
+import Sidebar from '@/components/Sidebar';
 import { useLocation } from 'react-router-dom';
-import { Button } from './button';
+import { Button } from './ui/button';
 
-const Header = ({language , setLanguage}) => {
+const Header = ({ language, setLanguage }) => {
     const { authUser, logout } = useAuthStore()
     const [isOpen, setIsOpen] = useState(false);
     const actingAs = localStorage.getItem("loggedInAs");
-    useEffect(() => {
-        console.log(authUser)
-        console.log("loggedInAs", actingAs)
-    }, [])
+ 
 
     const location = useLocation();
     const isHomePage = location.pathname === "/";
@@ -21,7 +18,7 @@ const Header = ({language , setLanguage}) => {
 
     return (
         <header className="sticky top-0 sm:z-40 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200 w-[100%] ">
-          {  <Sidebar
+            {<Sidebar
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
                 authUser={authUser}
