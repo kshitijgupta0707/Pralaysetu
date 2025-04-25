@@ -195,9 +195,7 @@ const GoMapsComponent = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white p-4 shadow-md">
-        <h1 className="text-2xl font-bold text-center">Emergency Services Locator</h1>
-      </div>
+      
 
       {/* Control panel */}
       <div className="control-panel p-2 md:p-4 bg-gray-100 border-b border-gray-300 sticky top-0 z-10">
