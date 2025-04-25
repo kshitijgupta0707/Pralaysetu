@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
   MapPin, Clock, AlertCircle, CheckCircle, Loader2, User,
-  Calendar, Navigation, BarChart4, List, Filter, Map, LogOut, Menu, X
+  Calendar, Navigation, BarChart4, List, Filter, Map, LogOut, Menu, X, FileText, Search
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -26,8 +27,35 @@ const ResponderDashboard = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [urgencyFilter, setUrgencyFilter] = useState('all');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeLocationCoords, setActiveLocationCoords] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
+  const [userLocation, setUserLocation] = useState({ lat: 28.630151, lng: 77.371149 });
+  
+  // Get user's current location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const newLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          console.log("Got user location:", newLocation);
+          setUserLocation(newLocation);
+          setIsLoading(false);
+        },
+        (error) => {
+          console.error('Error fetching user location:', error);
+          setIsLoading(false);
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      );
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+      setIsLoading(false);
+    }
+  }, []);
+  
   const { authUser } = useAuthStore();
   const navigate = useNavigate();
 
@@ -96,7 +124,6 @@ const ResponderDashboard = () => {
         useHelpStore.setState({ requestsAssigned: updatedRequests });
 
         // Clear active location coordinates
-        setActiveLocationCoords(null);
         setShowRequestDetail(false);
         setSelectedTab('completed');
         setIsLoading(false);
@@ -107,15 +134,6 @@ const ResponderDashboard = () => {
       });
   };
 
-  // Handle navigation to map
-  // Handle navigation to map
-  const handleNavigateToMap = (latitude, longitude) => {
-    // Save coordinates to state
-    setActiveLocationCoords({ latitude, longitude });
-    // Navigate to map view with state
-    navigate('/responder/map', { state: { latitude, longitude } });
-  };
-  // Filter requests based on selected tab and filters
   const getFilteredRequests = () => {
     // First filter by tab selection
     let filteredRequests = requestsAssigned.filter(req => {
@@ -133,6 +151,16 @@ const ResponderDashboard = () => {
     // Then apply urgency filter if not 'all'
     if (urgencyFilter !== 'all') {
       filteredRequests = filteredRequests.filter(req => req.urgency === urgencyFilter);
+    }
+
+    // Apply search filter if there's a search query
+    if (searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase();
+      filteredRequests = filteredRequests.filter(req => 
+        (req.reason && req.reason.toLowerCase().includes(query)) ||
+        (req.user?.firstName && req.user.firstName.toLowerCase().includes(query)) ||
+        (req.user?.lastName && req.user.lastName.toLowerCase().includes(query))
+      );
     }
 
     return filteredRequests;
@@ -167,162 +195,162 @@ const ResponderDashboard = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'pending':
-        return { color: 'bg-gray-500 text-white', icon: <AlertCircle size={16} /> };
+        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">Pending</Badge>;
       case 'verified':
-        return { color: 'bg-blue-500 text-white', icon: <CheckCircle size={16} /> };
+      case 'approved':
+        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">Verified</Badge>;
       case 'accepted':
-        return { color: 'bg-orange-500 text-white', icon: <Loader2 size={16} /> };
+        return <Badge variant="outline" className="bg-blue-300 text-blue-800 border-blue-300">Accepted</Badge>;
       case 'completed':
-        return { color: 'bg-green-500 text-white', icon: <CheckCircle size={16} /> };
+        return <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200">Completed</Badge>;
       case 'rejected':
-        return { color: 'bg-red-500 text-white', icon: <AlertCircle size={16} /> };
+        return <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">Rejected</Badge>;
+      case 'assigned':
+        return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">Assigned</Badge>;
       default:
-        return { color: 'bg-gray-500 text-white', icon: <AlertCircle size={16} /> };
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
   const filteredRequests = getFilteredRequests();
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Mobile menu toggle */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="bg-white shadow-md rounded-full"
-        >
-          <Menu size={20} />
-        </Button>
-      </div>
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100 relative">
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-xs z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
 
       {/* Sidebar - hidden on mobile unless toggled */}
-      <div className={`fixed inset-y-0 left-0 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 z-40 transition duration-200 ease-in-out lg:static lg:inset-0 bg-white shadow-lg w-64 flex flex-col`}>
-        <div className="p-4 border-b flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Avatar className="h-8 w-8 bg-primary text-white">
-              <AvatarFallback>PS</AvatarFallback>
-            </Avatar>
-            <div>
-              <h1 className="text-xl font-bold">PralaySetu</h1>
-              <p className="text-sm text-gray-500">Responder Portal</p>
+      <div className={`${isMobileMenuOpen ? 'fixed' : 'hidden'} lg:flex lg:static inset-y-0 z-50 w-64 bg-white shadow-lg transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
+        lg:translate-x-0 transition-transform duration-300 ease-in-out 
+        overflow-hidden lg:absolute top-0`}>
+        <div className="h-full flex flex-col lg:overflow-hidden overflow-y-auto w-full">
+          <div className="p-4 border-b flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Avatar className="h-8 w-8 bg-primary text-white">
+                <AvatarFallback>PS</AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="text-2xl font-bold text-blue-800">PralaySetu</h2>
+                <p className="text-sm text-gray-500">Responder Portal</p>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div className="p-4 border-b">
-          <div className="flex items-center space-x-3 mb-4">
-            <Avatar className="h-12 w-12">
-              <AvatarFallback className="bg-primary text-white">
-                {authUser?.firstName?.charAt(0) || "R"}{authUser?.lastName?.charAt(0) || "S"}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="font-medium">
-                {authUser?.firstName || "Responder"} {authUser?.lastName || "Name"}
-              </h2>
-              <p className="text-sm text-gray-500">
-                {authUser?.team || "NDRF Team"}
-              </p>
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="lg:hidden"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <X size={20} />
+            </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 mt-4">
-            <div className="bg-gray-100 p-3 rounded-lg text-center">
-              <p className="text-sm text-gray-500 mb-1">
-                Missions
-              </p>
-              <p className="font-bold">{authUser?.completedMissions || 0}</p>
+          <div className="p-4 border-b">
+            <div className="flex items-center space-x-3 mb-4">
+              <Avatar className="h-12 w-12">
+                <AvatarFallback className="bg-primary text-white">
+                  {authUser?.firstName?.charAt(0) || "R"}{authUser?.lastName?.charAt(0) || "S"}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="font-medium">
+                  {authUser?.firstName || "Responder"} {authUser?.lastName || "Name"}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {authUser?.team || "NDRF Team"}
+                </p>
+              </div>
             </div>
 
-            <div className="bg-gray-100 p-3 rounded-lg text-center">
-              <p className="text-sm text-gray-500 mb-1">
-                Status
-              </p>
-              <p className="font-bold text-green-500">Active</p>
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              <div className="bg-gray-100 p-3 rounded-lg text-center">
+                <p className="text-sm text-gray-500 mb-1">
+                  Missions
+                </p>
+                <p className="font-bold">{authUser?.completedMissions || 0}</p>
+              </div>
+
+              <div className="bg-gray-100 p-3 rounded-lg text-center">
+                <p className="text-sm text-gray-500 mb-1">
+                  Status
+                </p>
+                <p className="font-bold text-green-500">Active</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Navigation Links */}
-        <div className="flex-1 overflow-y-auto p-4">
-          <nav className="space-y-2">
-            <Link to="/responder-dashboard" className="flex items-center space-x-3 p-2 rounded-lg bg-gray-100 text-primary font-medium">
-              <List size={20} />
-              <span>Help Requests</span>
-            </Link>
-            <Link to="/responder/map" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 text-gray-700">
-              <Map size={20} />
-              <span>Map View</span>
-            </Link>
-            <Link to="/responder/statistics" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 text-gray-700">
-              <BarChart4 size={20} />
-              <span>Statistics</span>
-            </Link>
-            <Link to="/responder/profile" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 text-gray-700">
-              <User size={20} />
-              <span>Profile</span>
-            </Link>
+          {/* Navigation Links */}
+          <nav className="p-2 flex-1 overflow-y-auto">
+            <ul className="space-y-1">
+              <li>
+                <Button 
+                  variant="ghost"
+                  className="w-full justify-start bg-gray-100 text-blue-800 font-medium"
+                >
+                  <List size={20} className="mr-2" />
+                  <span>Help Requests</span>
+                </Button>
+              </li>
+            </ul>
           </nav>
-        </div>
 
-        {/* Logout */}
-        <div className="p-4 border-t">
-          <Button variant="outline" className="w-full flex items-center justify-center space-x-2">
-            <LogOut size={16} />
-            <span>Sign Out</span>
-          </Button>
+          {/* Logout */}
+          <div className="p-4 border-t">
+            <Button variant="outline" className="w-full flex items-center justify-center space-x-2">
+              <LogOut size={16} />
+              <span>Sign Out</span>
+            </Button>
+          </div>
         </div>
 
         {/* Close button for mobile menu */}
-        <div className="lg:hidden p-4 border-t">
-          <Button variant="ghost" className="w-full" onClick={() => setIsMobileMenuOpen(false)}>
-            Close Menu
-          </Button>
-        </div>
+        {isMobileMenuOpen && (
+          <div className="lg:hidden fixed top-2 left-52 -right-6 z-50">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="rounded-full shadow-md bg-white"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white shadow-sm z-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
+        <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="lg:hidden"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl md:text-2xl font-bold truncate">
               Help Requests Dashboard
             </h1>
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-              <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
-                <SelectTrigger className="w-full sm:w-40">
-                  <SelectValue placeholder="Filter by urgency" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Urgencies</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-40">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="verified">Verified</SelectItem>
-                  <SelectItem value="accepted">Accepted</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Avatar>
+              <AvatarImage src="/placeholder-user.jpg" />
+              <AvatarFallback>
+                {authUser?.firstName?.charAt(0) || "R"}{authUser?.lastName?.charAt(0) || "S"}
+              </AvatarFallback>
+            </Avatar>
           </div>
         </header>
 
-        {/* Main content area */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        {/* Content Area with Scroll */}
+        <main className="p-3 md:p-6 overflow-auto flex-1">
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
             <TabsList className="mb-6 bg-white p-1 shadow-sm">
               <TabsTrigger value="pending" className="flex items-center space-x-2">
@@ -339,32 +367,66 @@ const ResponderDashboard = () => {
               </TabsTrigger>
             </TabsList>
 
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
+              <div className="w-full sm:w-auto relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                <Input
+                  type="search"
+                  placeholder="Search requests..."
+                  className="pl-8 w-full sm:w-64"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <div className="flex space-x-2">
+                <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
+                  <SelectTrigger className="w-full sm:w-40">
+                    <SelectValue placeholder="Filter by urgency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Urgencies</SelectItem>
+                    <SelectItem value="critical">Critical</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-40">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="verified">Verified</SelectItem>
+                    <SelectItem value="accepted">Accepted</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
             <TabsContent value={selectedTab} className="mt-0">
-              {filteredRequests.length === 0 ? (
-                <Card className="border-dashed border-2">
-                  <CardContent className="flex flex-col items-center justify-center text-center py-12">
-                    <AlertCircle size={48} className="text-gray-400 mb-4" />
-                    <h3 className="text-xl font-medium text-gray-700 mb-2">
-                      No requests found
-                    </h3>
-                    <p className="text-gray-500 max-w-md">
-                      {selectedTab === 'pending' ? "There are no pending requests at the moment." :
-                        selectedTab === 'active' ? "You have no active missions currently." :
-                          "You haven't completed any missions yet."}
-                    </p>
-                  </CardContent>
-                </Card>
+              {isLoading ? (
+                <div className="flex justify-center p-8">
+                  <p>Loading requests...</p>
+                </div>
+              ) : filteredRequests.length === 0 ? (
+                <div className="text-center p-8 bg-white rounded-lg border">
+                  <AlertCircle size={48} className="text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500">
+                    {selectedTab === 'pending' ? "There are no pending requests at the moment." :
+                      selectedTab === 'active' ? "You have no active missions currently." :
+                        "You haven't completed any missions yet."}
+                  </p>
+                </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredRequests.map((request) => (
                     <Card
                       key={request._id}
-                      className="hover:shadow-md transition-shadow cursor-pointer border-l-4"
-                      style={{
-                        borderLeftColor: request.urgency === 'critical' ? '#ef4444' :
-                          request.urgency === 'high' ? '#f97316' :
-                            request.urgency === 'medium' ? '#eab308' : '#3b82f6'
-                      }}
+                      className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
                       onClick={() => {
                         setSelectedRequest(request);
                         setShowRequestDetail(true);
@@ -372,39 +434,40 @@ const ResponderDashboard = () => {
                     >
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start">
-                          <div className="flex items-center text-gray-500 text-sm">
-                            <MapPin size={16} className="mr-1" />
-                            {request.latitude || "Location"},
-                            {request.longitude}
+                          <div>
+                            <CardTitle className="flex items-center flex-wrap gap-1">
+                              <Badge className={getUrgencyColor(request.urgency)}>
+                                {request.urgency?.charAt(0).toUpperCase() + request.urgency?.slice(1) || "Unknown"}
+                              </Badge>
+                              {getStatusBadge(request.status)}
+                            </CardTitle>
+                            <CardDescription className="pt-1">
+                              From {request.user?.firstName + " " + request.user?.lastName || "Unknown User"}
+                            </CardDescription>
                           </div>
-                          <div className="flex items-center text-gray-500 text-sm">
-                            <Clock size={16} className="mr-1" />
+                          <div className="text-xs text-gray-500">
                             {formatDate(request.createdAt)}
                           </div>
                         </div>
-                        <Badge className={`mt-2 ${getUrgencyColor(request.urgency)}`}>
-                          {request.urgency?.charAt(0).toUpperCase() + request.urgency?.slice(1) || "Unknown"}
-                        </Badge>
                       </CardHeader>
                       <CardContent className="pb-2">
-                        <p className="text-gray-700 font-medium line-clamp-2">
+                        {request.photo && (
+                          <img
+                            src={request.photo}
+                            alt="Help request"
+                            className="w-full h-40 object-cover rounded-md mb-2"
+                          />
+                        )}
+                        <p className="text-sm line-clamp-2">
                           {request.reason || "No description provided"}
                         </p>
-                      </CardContent>
-                      <CardFooter className="flex justify-between items-center pt-0">
-                        <div className="flex items-center">
-                          <Avatar className="h-6 w-6 mr-2">
-                            <AvatarFallback className="bg-primary text-white text-xs">
-                              {request.user?.firstName?.charAt(0) || "U"}{request.user?.lastName?.charAt(0) || ""}
-                            </AvatarFallback>
-                          </Avatar>
-                          {request.user?.firstName || "User"} {request.user?.lastName || ""}
+                        <div className="flex items-center text-xs text-gray-500 mt-2">
+                          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                          <span className="truncate">
+                            Lat: {request.latitude?.toFixed(4)}, Long: {request.longitude?.toFixed(4)}
+                          </span>
                         </div>
-                        <Badge variant="outline" className={`flex items-center ${getStatusBadge(request.status).color}`}>
-                          {getStatusBadge(request.status).icon}
-                          <span className="ml-1">{request.status?.charAt(0).toUpperCase() + request.status?.slice(1) || "Unknown"}</span>
-                        </Badge>
-                      </CardFooter>
+                      </CardContent>
                     </Card>
                   ))}
                 </div>
@@ -501,13 +564,9 @@ const ResponderDashboard = () => {
                     <h3 className="text-lg font-medium mb-2">
                       Status
                     </h3>
-                    <Alert className={getStatusBadge(selectedRequest.status).color}>
-                      <div className="flex items-center mb-2">
-                        {selectedRequest.status === 'pending' && <AlertCircle className="mr-2" size={20} />}
-                        {selectedRequest.status === 'verified' && <CheckCircle className="mr-2" size={20} />}
-                        {selectedRequest.status === 'accepted' && <Loader2 className="mr-2 animate-spin" size={20} />}
-                        {selectedRequest.status === 'completed' && <CheckCircle className="mr-2" size={20} />}
-                      </div>
+                    <Alert className={selectedRequest.status === 'accepted' ? "bg-blue-100 border-blue-300" : 
+                                      selectedRequest.status === 'completed' ? "bg-purple-100 border-purple-300" : 
+                                      "bg-gray-100 border-gray-300"}>
                       <AlertTitle>
                         {selectedRequest.status?.charAt(0).toUpperCase() + selectedRequest.status?.slice(1) || "Unknown"}
                       </AlertTitle>
@@ -527,7 +586,7 @@ const ResponderDashboard = () => {
                 {['assigned'].includes(selectedRequest.status) && (
                   <Button
                     disabled={hasActiveMission || isLoading}
-                    className="w-full sm:w-auto bg-primary"
+                    className="w-full sm:w-auto border-green-500 bg-green-500 hover:bg-green-600 text-white"
                     onClick={() => handleAcceptRequest(selectedRequest._id)}
                   >
                     {isLoading ? (
@@ -543,13 +602,21 @@ const ResponderDashboard = () => {
                     )}
                   </Button>
                 )}
-
+               
                 {/* Show navigate button for accepted requests */}
                 {selectedRequest.status === 'accepted' && selectedRequest.assignedTo?._id === authUser?._id && (
                   <Button
                     variant="outline"
                     className="w-full sm:w-auto"
-                    onClick={() => handleNavigateToMap(selectedRequest.latitude, selectedRequest.longitude)}
+                    onClick={() => {
+                      const { lat, lng } = userLocation;
+                      const destinationLat = selectedRequest.latitude;
+                      const destinationLng = selectedRequest.longitude;
+  
+                      // Open Google Maps with the directions from user's location to the place's location
+                      window.open(`https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=${destinationLat},${destinationLng}&travelmode=driving`, '_blank');
+                    }}
+
                   >
                     <Navigation className="mr-2 h-4 w-4" />
                     Navigate

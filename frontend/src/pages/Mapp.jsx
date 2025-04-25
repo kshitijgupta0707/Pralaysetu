@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MapPin, Clock, Star, Info, Loader } from 'lucide-react';
 
 const GoMapsComponent = () => {
-  
-  const apiKey = 'AlzaSyjhZhqjrJkRFyIXOpoF4DqRRyrUd6195KB'; // Replace with your GoMaps API key
+  const apiKey = 'AlzaSyZYQvpj4b5dFyZqoe9N52ZBAyxB6ur50Cc'; // Replace with your GoMaps API key
   const mapRef = useRef(null);
   const [userLocation, setUserLocation] = useState({});
   const [isLoading, setIsLoading] = useState(true);

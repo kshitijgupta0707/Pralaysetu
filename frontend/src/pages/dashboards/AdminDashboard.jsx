@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, AlertTriangle, FileText, Users, Settings, Search, Filter, X, Check, MapPin, User, Menu } from 'lucide-react';
+import { Bell, AlertTriangle, FileText, Users, Search, Filter, X, Check, MapPin, User, Menu } from 'lucide-react';
 // ui components
-import { Button , Input, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Tabs, TabsContent, TabsList, TabsTrigger, Badge, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, Avatar, AvatarFallback, AvatarImage, Popover, PopoverContent, PopoverTrigger, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,} 
-from '@/components/ui-kit';
+import { Button, Input, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Tabs, TabsContent, TabsList, TabsTrigger, Badge, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, Avatar, AvatarFallback, AvatarImage, Popover, PopoverContent, PopoverTrigger, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, }
+  from '@/components/ui-kit';
 
 //store
 import { useAdminStore } from '@/store/useAdminStore';
@@ -16,12 +16,8 @@ const AdminDashboard = () => {
   const { socket } = useAuthStore()
   const [activeTab, setActiveTab] = useState('reports');
   const [isLoading, setIsLoading] = useState(true);
-  const [broadcastMessage, setBroadcastMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('pending');
-  const [showBroadcastDialog, setShowBroadcastDialog] = useState(false);
-  const [broadcastType, setBroadcastType] = useState('alert');
-  const [broadcastRegion, setBroadcastRegion] = useState('all');
   const [showSidebar, setShowSidebar] = useState(false);
   const [confirmAssignmentId, setConfirmAssignmentId] = useState(null);
   const {
@@ -141,14 +137,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleBroadcast = () => {
-    if (!broadcastMessage.trim()) return;
 
-
-    alert(`${broadcastType.toUpperCase()} broadcast sent successfully to ${broadcastRegion === 'all' ? 'all regions' : broadcastRegion}!`);
-    setBroadcastMessage('');
-    setShowBroadcastDialog(false);
-  };
 
   const filteredReports = reports.filter(report => {
     const matchesSearch =
@@ -222,17 +211,18 @@ const AdminDashboard = () => {
   lg:translate-x-0 transition-transform duration-300 ease-in-out 
    overflow-hidden lg:absolute top-0`}
       >
-        <div className="h-full flex flex-col lg:overflow-hidden overflow-y-auto">
+        <div className="h-full flex flex-col lg:overflow-hidden overflow-y-auto w-full">
+
           <div className="p-4 border-b flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-blue-800">PralaySetu Admin</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="lg:hidden"
-              onClick={() => setShowSidebar(false)}
-            >
-              {/* Close icon */}
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Avatar className="h-8 w-8 border-1 border-blue-600 text-black">
+                <AvatarFallback>PS</AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="text-xl font-bold">PralaySetu</h1>
+                <p className="text-sm text-gray-600">Admin Portal</p>
+              </div>
+            </div>
           </div>
 
           <nav className="p-2 flex-1 lg:h-[calc(100%-64px)]">
@@ -276,19 +266,7 @@ const AdminDashboard = () => {
                   Responders
                 </Button>
               </li>
-              <li>
-                <Button
-                  variant={activeTab === 'settings' ? "default" : "ghost"}
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setActiveTab('settings');
-                    setShowSidebar(false);
-                  }}
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </Button>
-              </li>
+
             </ul>
           </nav>
         </div>
@@ -326,29 +304,6 @@ const AdminDashboard = () => {
                 activeTab === 'help' ? 'Help Requests' :
                   activeTab === 'responders' ? 'Responders' : 'Settings'}
             </h1>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowBroadcastDialog(true)}
-              className="hidden sm:flex items-center"
-            >
-              <Bell className="h-4 w-4 mr-2" />
-              Broadcast Alert
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowBroadcastDialog(true)}
-              className="sm:hidden"
-            >
-              <Bell className="h-4 w-4" />
-            </Button>
-            <Avatar>
-              <AvatarImage src="/placeholder-user.jpg" />
-              <AvatarFallback>AD</AvatarFallback>
-            </Avatar>
           </div>
         </header>
 
@@ -860,89 +815,10 @@ const AdminDashboard = () => {
               </Tabs>
             </div>
           )}
-
-          {activeTab === 'settings' && (
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>System Settings</CardTitle>
-                  <CardDescription>Configure your disaster management system settings</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-lg font-medium">Alert Settings</h3>
-                      <p className="text-sm text-gray-500">Configure how alerts are sent and received in the system</p>
-                    </div>
-                    <Button onClick={() => setShowBroadcastDialog(true)}>
-                      <Bell className="h-4 w-4 mr-2" />
-                      Send New Broadcast Alert
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
         </main>
       </div>
 
-      {/* Broadcast Dialog */}
-      <Dialog open={showBroadcastDialog} onOpenChange={setShowBroadcastDialog}>
-        <DialogContent className="sm:max-w-md max-w-[95vw] mx-auto">
-          <DialogHeader>
-            <DialogTitle>Broadcast Alert</DialogTitle>
-            <DialogDescription>
-              Send an important alert to all users in the selected region
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Select value={broadcastType} onValueChange={setBroadcastType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Alert Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="alert">Emergency Alert</SelectItem>
-                  <SelectItem value="warning">Warning</SelectItem>
-                  <SelectItem value="info">Information</SelectItem>
-                  <SelectItem value="update">Situation Update</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Select value={broadcastRegion} onValueChange={setBroadcastRegion}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Region" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Regions</SelectItem>
-                  <SelectItem value="north">North India</SelectItem>
-                  <SelectItem value="south">South India</SelectItem>
-                  <SelectItem value="east">East India</SelectItem>
-                  <SelectItem value="west">West India</SelectItem>
-                  <SelectItem value="central">Central India</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Textarea
-                placeholder="Enter your alert message here..."
-                value={broadcastMessage}
-                onChange={(e) => setBroadcastMessage(e.target.value)}
-                rows={5}
-              />
-            </div>
-          </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={() => setShowBroadcastDialog(false)} className="w-full sm:w-auto">
-              Cancel
-            </Button>
-            <Button type="submit" onClick={handleBroadcast} disabled={!broadcastMessage.trim()} className="w-full sm:w-auto">
-              Broadcast Now
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
 
       {/* Confirmation Alert Dialog */}
       <AlertDialog open={confirmAssignmentId !== null} onOpenChange={() => setConfirmAssignmentId(null)}>

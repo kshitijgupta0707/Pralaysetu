@@ -26,6 +26,7 @@ import Cancel from "./pages/payment/Cancel";
 import { NGODashboard } from "./pages/dashboards/NGODashboard";
 // import { Header } from "@radix-ui/react-accordion";
 import Header from "./components/Header";
+
 function App() {
 
   const { socket, authUser, checkAuth, isCheckingAuth, actingAs, setActingAs } = useAuthStore();
@@ -203,13 +204,20 @@ function App() {
             )
           }
         />
-
+        
 
 
       </Routes>
 
 
       <Toaster />
+         {/* Footer */}
+   <footer className="mt-auto py-4 bg-gray-100 border-t border-gray-300">
+        <p className="text-center text-gray-600 text-sm">
+         Pralaysetu - Kshitij Gupta © {new Date().getFullYear()}
+        </p>
+      </footer>
+
     </div>
   );
 }
