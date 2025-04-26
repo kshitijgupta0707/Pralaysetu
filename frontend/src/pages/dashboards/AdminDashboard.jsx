@@ -207,10 +207,10 @@ const AdminDashboard = () => {
         />
       )}
       <div
-        className={`${showSidebar ? 'fixed' : 'hidden'} lg:flex lg:static inset-y-0 z-50 w-64 bg-white shadow-lg transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'} 
+  className={`${showSidebar ? 'fixed' : 'hidden'} lg:flex lg:fixed lg:top-14 inset-y-0 z-50 lg:z-30 w-64 bg-white shadow-lg transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'} 
   lg:translate-x-0 transition-transform duration-300 ease-in-out 
-   overflow-hidden lg:absolute top-0`}
-      >
+  overflow-hidden`}
+>
         <div className="h-full flex flex-col lg:overflow-hidden overflow-y-auto w-full">
 
           <div className="p-4 border-b flex items-center justify-between">
@@ -284,10 +284,10 @@ const AdminDashboard = () => {
           </div>
         )}
       </div>
-
+{/* Main Content */}
+<div className="flex-1 flex flex-col overflow-hidden lg:pl-64">
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
@@ -299,7 +299,7 @@ const AdminDashboard = () => {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="text-xl md:text-2xl font-bold truncate">
+            <h1 className="text-xl md:text-2xl font-bold truncate lg:pl-10">
               {activeTab === 'reports' ? 'Disaster Reports' :
                 activeTab === 'help' ? 'Help Requests' :
                   activeTab === 'responders' ? 'Responders' : 'Settings'}

@@ -211,12 +211,7 @@ function App() {
 
 
       <Toaster />
-         {/* Footer */}
-   <footer className="mt-auto py-4 bg-gray-100 border-t border-gray-300">
-        <p className="text-center text-gray-600 text-sm">
-         Pralaysetu - Kshitij Gupta © {new Date().getFullYear()}
-        </p>
-      </footer>
+ 
 
     </div>
   );

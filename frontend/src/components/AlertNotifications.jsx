@@ -27,62 +27,10 @@ const AlertNotifications = ({ userLocation }) => {
       time: '2025-04-07T08:00:00Z',
       expiresAt: '2025-04-09T08:00:00Z',
       read: false,
-      actions: [
-        { id: 1, text: 'View Safety Tips', link: '/safety/floods' },
-        { id: 2, text: 'Evacuation Centers', link: '/maps/shelters' }
-      ]
     },
-    {
+   
+       {
       id: 2,
-      title: 'Road Closure Alert',
-      description: 'Main Street Bridge closed due to structural concerns following yesterday\'s earthquake.',
-      details: 'The Main Street Bridge has been closed for public safety following an inspection that revealed structural damage from yesterday\'s earthquake. Public Works Department engineers are assessing the damage. Alternative routes are available via Central Avenue or River Road.',
-      severity: 'medium',
-      type: 'infrastructure',
-      source: 'City Transportation Department',
-      location: 'Main Street Bridge',
-      time: '2025-04-06T14:30:00Z',
-      expiresAt: '2025-04-13T23:59:59Z',
-      read: true,
-      actions: [
-        { id: 1, text: 'View Alternate Routes', link: '/maps/routes' }
-      ]
-    },
-    {
-      id: 3,
-      title: 'Emergency Shelter Open',
-      description: 'Central High School is now serving as an emergency shelter for those affected by flooding.',
-      details: 'Central High School (123 School Ave) has been designated as an emergency shelter for those affected by flooding. The shelter is equipped with food, water, cots, and basic medical services. Pets are allowed if properly contained.',
-      severity: 'medium',
-      type: 'facility',
-      source: 'Emergency Management Office',
-      location: 'Central High School, 123 School Ave',
-      time: '2025-04-07T10:15:00Z',
-      expiresAt: '2025-04-14T23:59:59Z',
-      read: false,
-      actions: [
-        { id: 1, text: 'Get Directions', link: '/maps/directions?to=central-high-school' },
-        { id: 2, text: 'What to Bring', link: '/shelter-info' }
-      ]
-    },
-    {
-      id: 4,
-      title: 'Drinking Water Advisory',
-      description: 'Boil water advisory in effect for North District due to possible contamination.',
-      details: 'A boil water advisory is in effect for all residents in the North District due to possible contamination following a water main break. Residents should boil all water used for drinking, cooking, and brushing teeth for at least one minute.',
-      severity: 'high',
-      type: 'health',
-      source: 'Public Health Department',
-      location: 'North District',
-      time: '2025-04-06T18:45:00Z',
-      expiresAt: '2025-04-10T12:00:00Z',
-      read: false,
-      actions: [
-        { id: 1, text: 'Water Safety Guidelines', link: '/safety/water' }
-      ]
-    },
-    {
-      id: 5,
       title: 'Earthquake Aftershock Warning',
       description: 'Possibility of aftershocks over the next 48 hours. Take necessary precautions.',
       details: 'Seismologists warn that aftershocks ranging from 3.0 to 4.5 magnitude are possible over the next 48 hours following yesterday\'s earthquake. Residents should secure heavy furniture and be prepared for additional shaking.',
@@ -93,27 +41,7 @@ const AlertNotifications = ({ userLocation }) => {
       time: '2025-04-06T09:30:00Z',
       expiresAt: '2025-04-08T09:30:00Z',
       read: false,
-      actions: [
-        { id: 1, text: 'Earthquake Safety', link: '/safety/earthquake' },
-        { id: 2, text: 'Report Damage', link: '/report/damage' }
-      ]
-    },
-    {
-      id: 6,
-      title: 'Power Outage Update',
-      description: 'Ongoing power outage affecting West and Central districts. Estimated restoration: 6PM.',
-      details: 'Power outages continue to affect West and Central districts following damage to a main transmission line. Crews are working to repair the damage. Estimated restoration time is 6:00 PM today.',
-      severity: 'medium',
-      type: 'infrastructure',
-      source: 'City Power Authority',
-      location: 'West and Central Districts',
-      time: '2025-04-07T09:15:00Z',
-      expiresAt: '2025-04-07T18:00:00Z',
-      read: true,
-      actions: [
-        { id: 1, text: 'Power Outage Map', link: '/maps/outages' },
-        { id: 2, text: 'Food Safety Tips', link: '/safety/food' }
-      ]
+     
     }
   ];
 
@@ -402,13 +330,11 @@ const AlertNotifications = ({ userLocation }) => {
         </TabsContent>
       </Tabs>
 
-      <CardFooter className="flex justify-between border-t pt-4">
+      <CardFooter className="flex justify-between border-t">
         <div className="text-sm text-gray-500">
           {filteredAlerts.length} {filteredAlerts.length === 1 ? 'alert' : 'alerts'} found
         </div>
-        <Button variant="outline" size="sm" onClick={() => window.location.href = '/settings/notifications'}>
-          Notification Settings
-        </Button>
+       
       </CardFooter>
     </Card>
   );

@@ -341,31 +341,7 @@ const UserDashboard = () => {
                 </Card>
               </div>
               
-              {/* Quick Map Preview */}
-              <Card className="md:col-span-3">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
-                    <MapPin className="h-5 w-5 mr-2" />
-                    Emergency Resources Map
-                  </CardTitle>
-                  <CardDescription>
-                    Nearby emergency services and safe zones
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="h-[300px] p-0 rounded-b-lg overflow-hidden">
-                  {userLocation && <EmergencyMap location={userLocation} height="300px" />}
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => setActiveTab('map')}
-                  >
-                    Open Full Map
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </CardFooter>
-              </Card>
+  
             </div>
           </TabsContent>
 
