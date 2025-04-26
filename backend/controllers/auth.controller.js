@@ -44,6 +44,7 @@ export const sendOtp = async (req, res) => {
       });
       result = await OTP.findOne({ otp });
     }
+    console.log("otp is" , otp);
 
     //create an entry in db for otp
     const otpPayLoad = { email, otp };

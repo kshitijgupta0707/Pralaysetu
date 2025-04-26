@@ -17,7 +17,7 @@ export const useAuthStore = create((set, get) => ({
   isCheckingAuth: true,
   onlineUsers: [],
   socket: null,
-  actingAs: null,
+  actingAs: "User",
   isResettingPassword: false,
   isSendingLink: false,
   setFormData: (data) => set({ formData: data }),
@@ -87,8 +87,10 @@ export const useAuthStore = create((set, get) => ({
     try {
       
       const res = await axiosInstance.post("/auth/login", data);
-        set({ authUser: res.data.responseUser });
 
+
+        set({ authUser: res.data.responseUser });
+        
       toast.success("Logged in successfully ");
       get().connectSocket();
     } catch (error) {

@@ -92,7 +92,10 @@ function App() {
 
   // Sync `loggedInAs` whenever route changes
   useEffect(() => {
-    const storedRole = localStorage.getItem("loggedInAs");
+    let storedRole = localStorage.getItem("loggedInAs");
+    if(storedRole == null){
+        storedRole = "User"
+    }
     setActingAs(storedRole);
     // console.log("Updated actingAs:", storedRole);
   }, [location.pathname]);
@@ -118,7 +121,7 @@ function App() {
         <Route
           path="/login"
           element={
-            !actingAs ?
+            !actingAs|| authUser?.workAsResponder || (!authUser)?
               <LoginPage />
               :
               <Navigate to="/" />

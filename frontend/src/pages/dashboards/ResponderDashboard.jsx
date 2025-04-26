@@ -56,7 +56,7 @@ const ResponderDashboard = () => {
     }
   }, []);
   
-  const { authUser } = useAuthStore();
+  const { authUser , logout } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -225,17 +225,17 @@ const ResponderDashboard = () => {
       )}
 
       {/* Sidebar - hidden on mobile unless toggled */}
-      <div className={`${isMobileMenuOpen ? 'fixed' : 'hidden'} lg:flex lg:static inset-y-0 z-50 lg:z-30  w-64 bg-white shadow-lg transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
+      <div className={`${isMobileMenuOpen ? 'fixed' : 'hidden'} lg:flex lg:fixed lg:top-14 inset-y-0 z-50 lg:z-30  w-64 bg-white shadow-lg transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
         lg:translate-x-0 transition-transform duration-300 ease-in-out 
         overflow-hidden lg:absolute top-0`}>
         <div className="h-full flex flex-col lg:overflow-hidden overflow-y-auto w-full">
-          <div className="p-4 border-b flex items-center justify-between">
+          <div className="p-3 border-b flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Avatar className="h-8 w-8 bg-primary text-black border-1 border-blue-800">
                 <AvatarFallback>PS</AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="text-2xl font-bold text-blue-800">PralaySetu</h2>
+                <h2 className="text-xl font-bold text-blue-800">PralaySetu</h2>
                 <p className="text-sm text-gray-500">Responder Portal</p>
               </div>
             </div>
@@ -298,7 +298,13 @@ const ResponderDashboard = () => {
             </ul>
           </nav>
 
-        
+          {/* Logout */}
+          <div className="p-4 border-t">
+            <Button onClick={logout} variant="outline" className="w-full flex items-center justify-center space-x-2">
+              <LogOut size={16} />
+              <span>Log Out</span>
+            </Button>
+          </div>
         </div>
 
         {/* Close button for mobile menu */}
@@ -317,7 +323,7 @@ const ResponderDashboard = () => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden lg:pl-64">
         {/* Header */}
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
@@ -329,7 +335,7 @@ const ResponderDashboard = () => {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="text-xl md:text-2xl font-bold truncate">
+            <h1 className="text-xl md:text-2xl font-bold truncate text-gray-700">
               Help Requests Dashboard
             </h1>
           </div>

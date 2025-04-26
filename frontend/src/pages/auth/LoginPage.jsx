@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import RegistrationRoleModal from '../../components/RegistrationRoleModel'; // Import the new component
 import { SignInWithGoogle } from '../../google/SignInWithGoogle';
 import { SignInWithFacebook } from '@/google/SignInWithFacebook';
+import { auth } from '@/firebase';
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [showRoleModal, setShowRoleModal] = useState(false);
@@ -19,11 +20,16 @@ const LoginPage = () => {
 
   useEffect(() => {
     // Check if user is logged in and needs to select a role
-    if (authUser && authUser.registerAs === 'None') {
+    console.log("at loggined page")
+    if (authUser && authUser.registerAs === 'None' && authUser.workAsResponder) {
+      console.log(authUser)
       setShowRoleModal(true);
     } else if (authUser) {
       // If user is logged in and already has a role, navigate to home
+      console.log("auth user is set")
       navigate('/');
+    }else{
+      console.log("auth user set ni hain")
     }
   }, [authUser, navigate]);
 
@@ -48,6 +54,7 @@ const LoginPage = () => {
     toast.success(`You've logged in as a ${role === 'normalUser' ? 'User' : 'Responder'}`);
     // Close the modal
     setShowRoleModal(false);
+
     localStorage.setItem("loggedInAs", role === 'normalUser' ? 'User' : 'Responder');
     // Navigate to appropriate dashboard or onboarding flow based on role    
     navigate('/');

@@ -7,10 +7,12 @@ import { useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
 
 const Header = ({ language, setLanguage }) => {
-    const { authUser, logout } = useAuthStore()
+    const { authUser, logout , actingAs } = useAuthStore()
     const [isOpen, setIsOpen] = useState(false);
-    const actingAs = localStorage.getItem("loggedInAs");
  
+    useEffect(()=>{
+      console.log(authUser);
+    },[authUser])
 
     const location = useLocation();
     const isHomePage = location.pathname === "/";

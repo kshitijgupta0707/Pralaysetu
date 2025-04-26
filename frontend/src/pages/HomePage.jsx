@@ -1,15 +1,81 @@
 import React, { useEffect, useState } from 'react';
-import { BellRing, AlertTriangle, Map, Users, Heart, Phone, Star, ArrowRight, LifeBuoy, Shield, Globe, Volume2 } from 'lucide-react';
+import { BellRing, AlertTriangle, Map, Users, Heart, Phone, Star, ArrowRight, LifeBuoy, Shield, Globe, Volume2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+
+
 import { useAuthStore } from '@/store/useAuthstore';
 import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin } from 'lucide-react'
 import Sidebar from '../components/Sidebar';
+// import { useAuthStore } from '@/store/useAuthstore';
 const HomePage = ({ language }) => {
 
+
+  const { authUser, actingAs } = useAuthStore()
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  })
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+
+  const [result, setResult] = useState("");
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+
+  };
+
+
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    // Handle form submission logic here
+    // Reset form
+    
+    setFormData({
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    })
+    // Show success message
+    setResult("Sending....");
+    const formData = new FormData(e.target);
+    console.log(formData)
+
+    formData.append("access_key", "19c4dc74-be84-4eee-858e-12b864d03813");
+
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      body: formData
+    });
+    console.log("Not working  ")
+
+    const data = await response.json();
+
+    if (data.success) {
+      setResult("Form Submitted Successfully");
+      e.target.reset();
+    } else {
+      console.log("Error", data);
+      setResult(data.message);
+    }
+
+
+  }
 
 
   const translations = {
@@ -105,16 +171,47 @@ const HomePage = ({ language }) => {
                   {t.heroSubtitle}
                 </p>
                 <div className="flex flex-wrap gap-4 pt-4">
-                  <Link to="/signup">
+
+                  {
+                    !authUser && <>
+                      <Link to="/signup">
+                        <Button className="bg-white text-blue-700 hover:bg-blue-50">
+                          {t.getStarted} <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
+                      <Link to="/signup">
+                        <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white/10">
+                          {t.joinAsResponder}
+                        </Button>
+                      </Link>
+                    </>
+                  }
+                  {authUser && authUser.registerAs == "None" && actingAs == "User" && <Link to="/user-dashboard" >
+
                     <Button className="bg-white text-blue-700 hover:bg-blue-50">
-                      {t.getStarted} <ArrowRight className="ml-2 h-4 w-4" />
+                      User Portal <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
-                  </Link>
-                  <Link to="/signup">
-                    <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white/10">
-                      {t.joinAsResponder}
+
+                  </Link>}
+                  {authUser && authUser.registerAs == "None" && actingAs == "Responder" && <Link to="/responder-dashboard">
+
+                    <Button className="bg-white text-blue-700 hover:bg-blue-50">
+                      Responder Portal <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
-                  </Link>
+                  </Link>}
+                  {authUser && authUser.registerAs == "Admin" && <Link to="/admin-dashboard" >
+
+                    <Button className="bg-white text-blue-700 hover:bg-blue-50">
+                      Admin Portal <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>}
+
+                  {authUser && authUser.registerAs == "NGO" && <Link to="/ngo-dashboard" >
+
+                    <Button className="bg-white text-blue-700 hover:bg-blue-50">
+                      NGO Portal<ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>}
                 </div>
               </div>
 
@@ -234,7 +331,7 @@ const HomePage = ({ language }) => {
                 </p>
                 <ul className="space-y-3">
                   {[
-                    "View nearby hospitals, police stations, and fire stations",
+                    "View nearby hospitals, pharmicies and police stations",
                     "Get turn-by-turn navigation to safety",
                     "Monitor disaster-affected areas in real-time",
                     "See the location of emergency responders",
@@ -286,7 +383,7 @@ const HomePage = ({ language }) => {
             </div>
 
             <Tabs defaultValue="users" className="max-w-4xl mx-auto">
-              <TabsList className="grid grid-cols-3 mb-8">
+              <TabsList className="grid grid-cols-3 mb-8 pb-2">
                 <TabsTrigger value="users" className="text-center py-3">
                   <Users className="h-5 w-5 mr-2" />
                   <span>For Users</span>
@@ -312,7 +409,6 @@ const HomePage = ({ language }) => {
                         "Report unusual activities",
                         "Request emergency assistance",
                         "Access to emergency contacts",
-                        "View safe locations map",
                         "Real-time disaster updates"
                       ].map((feature, i) => (
                         <li key={i} className="flex items-center">
@@ -364,9 +460,6 @@ const HomePage = ({ language }) => {
                       {[
                         "View and accept help requests",
                         "Real-time navigation to victims",
-                        "Coordination with other responders",
-                        "Status updates for emergency management",
-                        "Resource allocation visibility",
                         "Communication with affected individuals"
                       ].map((feature, i) => (
                         <li key={i} className="flex items-center">
@@ -420,9 +513,6 @@ const HomePage = ({ language }) => {
                       {[
                         "Create verified fundraising campaigns",
                         "Track donation progress transparently",
-                        "Coordinate with government authorities",
-                        "Manage volunteer registrations",
-                        "Access affected area analytics",
                         "Distribute aid efficiently"
                       ].map((feature, i) => (
                         <li key={i} className="flex items-center">
@@ -669,51 +759,87 @@ const HomePage = ({ language }) => {
               <div id="contact">
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">{t.contactUs}</h2>
                 <Card className="border-0 shadow-lg">
-                  <CardContent className="pt-6">
-                    <form className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium" htmlFor="name">Name</label>
-                          <input
-                            id="name"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                            type="text"
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium" htmlFor="email">Email</label>
-                          <input
-                            id="email"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                            type="email"
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium" htmlFor="subject">Subject</label>
-                        <input
-                          id="subject"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                          type="text"
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium" htmlFor="message">Message</label>
-                        <textarea
-                          id="message"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                          rows="4"
-                          required
-                        ></textarea>
-                      </div>
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                  <CardContent className="">
 
-                        Send Message
-                      </Button>
-                    </form>
+                    <div className="bg-card backdrop-blur-sm border border-border rounded-2xl p-6 shadow-xl">
+
+                      <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label htmlFor="name" className="block text-sm font-medium mb-2">
+                              Your Name
+                            </label>
+                            <Input
+                              id="name"
+                              name="name"
+                              value={formData.name}
+                              onChange={handleChange}
+                              placeholder="John Doe"
+                              required
+                              className="bg-background/50 border-border focus:border-primary focus:ring-primary/20"
+                            />
+                          </div>
+
+                          <div>
+                            <label htmlFor="email" className="block text-sm font-medium mb-2">
+                              Your Email
+                            </label>
+                            <Input
+                              id="email"
+                              name="email"
+                              type="email"
+                              value={formData.email}
+                              onChange={handleChange}
+                              placeholder="john@example.com"
+                              required
+                              className="bg-background/50 border-border focus:border-primary focus:ring-primary/20"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label htmlFor="subject" className="block text-sm font-medium mb-2">
+                            Subject
+                          </label>
+                          <Input
+                            id="subject"
+                            name="subject"
+                            value={formData.subject}
+                            onChange={handleChange}
+                            placeholder="Project Inquiry"
+                            required
+                            className="bg-background/50 border-border focus:border-primary focus:ring-primary/20"
+                          />
+                        </div>
+
+                        <div>
+                          <label htmlFor="message" className="block text-sm font-medium mb-2">
+                            Your Message
+                          </label>
+                          <Textarea
+                            id="message"
+                            name="message"
+                            value={formData.message}
+                            onChange={handleChange}
+                            placeholder="Hello, I'd like to talk about..."
+                            rows={5}
+                            required
+                            className="bg-background/50 border-border focus:border-primary focus:ring-primary/20"
+                          />
+                        </div>
+
+                        <Button type="submit" className="bg-primary hover:bg-primary/90 text-white w-full">
+                          <Send className="w-4 h-4 mr-2" />
+                          Send Message
+                        </Button>
+
+                        {result && (
+                          <div className="text-green-500 text-sm mt-2 m-auto text-center">
+                            {result}
+                          </div>
+                        )}
+                      </form>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -734,7 +860,7 @@ const HomePage = ({ language }) => {
                   Sign Up Now
                 </Button>
               </Link>
-              <Link to="/responder/signup">
+              <Link to="/signup">
                 <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white/10 px-6 py-6 text-lg">
                   Join as Responder
                 </Button>
@@ -809,7 +935,7 @@ const HomePage = ({ language }) => {
               <ul className="space-y-4">
                 <li className="flex items-start space-x-3">
                   <MapPin size={20} className="flex-shrink-0 mt-1 text-blue-300" />
-                  <span className="text-gray-300">123 Emergency Avenue, Safety District, India</span>
+                  <span className="text-gray-300">Jaypee institute of information technology , Noida </span>
                 </li>
                 <li className="flex items-center space-x-3">
                   <Phone size={20} className="flex-shrink-0 text-blue-300" />
@@ -823,35 +949,6 @@ const HomePage = ({ language }) => {
             </div>
           </div>
 
-          {/* Middle section with download app buttons */}
-          {/* <div className="py-8 border-t border-b border-blue-800/50"> */}
-          {/* <div className="flex flex-col md:flex-row justify-between items-center gap-6"> */}
-          {/* <div>
-                <h4 className="text-lg font-medium mb-2">Download Our Mobile App</h4>
-                <p className="text-gray-300 text-sm">Stay prepared with real-time alerts and emergency assistance on your phone.</p>
-              </div> */}
-          {/* <div className="flex flex-wrap gap-4">
-                <a href="#" className="bg-black/30 hover:bg-black/50 backdrop-blur-sm transition-colors flex items-center space-x-3 rounded-lg px-4 py-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.5 12c0 .3-.2.5-.5.5h-10c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h10c.3 0 .5.2.5.5zm-5-4c0 .3-.2.5-.5.5h-5c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h5c.3 0 .5.2.5.5zm5 8c0 .3-.2.5-.5.5h-10c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h10c.3 0 .5.2.5.5zm1.7-12h-14.4c-.7 0-1.3.6-1.3 1.3v13.4c0 .7.6 1.3 1.3 1.3h14.4c.7 0 1.3-.6 1.3-1.3v-13.4c0-.7-.6-1.3-1.3-1.3zm-14.4 1h14.4c.2 0 .3.1.3.3v13.4c0 .2-.1.3-.3.3h-14.4c-.2 0-.3-.1-.3-.3v-13.4c0-.2.1-.3.3-.3z" />
-                  </svg>
-                  <div>
-                    <div className="text-xs">Get it on</div>
-                    <div className="font-medium">Google Play</div>
-                  </div>
-                </a>
-                <a href="#" className="bg-black/30 hover:bg-black/50 backdrop-blur-sm transition-colors flex items-center space-x-3 rounded-lg px-4 py-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53-1.71-2.52-3.03-7.02-1.27-10.14.87-1.5 2.43-2.45 4.12-2.48 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83l.01.03zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-                  </svg>
-                  <div>
-                    <div className="text-xs">Download on the</div>
-                    <div className="font-medium">App Store</div>
-                  </div>
-                </a>
-              </div> */}
-          {/* </div> */}
-          {/* </div> */}
 
           {/* Bottom section with copyright and additional links */}
           <div className="pt-8 grid grid-cols-1 md:grid-cols-2 items-center">

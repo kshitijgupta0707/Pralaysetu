@@ -16,7 +16,6 @@ import  ngoRoutes  from "./routes/ngo.route.js";
 import { stripeWebhookHandler } from "./controllers/stripe.controller.js";
 import "./cron/expiredFundraiser.js"
 import axios from "axios";
-
 //to get data from the .env file
 dotenv.config();
 
