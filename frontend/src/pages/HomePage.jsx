@@ -848,7 +848,7 @@ const HomePage = ({ language }) => {
         </section>
 
         {/* CTA */}
-        <section className="py-16 bg-gradient-to-br from-blue-600 to-indigo-800 text-white">
+        { !authUser &&  <section className="py-16 bg-gradient-to-br from-blue-600 to-indigo-800 text-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold mb-6">{t.joinOurMission}</h2>
             <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
@@ -867,7 +867,7 @@ const HomePage = ({ language }) => {
               </Link>
             </div>
           </div>
-        </section>
+        </section>}
       </main>
       <footer className="bg-gradient-to-br from-blue-900 to-indigo-900 text-white">
         <div className="container mx-auto px-6 py-12">

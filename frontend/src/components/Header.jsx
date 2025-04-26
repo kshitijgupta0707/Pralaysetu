@@ -9,6 +9,10 @@ import { Button } from './ui/button';
 const Header = ({ language, setLanguage }) => {
     const { authUser, logout , actingAs } = useAuthStore()
     const [isOpen, setIsOpen] = useState(false);
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth'     });
+      };
+      
  
     useEffect(()=>{
       console.log(authUser);
@@ -31,7 +35,7 @@ const Header = ({ language, setLanguage }) => {
             />}
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
-                    <div className="flex items-center">
+                    <div onClick={scrollToTop} className="flex items-center">
                         <Link to="/" className="flex items-center gap-2">
                             <div className="bg-blue-600 p-2 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

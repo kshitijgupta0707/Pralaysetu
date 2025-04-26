@@ -17,6 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Link, useNavigate } from 'react-router-dom';
 import { useHelpStore } from '@/store/useHelpStore';
 import { useAuthStore } from '@/store/useAuthstore';
+import { TruncatedText } from '@/components/shared/TruncatedText';
+import { DisasterImageDisplay } from '@/components/shared/DisasterImageDisplay';
 
 const ResponderDashboard = () => {
   const { requestsAssigned, acceptHelpRequest, getAllHelpRequest, completeHelpRequest } = useHelpStore();
@@ -30,7 +32,7 @@ const ResponderDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const [userLocation, setUserLocation] = useState({ lat: 28.630151, lng: 77.371149 });
-  
+
   // Get user's current location
   useEffect(() => {
     if (navigator.geolocation) {
@@ -55,8 +57,8 @@ const ResponderDashboard = () => {
       setIsLoading(false);
     }
   }, []);
-  
-  const { authUser , logout } = useAuthStore();
+
+  const { authUser, logout } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -156,7 +158,7 @@ const ResponderDashboard = () => {
     // Apply search filter if there's a search query
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
-      filteredRequests = filteredRequests.filter(req => 
+      filteredRequests = filteredRequests.filter(req =>
         (req.reason && req.reason.toLowerCase().includes(query)) ||
         (req.user?.firstName && req.user.firstName.toLowerCase().includes(query)) ||
         (req.user?.lastName && req.user.lastName.toLowerCase().includes(query))
@@ -287,7 +289,7 @@ const ResponderDashboard = () => {
           <nav className="p-2 flex-1 overflow-y-auto">
             <ul className="space-y-1">
               <li>
-                <Button 
+                <Button
                   variant="ghost"
                   className="w-full justify-start bg-gray-100 text-blue-800 font-medium"
                 >
@@ -355,7 +357,7 @@ const ResponderDashboard = () => {
             <TabsList className="mb-6  p-1 shadow-sm flex sm:gap-5 md:gap-3 lg:gap-5 flex-wrap sm:m-auto lg:mb-6 lg:mt-0 lg:ml-0">
               <TabsTrigger value="pending" className="flex items-center space-x-2 bg-[#FBFBFB] m-1">
                 <AlertCircle size={16} />
-                <span  className=' ' >Pending Requests</span>
+                <span className=' ' >Pending Requests</span>
               </TabsTrigger>
               <TabsTrigger value="active" className="flex items-center space-x-2 bg-[#FBFBFB] m-1">
                 <Loader2 size={16} />
@@ -428,8 +430,7 @@ const ResponderDashboard = () => {
                       key={request._id}
                       className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
                       onClick={() => {
-                        setSelectedRequest(request);
-                        setShowRequestDetail(true);
+
                       }}
                     >
                       <CardHeader className="pb-2">
@@ -451,15 +452,11 @@ const ResponderDashboard = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="pb-2">
-                        {request.photo && (
-                          <img
-                            src={request.photo}
-                            alt="Help request"
-                            className="w-full h-40 object-cover rounded-md mb-2"
-                          />
-                        )}
-                        <p className="text-sm line-clamp-2">
-                          {request.reason || "No description provided"}
+
+                        <DisasterImageDisplay imageUrl={request.photo} disasterType={"Request"} />
+
+                        <p className="text-sm ">
+                          <TruncatedText text={request.reason || "No description provided"} maxLength={60} height={100} />
                         </p>
                         <div className="flex items-center text-xs text-gray-500 mt-2">
                           <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
@@ -467,10 +464,16 @@ const ResponderDashboard = () => {
                             Lat: {request.latitude?.toFixed(4)}, Long: {request.longitude?.toFixed(4)}
                           </span>
                         </div>
+
+                        <Button className="mt-3 bg-cyan-600" onClick={() => {
+                          setSelectedRequest(request);
+                          setShowRequestDetail(true);
+                        }} > Open Request</Button>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
+
               )}
             </TabsContent>
           </Tabs>
@@ -545,7 +548,7 @@ const ResponderDashboard = () => {
                 </div>
 
                 <div className="space-y-6 mt-6">
-                {selectedRequest.photo &&<div>
+                  {selectedRequest.photo && <div>
                     <h3 className="text-lg font-medium mb-2">
                       Situation Photo
                     </h3>
@@ -564,9 +567,9 @@ const ResponderDashboard = () => {
                     <h3 className="text-lg font-medium mb-2">
                       Status
                     </h3>
-                    <Alert className={selectedRequest.status === 'accepted' ? "bg-blue-100 border-blue-300" : 
-                                      selectedRequest.status === 'completed' ? "bg-purple-100 border-purple-300" : 
-                                      "bg-gray-100 border-gray-300"}>
+                    <Alert className={selectedRequest.status === 'accepted' ? "bg-blue-100 border-blue-300" :
+                      selectedRequest.status === 'completed' ? "bg-purple-100 border-purple-300" :
+                        "bg-gray-100 border-gray-300"}>
                       <AlertTitle>
                         {selectedRequest.status?.charAt(0).toUpperCase() + selectedRequest.status?.slice(1) || "Unknown"}
                       </AlertTitle>
@@ -602,7 +605,7 @@ const ResponderDashboard = () => {
                     )}
                   </Button>
                 )}
-               
+
                 {/* Show navigate button for accepted requests */}
                 {selectedRequest.status === 'accepted' && selectedRequest.assignedTo?._id === authUser?._id && (
                   <Button
@@ -612,7 +615,7 @@ const ResponderDashboard = () => {
                       const { lat, lng } = userLocation;
                       const destinationLat = selectedRequest.latitude;
                       const destinationLng = selectedRequest.longitude;
-  
+
                       // Open Google Maps with the directions from user's location to the place's location
                       window.open(`https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=${destinationLat},${destinationLng}&travelmode=driving`, '_blank');
                     }}

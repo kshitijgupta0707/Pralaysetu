@@ -3,7 +3,8 @@ import { Bell, AlertTriangle, FileText, Users, Search, Filter, X, Check, MapPin,
 // ui components
 import { Button, Input, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Tabs, TabsContent, TabsList, TabsTrigger, Badge, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, Avatar, AvatarFallback, AvatarImage, Popover, PopoverContent, PopoverTrigger, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, }
   from '@/components/ui-kit';
-
+import { TruncatedText } from '@/components/shared/TruncatedText';
+import { DisasterImageDisplay } from '@/components/shared/DisasterImageDisplay';
 //store
 import { useAdminStore } from '@/store/useAdminStore';
 import { useReportStore } from '@/store/useReportStore';
@@ -55,7 +56,7 @@ const AdminDashboard = () => {
   const [selectedResponderForAssignment, setSelectedResponderForAssignment] = useState(null);
   // Extract data and functions from adminStore
 
-
+  const [showFullText, setShowFullText] = useState(false);
   useEffect(() => {
     if (!socket) return;
     socket.on("newHelpRequest", (newRequest) => {
@@ -207,10 +208,10 @@ const AdminDashboard = () => {
         />
       )}
       <div
-  className={`${showSidebar ? 'fixed' : 'hidden'} lg:flex lg:fixed lg:top-14 inset-y-0 z-50 lg:z-30 w-64 bg-white shadow-lg transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'} 
+        className={`${showSidebar ? 'fixed' : 'hidden'} lg:flex lg:fixed lg:top-14 inset-y-0 z-50 lg:z-30 w-64 bg-white shadow-lg transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'} 
   lg:translate-x-0 transition-transform duration-300 ease-in-out 
   overflow-hidden`}
->
+      >
         <div className="h-full flex flex-col lg:overflow-hidden overflow-y-auto w-full">
 
           <div className="p-4 border-b flex items-center justify-between">
@@ -284,10 +285,10 @@ const AdminDashboard = () => {
           </div>
         )}
       </div>
-{/* Main Content */}
-<div className="flex-1 flex flex-col overflow-hidden lg:pl-64">
-
       {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden lg:pl-64">
+
+        {/* Main Content */}
         {/* Header */}
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
@@ -378,9 +379,17 @@ const AdminDashboard = () => {
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start">
                           <div>
-                            <CardTitle className="flex items-center flex-wrap gap-1">
-                              <Badge className="mr-2">{report.disasterType}</Badge>
-                              {getStatusBadge(report.status)}
+                            <CardTitle className="flex justify-between items-center flex-wrap gap-1">
+                              <div className='flex ' >
+                              { report.disasterType == "earthquake" ? <Badge className="mr-2">Equake</Badge> :<Badge className="mr-2">{report.disasterType}</Badge>}
+
+                              <div>
+                                {getStatusBadge(report.status)}
+                              </div>
+
+                              </div>
+
+
                             </CardTitle>
                           </div>
                           <div className="text-xs text-gray-500">
@@ -389,17 +398,15 @@ const AdminDashboard = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="pb-2">
-                        <img
-                          src={report.imageUrl}
-                          alt={report.disasterType}
-                          className="w-full h-40 object-cover rounded-md mb-2"
-                        />
-                        <p className="text-sm">{report.description}</p>
+                        <DisasterImageDisplay imageUrl={report.imageUrl} disasterType={report.disasterType} />
+                        <TruncatedText text={report.description} maxLength={100} height={60} />
+
                         <div className="flex items-center text-xs text-gray-500 mt-2">
                           <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
                           <span className="truncate">Lat: {report.latitude?.toFixed(4)}, Long: {report.longitude?.toFixed(4)}</span>
                         </div>
                       </CardContent>
+                      
                       {report.status === 'pending' && (
                         <CardFooter className="flex justify-between pt-2">
                           <Button
@@ -492,14 +499,9 @@ const AdminDashboard = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="pb-2">
-                        {request.photo && (
-                          <img
-                            src={request.photo}
-                            alt="Help request"
-                            className="w-full h-40 object-cover rounded-md mb-2"
-                          />
-                        )}
-                        <p className="text-sm">{request.reason}</p>
+                        <DisasterImageDisplay imageUrl={request.photo} disasterType={"Help Request"} />
+                        <TruncatedText text={request.reason} maxLength={80} />
+
                         <div className="flex items-center text-xs text-gray-500 mt-2">
                           <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
                           <span className="truncate">
@@ -545,32 +547,35 @@ const AdminDashboard = () => {
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-full p-0 max-h-60 overflow-y-auto">
-                              <div className="py-2">
+                              <div className="py-2 w-[355px] space-y-2">
                                 {responders.length === 0 ? (
                                   <div className="px-4 py-2 text-sm text-gray-500">No available responders</div>
                                 ) : (
-                                  responders
-                                    .map(responder => (
-                                      <button
-                                        key={responder._id}
-                                        className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center"
-                                        onClick={() => {
-                                          setSelectedResponderForAssignment(responder);
-                                          setConfirmAssignmentId(request._id);
-                                        }}
-                                      >
-                                        <Avatar className="h-6 w-6 mr-2">
-                                          <AvatarFallback>{responder.firstName?.charAt(0) || 'R'}</AvatarFallback>
-                                        </Avatar>
-                                        <span>{responder.firstName + " " + responder.lastName}</span>
-                                        {/* <span>{"     " + responder.email}</span> */}
-                                      </button>
-                                    ))
+                                  responders.map(responder => (
+                                    <button
+                                      key={responder._id}
+                                      className="w-full flex items-center px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-200 ease-in-out"
+                                      onClick={() => {
+                                        setSelectedResponderForAssignment(responder);
+                                        setConfirmAssignmentId(request._id);
+                                      }}
+                                    >
+                                      <Avatar className="h-8 w-8 mr-3 border-2 border-gray-300">
+                                        <AvatarFallback>{responder.firstName?.charAt(0) || 'R'}</AvatarFallback>
+                                      </Avatar>
+                                      <div className="flex flex-col justify-start items-start">
+                                        <span className="text-md font-semibold">{responder.firstName + " " + responder.lastName}</span>
+                                        <span className="text-sm text-gray-500">{responder.email}</span>
+                                      </div>
+                                    </button>
+                                  ))
                                 )}
                               </div>
                             </PopoverContent>
+
                           </Popover>
                         </CardFooter>
+
                       )}
                     </Card>
                   ))}
@@ -585,12 +590,10 @@ const AdminDashboard = () => {
                 <div className="overflow-x-auto">
                   <TabsList className="mb-2">
                     <TabsTrigger value="active">Active Responders</TabsTrigger>
-                    <TabsTrigger value="responders">Responders</TabsTrigger>
                     <TabsTrigger value="pending">Pending Registrations</TabsTrigger>
                     <TabsTrigger value="entities">Registered Entities</TabsTrigger>
                   </TabsList>
                 </div>
-
                 <TabsContent value="active" className="mt-4">
                   <div className="bg-white rounded-lg shadow">
                     <div className="p-4 border-b">
@@ -600,8 +603,9 @@ const AdminDashboard = () => {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="bg-gray-50">
-                            <th className="px-4 py-3 text-left">Name</th>
-                            <th className="px-4 py-3 text-left">Type</th>
+                            <th className="px-4 py-3 text-left">First Name</th>
+                            <th className="px-4 py-3 text-left">Last Name</th>
+                            <th className="px-4 py-3 text-left">Email</th>
                             <th className="px-4 py-3 text-left">Status</th>
                           </tr>
                         </thead>
@@ -609,10 +613,11 @@ const AdminDashboard = () => {
                           {responders.map(responder => (
                             <tr key={responder._id} className="border-t hover:bg-gray-50">
                               <td className="px-4 py-3">{responder.firstName}</td>
-                              <td className="px-4 py-3">{responder.registerAs == "None" ? "User" : responder.registerAs}</td>
+                              <td className="px-4 py-3">{responder.lastName}</td>
+                              <td className="px-4 py-3">{responder.email}</td>
                               <td className="px-4 py-3">
                                 <Badge variant={responder.Verified === 'available' ? 'outline' : 'secondary'}>
-                                  {responder.registerAs}
+                                  {responder.registerAs == "None" ? "User" : responder.registerAs}
                                 </Badge>
                               </td>
                             </tr>
@@ -622,7 +627,6 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 </TabsContent>
-
                 <TabsContent value="pending" className="mt-4">
                   <div className="space-y-4">
                     {pendingUsers.map(registration => (
@@ -724,93 +728,89 @@ const AdminDashboard = () => {
                     )}
                   </div>
                 </TabsContent>
-
-                <TabsContent value="responders">
-                  {loading ? (
-                    <div className="text-center py-10">Loading responders...</div>
-                  ) : responders.length === 0 ? (
-                    <div className="text-center py-10">No responders found.</div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {responders.map(responder => (
-                        <div key={responder._id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow p-4">
-                          <div className="flex items-center gap-3 mb-3">
-                            <img
-                              src={responder.profilePic || "/placeholder-user.jpg"}
-                              alt={`${responder.firstName} ${responder.lastName}`}
-                              className="w-12 h-12 rounded-full object-cover"
-                            />
-                            <div className="overflow-hidden">
-                              <h3 className="font-semibold truncate">
-                                {responder.firstName} {responder.lastName}
-                              </h3>
-                              <p className="text-sm text-gray-600 truncate">{responder.email}</p>
+                <TabsContent value="entities"> <div className="space-y-4">
+                  {verifiedEntities.map(registration => (
+                    <Card key={registration._id}>
+                      <CardHeader>
+                        <CardTitle>{registration.registerAs}</CardTitle>
+                        <CardDescription className="text-sm">
+                          <span className="font-semibold">Type:</span> {registration.type} |
+                          <span className="font-semibold ml-2">Applied on:</span> {formatDate(registration.createdAt)}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <div className="space-y-2">
+                            <div>
+                              <span className="text-sm font-medium">Contact Person:</span>
+                              <p>{registration.firstName + " " + registration.lastName}</p>
                             </div>
-                          </div>
-
-                          <div className="flex gap-2 mb-2 flex-wrap">
-                            <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
-                              {responder.registerAs || "Responder"}
-                            </Badge>
-                          </div>
-
-                          <div className="mt-3 flex justify-end">
-                            <Button variant="outline" size="sm">
-                              View Profile
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="entities">
-                  {loading ? (
-                    <div className="text-center py-10">Loading verified entities...</div>
-                  ) : verifiedEntities.length === 0 ? (
-                    <div className="text-center py-10">No verified entities found.</div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {verifiedEntities.map(entity => (
-                        <div key={entity._id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow p-4">
-                          <div className="flex items-center gap-3 mb-3">
-                            <img
-                              src={entity.profilePic || "/placeholder-user.jpg"}
-                              alt={`${entity.firstName} ${entity.lastName}`}
-                              className="w-12 h-12 rounded-full object-cover"
-                            />
-                            <div className="overflow-hidden">
-                              <h3 className="font-semibold truncate">
-                                {entity.firstName} {entity.lastName}
-                              </h3>
-                              <p className="text-sm text-gray-600 truncate">{entity.email}</p>
+                            <div>
+                              <span className="text-sm font-medium">Email:</span>
+                              <p className="break-words">{registration.email}</p>
                             </div>
-                          </div>
+                            <div>
+                              <span className="text-sm font-medium">Phone:</span>
+                              <p>{"95555XXXX8"}</p>
+                            </div>
 
-                          <div className="flex gap-2 mb-2 flex-wrap">
-                            <Badge variant="outline" className={`${entity.registerAs === 'Government'
-                              ? 'bg-purple-100 text-purple-800 border-purple-200'
-                              : 'bg-green-100 text-green-800 border-green-200'
-                              }`}>
-                              {entity.registerAs}
-                            </Badge>
-                            {entity.workAsResponder && (
-                              <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
-                                Responder
-                              </Badge>
+                            {/* NGO Specific Details */}
+                            {registration.registerAs === 'NGO' && (
+                              <div >
+
+                                <div className="mt-4 pt-3 border-t">
+                                  <span className="text-sm font-medium text-blue-600">NGO Details</span>
+                                </div>
+                                <div>
+                                  <span className="text-sm font-medium">NGO Name:</span>
+                                  <p>{registration.ngoId?.name}</p>
+                                </div>
+                                <div>
+                                  <span className="text-sm font-medium">NGO Phone:</span>
+                                  <p>{registration.ngoId?.phone}</p>
+                                </div>
+                                <div>
+                                  <span className="text-sm font-medium">NGO Address:</span>
+                                  <p className="text-sm">{registration.ngoId?.address}</p>
+                                </div>
+                              </div>
                             )}
                           </div>
+                        </div>
+                        <div>
+                          {/* Description section for NGO */}
+                          {registration.registerAs === 'NGO' && (
+                            <div className="space-y-2 mb-4">
+                              <span className="text-sm font-medium">NGO Description:</span>
+                              <p className="text-sm bg-gray-50 p-3 rounded border">{registration.ngoId?.description}</p>
+                            </div>
+                          )}
 
-                          <div className="mt-3 flex justify-end">
-                            <Button variant="outline" size="sm">
-                              View Profile
-                            </Button>
+                          <div className="space-y-2">
+                            <div>
+                              <span className="text-sm font-medium">ID Proof:</span>
+                              <div className="mt-1">
+                                <img
+                                  src={registration.governmentDocument}
+                                  alt="ID Proof"
+                                  className="w-full max-w-xs rounded border"
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      ))}
+                      </CardContent>
+
+                    </Card>
+                  ))}
+
+                  {verifiedEntities.length === 0 && (
+                    <div className="text-center p-8 bg-white rounded-lg border">
+                      <p className="text-gray-500">No pending registration requests</p>
                     </div>
                   )}
+                </div>
+
                 </TabsContent>
               </Tabs>
             </div>
@@ -826,19 +826,28 @@ const AdminDashboard = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Assignment</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to assign this help request to {selectedResponderForAssignment?.name}?
+              Are you sure you want to assign this help request to{" "}
+              <span className="font-semibold">
+                {selectedResponderForAssignment?.firstName}{" "}
+                {selectedResponderForAssignment?.lastName}
+              </span>?
+              <div className="mt-2 text-sm text-gray-500">
+                <span>Email: </span>
+                <span className="text-gray-700">{selectedResponderForAssignment?.email}</span>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
-              if (confirmAssignmentId && selectedResponderForAssignment) {
-                console.log("i am caleed at alert dialog action")
-                assignHelpRequest(confirmAssignmentId, selectedResponderForAssignment._id);
-                setConfirmAssignmentId(null);
-                setSelectedResponderForAssignment(null);
-              }
-            }}>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmAssignmentId && selectedResponderForAssignment) {
+                  assignHelpRequest(confirmAssignmentId, selectedResponderForAssignment._id);
+                  setConfirmAssignmentId(null);
+                  setSelectedResponderForAssignment(null);
+                }
+              }}
+            >
               Confirm Assignment
             </AlertDialogAction>
           </AlertDialogFooter>

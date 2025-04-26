@@ -1,8 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MapPin, Clock, Star, Info, Loader } from 'lucide-react';
-
+import PlaceCards from './PlaceCards.';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { TruncatedText } from '@/components/shared/TruncatedText';
 const GoMapsComponent = () => {
-  
+
   const apiKey = 'AlzaSyjhZhqjrJkRFyIXOpoF4DqRRyrUd6195KB'; // Replace with your GoMaps API key
   const mapRef = useRef(null);
   const [userLocation, setUserLocation] = useState({});
@@ -157,7 +164,6 @@ const GoMapsComponent = () => {
               // Create info window for the place
               const infoWindow = new window.google.maps.InfoWindow({
                 content: `
-                njnknk
                   <div style="padding: 10px; max-width: 200px;">
                     <h3 style="margin-top: 0; font-weight: bold;">${place.name}</h3>
                     <p>${place.vicinity}</p>
@@ -195,7 +201,7 @@ const GoMapsComponent = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header */}
-      
+
 
       {/* Control panel */}
       <div className="control-panel p-2 md:p-4 bg-gray-100 border-b border-gray-300 sticky top-0 z-10">
@@ -281,13 +287,15 @@ const GoMapsComponent = () => {
             {places.map((place) => (
               <div key={place.place_id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 {/* Header with shadow */}
-                <div className="bg-blue-50 px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-xl font-bold text-gray-800">{place.name}</h2>
+                <div className="bg-blue-50 px-6 py-4 h-[80px] border-b border-gray-200 flex justify-center items-center text-center">
+                  <h2 className=" text-lg font-bold text-gray-800">{place.name.length > 50 ? place.name.slice(0,40) + "..." :place.name}
+                    
+                  </h2>
                 </div>
 
                 {/* Facility Information */}
                 <div className="p-6">
-                  <div className="flex items-center mb-4 flex-wrap">
+                  {selectedCategory != 'police' && <div className="flex items-center  flex-wrap h-[50px] ">
                     {place.rating && (
                       <div className="flex items-center mr-4 mb-2">
                         <Star className="w-5 h-5 text-yellow-500" />
@@ -301,19 +309,20 @@ const GoMapsComponent = () => {
                         <span>{place.opening_hours.open_now ? 'Open Now' : 'Closed'}</span>
                       </div>
                     )}
-                  </div>
+                  </div>}
 
-                  <div className="mb-4">
-                    <div className="flex items-start mb-2">
+                  <div className="mb-2">
+                    <div className="flex items-start  -700">
                       <MapPin className="w-5 h-5 text-blue-500 mt-1 mr-2 flex-shrink-0" />
-                      <p className="text-gray-600">{place.vicinity}</p>
+                      <TruncatedText text={place.vicinity} maxLength={40} height={50}  />
                     </div>
+
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-600">
                       <Info className="w-5 h-5 mr-2" />
-                      <span>{place.vicinity.split(',').slice(-2)[0]}</span>
+                      <span>{place.vicinity.split(',').slice(-2)[0].length > 20 ? place.vicinity.split(',').slice(-2)[0].slice(0, 20) + "..." : place.vicinity.split(',').slice(-2)[0]}</span>
                     </div>
                     <button
                       className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors text-sm"
@@ -342,19 +351,22 @@ const GoMapsComponent = () => {
               </div>
             ))}
           </div>
-        ) : (
-          <div className="text-center p-10">
-            {isLoading ? (
-              <div className="flex flex-col items-center">
-                <Loader className="animate-spin h-8 w-8 text-blue-500 mb-2" />
-                <p>Searching for places...</p>
-              </div>
-            ) : (
-              <p className="text-gray-500">No {selectedCategory} facilities found in this area. Try increasing the radius or selecting a different category.</p>
-            )}
-          </div>
-        )}
+        )
+          : (
+            <div className="text-center p-10">
+              {isLoading ? (
+                <div className="flex flex-col items-center">
+                  <Loader className="animate-spin h-8 w-8 text-blue-500 mb-2" />
+                  <p>Searching for places...</p>
+                </div>
+              ) : (
+                <p className="text-gray-500">No {selectedCategory} facilities found in this area. Try increasing the radius or selecting a different category.</p>
+              )}
+            </div>
+          )}
       </div>
+
+
 
 
     </div>

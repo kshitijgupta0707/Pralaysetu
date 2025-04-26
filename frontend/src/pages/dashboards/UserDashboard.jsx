@@ -19,7 +19,7 @@ import EmergencyMap from '../map/EmergencyMap';
 import AlertNotifications from '../../components/AlertNotifications';
 import ReportIncident from '../../components/ReportIncident';
 import RequestHelp from '../../components/RequestHelp';
-
+import { TruncatedText } from '@/components/shared/TruncatedText';
 // Store imports
 import { useAuthStore } from '@/store/useAuthstore';
 import { useNgoStore } from '@/store/useNgoStore';

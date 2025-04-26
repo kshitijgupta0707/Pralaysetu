@@ -30,7 +30,7 @@ export const approveUser = async (req, res) => {
 export const rejectUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    
+
     if (!user) return res.status(404).json({ message: "User not found" });
 
     user.registrationStatus = "rejected";
@@ -60,7 +60,7 @@ export const getAllVerifiedGovernmentAndNgo = async (req, res) => {
       registerAs: { $in: ["Government", "NGO"] },
       registrationStatus: "approved",
       isVerified: true,
-    }).select("-password"); // exclude password
+    }).populate("ngoId").select("-password"); // exclude password
 
     res.status(200).json(responders);
   } catch (err) {

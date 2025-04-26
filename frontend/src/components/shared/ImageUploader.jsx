@@ -24,14 +24,14 @@ export const ImageUploader = ({
           />
           <label
             htmlFor="image"
-            className="flex flex-col items-center justify-center cursor-pointer h-40"
+            className="flex flex-col items-center justify-center cursor-pointer min-h-[160px]"
           >
             {imagePreview ? (
-              <div className="relative w-full h-full">
+              <div className="relative w-full">
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="w-full h-full object-cover rounded"
+                  className="w-full max-h-[500px] object-contain rounded"
                 />
                 <button
                   type="button"
@@ -46,7 +46,7 @@ export const ImageUploader = ({
                 </button>
               </div>
             ) : (
-              <>
+              <div className="flex flex-col items-center justify-center">
                 <Camera className="h-12 w-12 text-gray-400 mb-2" />
                 <span className="text-sm text-gray-500">
                   {placeholder}
@@ -54,7 +54,7 @@ export const ImageUploader = ({
                 <span className="text-xs text-gray-400 mt-1">
                   {subtext}
                 </span>
-              </>
+              </div>
             )}
           </label>
         </div>
@@ -62,4 +62,3 @@ export const ImageUploader = ({
     </div>
   );
 };
-

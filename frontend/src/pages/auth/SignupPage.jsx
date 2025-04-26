@@ -23,7 +23,6 @@ const SignupPage = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    location: '',
     registerAs: 'None', // Default: None
     workAsResponder: false, // Default: No
     governmentDocument: null,
@@ -62,10 +61,7 @@ const SignupPage = () => {
     return true;
   };
   const validateStep2 = () => {
-    if (!registerData.location.trim()) {
-      toast.error("Location is required");
-      return false;
-    }
+   
 
     if (registerData.registerAs === 'NGO') {
       if (!registerData.ngoName.trim()) {
@@ -167,7 +163,7 @@ const SignupPage = () => {
     formData.append("email", registerData.email);
     formData.append("password", registerData.password);
     formData.append("confirmPassword", registerData.confirmPassword);
-    formData.append("location", registerData.location);
+   
     formData.append("registerAs", registerData.registerAs);
     formData.append("workAsResponder", registerData.workAsResponder);
 
@@ -400,18 +396,7 @@ const SignupPage = () => {
                   {/* Step 2: Location and Roles */}
                   {currentStep === 2 && (
                     <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="location" className="text-gray-700">Location</Label>
-                        <Input
-                          id="location"
-                          type="text"
-                          placeholder="City, State"
-                          value={registerData.location}
-                          onChange={handleInputChange}
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                          required
-                        />
-                      </div>
+                    
 
                       {/* Organization Type */}
                       <div className="space-y-2">
@@ -592,7 +577,7 @@ const SignupPage = () => {
                           required
                         />
                       </div>
-                      <div className="flex items-start space-x-2 pt-2">
+                      <div className="flex items-start space-x-2 pt-2 mb-5">
                         <Checkbox
                           id="terms"
                           checked={acceptTerms}
@@ -600,7 +585,7 @@ const SignupPage = () => {
                           className="mt-1"
                         />
                         <Label htmlFor="terms" className="text-sm text-gray-600">
-                          I agree to the <Link className="text-blue-600 hover:underline" to="/terms">Terms of Service</Link> and <Link className="text-blue-600 hover:underline" to="/privacy">Privacy Policy</Link>
+                          I agree to the <span className="text-blue-600 hover:underline" >Terms of Service</span> and <span className="text-blue-600 hover:underline" >Privacy Policy</span>
                         </Label>
                       </div>
                     </div>

@@ -128,7 +128,7 @@ export const signup = async (req, res) => {
     if (governmentDocument) {
       const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
       if (!allowedTypes.includes(governmentDocument.mimetype)) {
-        return res.status(400).json({ message: "Only JPG and PNG files are allowed" });
+        return res.status(400).json({ message: "Only JPG, JPEG and PNG files are allowed" });
       }
 
       if (governmentDocument.size > 200 * 1024) {
