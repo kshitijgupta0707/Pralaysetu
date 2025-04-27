@@ -1,15 +1,17 @@
 // notification.controller.js
-import pkg from 'google-auth-library';
-const { google } = pkg;
-
 import { JWT } from 'google-auth-library';
 import axios from "axios";
+
+import { User } from "../models/user.model.js"
+
+
 
 // import serviceAccount from "../service-account.json" assert { type: "json" };
 import { readFile } from "fs/promises";
 const serviceAccount = JSON.parse(
   await readFile(new URL("../service-account.json", import.meta.url))
 );
+serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
 
 const getAccessToken = async () => {
   const client = new JWT({
@@ -30,23 +32,25 @@ export const sendNotificationToAll = async (title, body, data = {}) => {
       console.log("⚠️ Notification sending already in progress. Skipping this request.");
       return { skipped: true };
     }
-    
+
     isProcessingNotifications = true;
-    
+
     // Fetch all tokens from database
     const tokenRecords = await Token.find({});
-    
+
     if (tokenRecords.length === 0) {
       console.log("No FCM tokens found. Skipping notification.");
       isProcessingNotifications = false;
       return { success: false, reason: "no-tokens" };
     }
-    
+
     console.log(`Sending notification to ${tokenRecords.length} devices`);
-    
+
     // Send notification to each token individually
     const sendPromises = tokenRecords.map(async (tokenRecord) => {
       try {
+        console.log("calling send notification function")
+
         await sendNotification(tokenRecord.token, title, body, data);
         return { success: true, token: tokenRecord.token };
       } catch (error) {
@@ -58,15 +62,15 @@ export const sendNotificationToAll = async (title, body, data = {}) => {
         return { success: false, token: tokenRecord.token, error: error.message };
       }
     });
-    
+
     const results = await Promise.all(sendPromises);
-    
+
     const successful = results.filter(r => r.success).length;
     console.log(`✅ Successfully sent notifications to ${successful}/${tokenRecords.length} devices`);
-    
+
     // Release the lock
     isProcessingNotifications = false;
-    
+
     return { success: true, sentCount: successful, totalCount: tokenRecords.length };
   } catch (error) {
     console.error("❌ Error sending notifications to all devices:", error);
@@ -75,31 +79,102 @@ export const sendNotificationToAll = async (title, body, data = {}) => {
     throw error;
   }
 };
-export const sendNotificationToPerson= async (title, body, data = {}) => {
+
+export const sendNotificationToAdmins = async (title, body, data = {}) => {
+  try {
+    if (isProcessingNotifications) {
+      console.log("⚠️ Notification sending already in progress. Skipping this request.");
+      return { skipped: true };
+    }
+
+    isProcessingNotifications = true;
+
+    // Step 1: Fetch all admin users
+    const users = await User.find({ registerAs: "Admin" });
+    console.log("✅ Admin users fetched:", users.length);
+
+    if (users.length === 0) {
+      console.log("⚠️ No Admin users found. Skipping notification.");
+      isProcessingNotifications = false;
+      return { skipped: true };
+    }
+
+    let allTokens = [];
+
+    // Step 2: Collect all tokens for all admins
+    for (const user of users) {
+      const tokens = await Token.find({ userId: user._id });
+      if (tokens.length > 0) {
+        allTokens.push(...tokens);
+      }
+    }
+
+    if (allTokens.length === 0) {
+      console.log("⚠️ No FCM tokens found for admins. Skipping notification.");
+      isProcessingNotifications = false;
+      return { skipped: true };
+    }
+
+    console.log(`📤 Sending notifications to ${allTokens.length} devices`);
+
+    // Step 3: Send notification to all tokens
+    const sendPromises = allTokens.map(async (tokenRecord) => {
+      try {
+        await sendNotification(tokenRecord.token, title, body, data);
+        return { success: true, token: tokenRecord.token };
+      } catch (error) {
+        if (error.response?.data?.error?.message === 'The registration token is not a valid FCM registration token') {
+          console.log(`🗑️ Removing invalid token: ${tokenRecord.token}`);
+          await Token.findByIdAndDelete(tokenRecord._id);
+        }
+        return { success: false, token: tokenRecord.token, error: error.message };
+      }
+    });
+
+    const results = await Promise.all(sendPromises);
+
+    const successful = results.filter(r => r.success).length;
+
+    console.log(`✅ Notifications successfully sent to ${successful}/${allTokens.length} devices.`);
+
+    isProcessingNotifications = false;
+    return { success: true, sentCount: successful, totalCount: allTokens.length };
+
+  } catch (error) {
+    console.error("❌ Error sending notifications:", error);
+    isProcessingNotifications = false;
+    throw error;
+  }
+};
+
+export const sendNotificationToPerson = async (title, body, data = {}) => {
   try {
     // Prevent concurrent execution
     if (isProcessingNotifications) {
       console.log("⚠️ Notification sending already in progress. Skipping this request.");
       return { skipped: true };
     }
-    
+
     isProcessingNotifications = true;
-    
+
     // Fetch all tokens from database
     let tokenRecords = []
-    if(data.userId){
-        tokenRecords = await Token.find({userId});
-    }else return;
-  
-    
+    let userId = data.userId
+    console.log("User id is", data.userId)
+    // User id is new ObjectId('680d2434c760d97a23118141')
+    if (userId) {
+      tokenRecords = await Token.find({ userId });
+    } else return;
+
+
     if (tokenRecords.length === 0) {
       console.log("No FCM tokens found. Skipping notification.");
       isProcessingNotifications = false;
       return { success: false, reason: "no-tokens" };
     }
-    
+
     console.log(`Sending notification to ${tokenRecords.length} devices`);
-    
+
     // Send notification to each token individually
     const sendPromises = tokenRecords.map(async (tokenRecord) => {
       try {
@@ -114,15 +189,15 @@ export const sendNotificationToPerson= async (title, body, data = {}) => {
         return { success: false, token: tokenRecord.token, error: error.message };
       }
     });
-    
+
     const results = await Promise.all(sendPromises);
-    
+
     const successful = results.filter(r => r.success).length;
     console.log(`✅ Successfully sent notifications to ${successful}/${tokenRecords.length} devices`);
-    
+
     // Release the lock
     isProcessingNotifications = false;
-    
+
     return { success: true, sentCount: successful, totalCount: tokenRecords.length };
   } catch (error) {
     console.error("❌ Error sending notifications to all devices:", error);
@@ -133,11 +208,11 @@ export const sendNotificationToPerson= async (title, body, data = {}) => {
 };
 
 // Modify your sendNotification function to include better error handling
-export const sendNotification = async(token, title, body, data = {}) => {
+export const sendNotification = async (token, title, body, data = {}) => {
   try {
+    console.log(" i am getting called send ntoifictoain")
     const accessToken = await getAccessToken();
 
-    // console.log("Got access token for FCM");
 
     const message = {
       message: {
@@ -189,19 +264,25 @@ export const saveFcmToken = async (req, res) => {
   try {
     const { userId, token } = req.body;
     console.log("Token is saved")
-
+    console.log(token)
+    console.log(userId)
     if (!userId || !token) {
+      console.log("missing")
       return res.status(400).json({ msg: "Missing userId or token" });
     }
 
     // Check if token already exists
-    const existing = await Token.findOne({ token });
+    const existing = await Token.findOne({ token ,userId });
+    console.log("yha aya")
+    console.log("yha aya")
 
     if (existing) {
+      console.log("existing")
       return res.status(200).json({ msg: "Token already exists" });
     }
 
     await Token.create({ userId, token });
+    console.log("created new token")
     console.log("token saved")
     res.status(201).json({ msg: "Token saved" });
   } catch (err) {

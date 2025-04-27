@@ -78,15 +78,16 @@ function App() {
   }, [])
   const location = useLocation(); // detects route changes
 
-  // useEffect(() => {
-  //   onMessage(messaging, (payload) => {
-  //     console.log("Foreground Notification:", payload);
-  //     alert(payload.notification.title + ": " + payload.notification.body);
-  //   });
-  // }, []);
+  useEffect(() => {
+    console.log("from app.jsx")
+    onMessage(messaging, (payload) => {
+      console.log("Foreground Notification:", payload);
+      alert(payload.notification.title + ": " + payload.notification.body);
+    });
+  }, []);
 
   // Check auth on mount
-  useEffect(() => {
+  useEffect(() => { 
     checkAuth();
   }, [checkAuth]);
 

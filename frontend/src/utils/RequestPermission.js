@@ -4,17 +4,31 @@
 import { messaging, getToken } from "@/firebase";
 import { axiosInstance } from "@/lib/axios";
 
+
+// If permission granted, you generate an FCM token 
+// Once token is generated, you send this token to your backend 
 export const requestNotificationPermission = async (authUser) => {
-  try { 
+  try {
+    console.log("At request notification function");
+
     const permission = await Notification.requestPermission();
 
     if (permission === "granted") {
-      const fcmToken = await getToken(messaging, {
-        vapidKey: import.meta.env.VITE_VAPID_KEY,
-      });
+      let fcmToken = localStorage.getItem("fcmToken");
+      if (!fcmToken) {
+        fcmToken = await getToken(messaging, {
+          vapidKey: import.meta.env.VITE_VAPID_KEY,
+        });
+
+        if (fcmToken) {
+          localStorage.setItem("fcmToken", fcmToken);
+        }
+      }
+      console.log("Permission granted");
 
       if (fcmToken) {
-        console.log("✅ FCM Token:", fcmToken);
+
+        console.log("Generated the FCM Token:", fcmToken);
 
         if (authUser?._id) {
           await axiosInstance.post("/notification/save-token", {

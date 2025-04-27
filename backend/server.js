@@ -15,6 +15,7 @@ import fundraiserRoutes from "./routes/fundraiser.route.js"
 import  ngoRoutes  from "./routes/ngo.route.js";
 import { stripeWebhookHandler } from "./controllers/stripe.controller.js";
 import "./cron/expiredFundraiser.js"
+import notificationRoutes from "./routes/fcm.notification.route.js"
 import axios from "axios";
 //to get data from the .env file
 dotenv.config();
@@ -53,6 +54,7 @@ app.use("/api/admin", adminRoutes);
 app.use('/api/payment', stripeRoutes);
 app.use("/api/fundraiser", fundraiserRoutes);
 app.use("/api/ngo", ngoRoutes);
+app.use("/api/notification" , notificationRoutes)
 
 
 

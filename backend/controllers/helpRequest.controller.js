@@ -3,7 +3,7 @@ import HelpRequest from "../models/helpRequest.model.js";
 import cloudinary from "cloudinary";
 import { io, getReceiverSocketId } from "../config/socket.js";
 import { sendNotificationToPerson } from "./notification.controller.js";
-
+import { sendNotificationToAdmins } from "./notification.controller.js";
 // Create Help Request
 export const createHelpRequest = async (req, res) => {
   try {
@@ -56,6 +56,13 @@ export const createHelpRequest = async (req, res) => {
     })
     const newHelpRequest = await HelpRequest.findById(helpRequest._id).populate('user', "firstName lastName")
 
+
+    const notificationResult = await sendNotificationToAdmins(
+      `New Help Request Submitted!`,
+      `The new Help Request has been submitted at PralaySetu.`,
+      { requestId: helpRequest._id.toString(), type: "report_status" }
+    );
+
     // EMIT socket event to admin
     io.emit("newHelpRequest", newHelpRequest); // You can send full object or just _id, up to you
     res.status(201).json({
@@ -105,6 +112,9 @@ export const verifyOrRejectHelpRequest = async (req, res) => {
     await request.save();
 
     //  Real-time notify the user
+    console.log("help requ")
+    console.log("user is", request.user);
+    console.log("id is", request.user._id)
     const userSocketId = getReceiverSocketId(request.user._id);
     if (userSocketId) {
       io.to(userSocketId).emit("helpRequestStatusChanged", {
@@ -117,19 +127,19 @@ export const verifyOrRejectHelpRequest = async (req, res) => {
 
 
 
-    // try {
-    //   // Send notification to all users - using the updated function with lock mechanism
-    //   const notificationResult = await sendNotificationToPerson(
-    //     `Request ${status}!`,
-    //     `The request has been ${status} by the admin.`,
-    //     { requestId: request._id, type: "request_status" , userId: request.user}
-    //   );
+    try {
+      // Send notification to all users - using the updated function with lock mechanism
+      const notificationResult = await sendNotificationToPerson(
+        `Request ${status}!`,
+        `The request has been ${status} by the admin.`,
+        { requestId: request._id, type: "request_status", userId: request.user }
+      );
 
-    //   console.log("Notification result:", notificationResult);
-    // } catch (notificationError) {
-    //   // Log the error but don't fail the entire request
-    //   console.error("Failed to send notifications:", notificationError);
-    // }
+      console.log("Notification result:", notificationResult);
+    } catch (notificationError) {
+      // Log the error but don't fail the entire request
+      console.error("Failed to send notifications:", notificationError);
+    }
 
     res.status(200).json({
       success: true,
@@ -181,6 +191,12 @@ export const assignHelpRequest = async (req, res) => {
         request: populatedRequest,
       });
     }
+
+    const notificationResult = await sendNotificationToPerson(
+      `Request assigned!`,
+      `The request has been assigned to you.`,
+      { requestId: request._id, type: "Request assigned", userId: request.assignedTo._id }
+    );
 
     res.status(200).json({ success: true, message: "Request assigned", request: populatedRequest });
   } catch (err) {
@@ -234,18 +250,18 @@ export const acceptHelpRequest = async (req, res) => {
 
     // const responderSocketId = getReceiverSocketId(responderId);
     // if (responderSocketId) {
-      //   io.to(responderSocketId).emit("assignedHelpRequest", {
-        //     title: "New Request Assignment",
-        //     message: `You have been assigned a help request by admin.`,
-        //     purpose: "assignment",
-        //     request: populatedRequest,
-        //   });
-        // }
-        
-        // //  Notify user their request was assigned
-        //  Notify user
+    //   io.to(responderSocketId).emit("assignedHelpRequest", {
+    //     title: "New Request Assignment",
+    //     message: `You have been assigned a help request by admin.`,
+    //     purpose: "assignment",
+    //     request: populatedRequest,
+    //   });
+    // }
+
+    // //  Notify user their request was assigned
+    //  Notify user
     const userSocketId = getReceiverSocketId(request.user._id);
-    console.log("Notifiyig " , userSocketId)
+    console.log("Notifiyig ", userSocketId)
     if (userSocketId) {
       io.to(userSocketId).emit("helpRequestStatusChanged", {
         title: "On the way to help you",
@@ -255,6 +271,16 @@ export const acceptHelpRequest = async (req, res) => {
       });
     }
     request.status = "accepted";
+
+    const notificationResult = await sendNotificationToPerson(
+      `Request accepted!`,
+      `Help is on your way`,
+      { requestId: request._id, type: "Request accepted", userId: request.user }
+    );
+
+
+
+
     await request.save();
     res.status(200).json({ success: true, message: "Request accepted", request });
   } catch (err) {

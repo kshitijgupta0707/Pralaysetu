@@ -3,7 +3,8 @@ import { Report } from "../models/report.model.js";
 import { getReceiverSocketId, io } from "../config/socket.js";
 import { uploadImageToCloudinary } from "../utils/imageUploader.js";
 import { sendNotificationToAll } from "./notification.controller.js";
-
+import { sendNotificationToPerson } from "./notification.controller.js";
+import { sendNotificationToAdmins } from "./notification.controller.js";
 export const createReport = async (req, res) => {
   try {
     const { disasterType, latitude, longitude, description } = req.body;
@@ -19,53 +20,77 @@ export const createReport = async (req, res) => {
         message: "Please send us the location"
       })
     }
-
-    //  // Check daily report limit
-    //  const startOfDay = new Date();
-    //  startOfDay.setHours(0, 0, 0, 0);
-
-    //  const endOfDay = new Date();
-    //  endOfDay.setHours(23, 59, 59, 999);
-
-    //  const todayReports = await Report.countDocuments({
-    //    user: req.user._id,
-    //    createdAt: { $gte: startOfDay, $lte: endOfDay }
-    //  });
-
-    //  if (todayReports >= 2) {
-    //    return res.status(429).json({
-    //      success: false,
-    //      message: "You can only submit 2 reports per day"
-    //    });
-    //  }
+    let report;
+    try {
 
 
-    let media = req.files?.media;
-    let mediaUrl = null;
-    if (media) {
-      const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-      if (!allowedTypes.includes(media.mimetype)) {
-        return res.status(400).json({ message: "Only JPG and PNG files are allowed" });
+      //  // Check daily report limit
+      //  const startOfDay = new Date();
+      //  startOfDay.setHours(0, 0, 0, 0);
+
+      //  const endOfDay = new Date();
+      //  endOfDay.setHours(23, 59, 59, 999);
+
+      //  const todayReports = await Report.countDocuments({
+      //    user: req.user._id,
+      //    createdAt: { $gte: startOfDay, $lte: endOfDay }
+      //  });
+
+      //  if (todayReports >= 2) {
+      //    return res.status(429).json({
+      //      success: false,
+      //      message: "You can only submit 2 reports per day"
+      //    });
+      //  }
+
+
+      let media = req.files?.media;
+      let mediaUrl = null;
+      if (media) {
+        const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+        if (!allowedTypes.includes(media.mimetype)) {
+          return res.status(400).json({ message: "Only JPG and PNG files are allowed" });
+        }
+        // only 200kb photo rquired
+        if (media.size > 200 * 1024) {
+          return res.status(400).json({ message: "Media size must be less than 200Kb" });
+        }
+
+        const uploadResponse = await uploadImageToCloudinary(media, "PralaySetu");
+        mediaUrl = uploadResponse.secure_url;
       }
-      // only 200kb photo rquired
-      if (media.size > 200 * 1024) {
-        return res.status(400).json({ message: "Media size must be less than 200Kb" });
-      }
+      report = await Report.create({
+        user: req.user._id,
+        disasterType,
+        latitude,
+        longitude,
+        description,
+        imageUrl: mediaUrl,
+      });
 
-      const uploadResponse = await uploadImageToCloudinary(media, "PralaySetu");
-      mediaUrl = uploadResponse.secure_url;
+      // EMIT event to admin
+      io.emit("newDisasterReport", report);
+
+      // Send notification to all users - using the updated function with lock mechanism
+      // const notificationResult = await sendNotificationToAll(
+      //   `Report Submitted!`,
+      //   `The report regarding "${report.disasterType}" has been submitted to admin.`,
+      //   { reportId: report.id.toString(), type: "report_status" }
+      // );
+      const notificationResult = await sendNotificationToAdmins(
+        `Report Submitted!`,
+        `The report regarding ${report.disasterType} has been submitted at PralaySetu.`,
+        { reportId: report.id.toString(), type: "report_status" }
+      );
+
+
+     
+
+      console.log("Notification result:", notificationResult);
+    } catch (notificationError) {
+      // Log the error but don't fail the entire request
+      console.error("Failed to send notifications:", notificationError);
     }
-    const report = await Report.create({
-      user: req.user._id,
-      disasterType,
-      latitude,
-      longitude,
-      description,
-      imageUrl: mediaUrl,
-    });
-
-    // EMIT event to admin
-    io.emit("newDisasterReport", report);
 
     res.status(201).json({
       success: true,
@@ -112,26 +137,38 @@ export const verifyReport = async (req, res) => {
         message: "Report not found",
       });
     }
-
     report.status = status;
     report.verifiedBy = req.user._id; // Admin who verified
     await report.save();
 
 
 
-    // try {
-    //   // Send notification to all users - using the updated function with lock mechanism
-    //   const notificationResult = await sendNotificationToAll(
-    //     `Report ${status}!`,
-    //     `The report regarding "${report.title}" has been ${status} by the admin.`,
-    //     { reportId: reportId.toString(), type: "report_status" }
-    //   );
+    try {
+      console.log("report verify contooler is callled");
+      console.log("Notifyig that oerson");
+       const notifyPerson = await sendNotificationToPerson(
+        `Report ${status}!`,
+        `Your report regarding "${report.disasterType}" has been ${status}.`,
+        {userId: report.user._id, reportId: reportId.toString(), type: "report_status" }
+      );
 
-    //   console.log("Notification result:", notificationResult);
-    // } catch (notificationError) {
-    //   // Log the error but don't fail the entire request
-    //   console.error("Failed to send notifications:", notificationError);
-    // }
+      // Send notification to all users - using the updated function with lock mechanism
+      if(status == "verified"){
+        const notificationResult = await sendNotificationToAll(
+          `Report ${status}!`,
+          `The report regarding "${report.disasterType}" has been published.`,
+          { reportId: reportId.toString(), type: "report_status" }
+        );
+  
+        console.log("Notification result:", notificationResult);
+      }
+      else{
+        console.log("not sending notificaiton as report is rejected")
+      }
+    } catch (notificationError) {
+      // Log the error but don't fail the entire request
+      console.error("Failed to send notifications:", notificationError);
+    }
 
 
 
