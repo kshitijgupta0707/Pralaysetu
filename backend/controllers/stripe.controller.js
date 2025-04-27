@@ -84,11 +84,11 @@ const stripeWebhookHandler = async (req, res) => {
 
     console.log("Ngo id", ngoId)
     const user = await User.find({ ngoId })
-    console.log("User = ", user)
+    console.log("User = ", user[0]._id)
 
     // Send real-time notification to the perosn
-    console.log("id = ", user._id)
-    const receiverSocketId = getReceiverSocketId(user._id);
+    console.log("id = ", user[0]._id)
+    const receiverSocketId = getReceiverSocketId(user[0]._id);
     console.log("rec socket id", receiverSocketId)
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("moneyRecieved", {
@@ -100,7 +100,7 @@ const stripeWebhookHandler = async (req, res) => {
         raisedAmount: raisedAmount += session.amount_total / 100
       });
     }
-    else{
+    else {
       console.log("No socket id for ", user._id)
     }
   }
