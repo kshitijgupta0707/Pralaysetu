@@ -83,7 +83,7 @@ const stripeWebhookHandler = async (req, res) => {
     await fundraiser.save();
 
     console.log("Ngo id", ngoId)
-    const user = User.find({ ngoId: ngoId })
+    const user = await User.find({ ngoId })
     console.log("User = ", user)
 
     // Send real-time notification to the perosn
