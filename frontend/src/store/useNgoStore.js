@@ -1,9 +1,9 @@
 // stores/useStore.js
-import {create} from 'zustand';
+import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios'; // Adjust the import path as necessary
 import toast from 'react-hot-toast';
 // import { c } from 'vite/dist/node/moduleRunnerTransport.d-CXw_Ws6P';
-export const useNgoStore = create((set ,get) => ({
+export const useNgoStore = create((set, get) => ({
   ngo: {},
   ngos: [],
   fundraisers: [],
@@ -11,7 +11,7 @@ export const useNgoStore = create((set ,get) => ({
   error: null, // To capture any errors during API calls
 
   // Set NGOs
-  setNGO: (ngo) => set({ ngo}),
+  setNGO: (ngo) => set({ ngo }),
 
   // Set Fundraisers
   setFundraisers: (fundraisers) => set({ fundraisers }),
@@ -52,7 +52,7 @@ export const useNgoStore = create((set ,get) => ({
     set({ loading: true });
     try {
       const response = await axiosInstance.get(`/ngo/${id}`);
-      set({ ngo: { ...response.data}, loading: false });
+      set({ ngo: { ...response.data }, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
     }
@@ -70,8 +70,8 @@ export const useNgoStore = create((set ,get) => ({
         ngo: response.data, // optionally update the currently selected NGO as well
         loading: false,
       }));
-      
-       toast.success("NGO updated successfully");
+
+      toast.success("NGO updated successfully");
     } catch (error) {
       toast.error("Error in updating NGO");
       set({ error: error.message, loading: false });
@@ -87,7 +87,7 @@ export const useNgoStore = create((set ,get) => ({
       // i am sharing the expanded ngoid
       const response = await axiosInstance.post('/fundraiser/create', fundraiserData);
       set((state) => ({
-        fundraisers: [ response.data,...state.fundraisers],
+        fundraisers: [response.data, ...state.fundraisers],
         loading: false,
       }));
       toast.success("Fundraiser created successfully");
@@ -109,6 +109,20 @@ export const useNgoStore = create((set ,get) => ({
       set({ error: error.message, loading: false });
     }
   },
+
+  updateFundraiser: async (id, raisedAmount) => {
+    set({ loading: true });
+    try {
+      let { fundraisers } = get();
+      let newFundraisers = fundraisers.map((fund) =>
+        fund._id === id ? { ...fund, raisedAmount } : fund
+      );
+      set({ fundraisers: newFundraisers, loading: false });
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
 
   // Get Fundraisers by NGO ID
   fetchFundraisersByNgoId: async (ngoId) => {

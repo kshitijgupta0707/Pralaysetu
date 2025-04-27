@@ -87,6 +87,7 @@ const stripeWebhookHandler = async (req, res) => {
     console.log("User = ", user)
 
     // Send real-time notification to the perosn
+    console.log("id = ", user._id)
     const receiverSocketId = getReceiverSocketId(user._id);
     console.log("rec socket id", receiverSocketId)
     if (receiverSocketId) {
@@ -95,9 +96,12 @@ const stripeWebhookHandler = async (req, res) => {
         title: `Fundraiser update`,
         message: `${session.amount_total / 100} has been deposited to your account`,
         purpose: "moneyRecieved",
-        report,
-
+        fundraiserId: fundraiser._id,
+        raisedAmount: raisedAmount += session.amount_total / 100
       });
+    }
+    else{
+      console.log("No socket id for ", user._id)
     }
   }
 
