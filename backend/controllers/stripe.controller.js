@@ -82,8 +82,8 @@ const stripeWebhookHandler = async (req, res) => {
     fundraiser.raisedAmount += session.amount_total / 100;
     await fundraiser.save();
 
-
-    const user = User.find({ ngoId })
+    console.log("Ngo id", ngoId)
+    const user = User.find({ ngoId: ngoId })
     console.log("User = ", user)
 
     // Send real-time notification to the perosn
@@ -99,10 +99,6 @@ const stripeWebhookHandler = async (req, res) => {
 
       });
     }
-
-
-
-
   }
 
   res.status(200).send("Received");
