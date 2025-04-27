@@ -1,29 +1,49 @@
 // notification.controller.js
 import { JWT } from 'google-auth-library';
 import axios from "axios";
-
+import { Token } from "../models/token.model.js";
 import { User } from "../models/user.model.js"
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// Create serviceAccount object from environment variables
+const serviceAccount = {
+  type: process.env.TYPE,
+  project_id: process.env.PROJECT_ID,
+  private_key_id: process.env.PRIVATE_KEY_ID,
+  private_key: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
+  client_email: process.env.CLIENT_EMAIL,
+  client_id: process.env.CLIEND_ID,
+  auth_uri: process.env.AUTH_URI,
+  token_uri: process.env.TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.auth_provider_x509_cert_url,
+  client_x509_cert_url: process.env.client_x509_cert_url,
+  universe_domain: process.env.universe_domain
+};
 
 
-
-// import serviceAccount from "../service-account.json" assert { type: "json" };
-import { readFile } from "fs/promises";
-const serviceAccount = JSON.parse(
-  await readFile(new URL("../service-account.json", import.meta.url))
-);
-serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+let isProcessingNotifications = false;
 
 const getAccessToken = async () => {
-  const client = new JWT({
-    email: serviceAccount.client_email,
-    key: serviceAccount.private_key,
-    scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
-  });
+  console.log("private key is ", serviceAccount.private_key)
+  try {
+    const client = new JWT({
 
-  const { access_token } = await client.authorize();
-  return access_token;
+      email: serviceAccount.client_email,
+      key: serviceAccount.private_key,
+      scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
+    });
+
+    const { access_token } = await client.authorize();
+    console.log('Access token', access_token)
+    return access_token;
+  }
+  catch (error) {
+    console.log(error);
+  }
 };
-let isProcessingNotifications = false;
 
 export const sendNotificationToAll = async (title, body, data = {}) => {
   try {
@@ -242,24 +262,6 @@ export const sendNotification = async (token, title, body, data = {}) => {
     throw error; // Re-throw the error so it can be caught by the caller
   }
 }
-
-// Example usage
-// const targetToken = "YOUR_CLIENT_DEVICE_FCM_TOKEN";
-// sendNotification(targetToken, "🚨 Alert!", "Disaster warning in your area!", {
-//   type: "disaster",
-//   severity: "high",
-// });
-
-
-
-
-
-
-
-
-
-import { Token } from "../models/token.model.js";
-
 export const saveFcmToken = async (req, res) => {
   try {
     const { userId, token } = req.body;
@@ -272,7 +274,7 @@ export const saveFcmToken = async (req, res) => {
     }
 
     // Check if token already exists
-    const existing = await Token.findOne({ token ,userId });
+    const existing = await Token.findOne({ token, userId });
     console.log("yha aya")
     console.log("yha aya")
 
@@ -304,61 +306,3 @@ export const removeToken = async (req, res) => {
   }
 };
 
-
-// export const sendNotification = async (title, body) => {
-//   try {
-//     // Step 1: Get all FCM tokens from the FcmToken collection
-//     const fcmTokens = await Token.find({}); // Fetch all tokens, or add a filter if needed
-
-//     // Step 2: Extract the token values
-//     const tokens = fcmTokens.map(fcmToken => fcmToken.token);
-
-//     if (tokens.length === 0) {
-//       console.log("No FCM tokens found. Skipping notification.");
-//       return;
-//     }
-
-//     // Step 3: Prepare the payload for FCM
-//     const payload = {
-//       registration_ids: tokens, // Use array of tokens
-//       notification: {
-//         title,
-//         body,
-//         icon: "/logo.png", // Optional: Add a notification icon
-//       },
-//     };
-
-//     // Step 4: Send the notification via FCM
-//     const response = await axios.post("https://fcm.googleapis.com/fcm/send", payload, {
-//       headers: {
-//         Authorization: `key=${process.env.FCM_SERVER_KEY}`, // Use your Firebase server key
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     console.log("✅ Notification sent:", response.data);
-//   } catch (err) {
-//     console.error("❌ Error sending notification:", err?.response?.data || err.message);
-//   }
-// };
-
-
-export const testAuth = async () => {
-  // try {
-  //   // console.log(process.env.CLIENT_EMAIL)
-  //   // console.log(process.env.PRIVATE_KEY.replace(/\\n/g, '\n'))
-  //   const client = new JWT({
-  //     email: serviceAccount.client_email,
-  //     key: serviceAccount.private_key,
-  //     scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
-  //   });
-
-
-
-
-  //   const tokens = await client.authorize();
-  //   console.log("✅ Authorized:", tokens);
-  // } catch (err) {
-  //   console.error("❌ Auth Error:", err.response?.data || err.message);
-  // }
-};
