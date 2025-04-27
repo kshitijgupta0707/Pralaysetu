@@ -8,7 +8,8 @@ router.post("/signup", signup);
 router.post("/sendotp", sendOtp);
 router.post("/login", login);
 router.post("/loginwithOAuth", loginwithOAuth);
-router.post("/logout", logout);
+//added authenticate so i have user for deleting token
+router.post("/logout", authenticate, logout);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 router.get('/check' , authenticate ,  checkAuth )

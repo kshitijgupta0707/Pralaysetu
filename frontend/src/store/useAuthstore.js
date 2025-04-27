@@ -127,6 +127,7 @@ export const useAuthStore = create((set, get) => ({
       // await axiosInstance.post("/notification/remove-token" , {userId: get().authUser._id})
       // console.log("removed from local storage")
       localStorage.removeItem("loggedInAs");
+      localStorage.removeItem("fcmToken"); 
       get().setActingAs(null)
       toast.success("Logged out successfully");
       get().disconnectSocket();

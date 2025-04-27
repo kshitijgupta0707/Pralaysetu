@@ -11,8 +11,8 @@ import { resetTemplate } from "../templates/reset.template.js";
 import { otpTemplate } from "../templates/otp.template.js";
 import crypto from "crypto";
 import { uploadImageToCloudinary } from "../utils/imageUploader.js";
-import { registrationRequestTemplate ,thankYouTemplate} from "../templates/register.template.js";
-
+import { registrationRequestTemplate, thankYouTemplate } from "../templates/register.template.js";
+import { Token } from "../models/token.model.js";
 export const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -44,7 +44,7 @@ export const sendOtp = async (req, res) => {
       });
       result = await OTP.findOne({ otp });
     }
-    console.log("otp is" , otp);
+    console.log("otp is", otp);
 
     //create an entry in db for otp
     const otpPayLoad = { email, otp };
@@ -255,7 +255,7 @@ export const signup = async (req, res) => {
         message: "Your registration request has been received and is pending admin approval.",
       });
     }
-    else{
+    else {
       // Send a success email to the user
       await mailSender(email, "Registration Successful", thankYouTemplate(firstName));
     }
@@ -345,6 +345,19 @@ export const logout = async (req, res) => {
       expires: new Date(0), // Alternatively to maxAge
     });
     //expire immediattely get removed by maxage , erased by " "
+
+
+
+
+    const userId = req.user._id;
+    // Remove the token for this user
+    //Also dlete all the token for the notification for the user
+    await Token.deleteMany({ userId });
+
+
+
+
+
 
     res.status(200).json({
       success: true,

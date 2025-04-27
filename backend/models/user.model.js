@@ -34,7 +34,6 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false
     },
-    fcmTokens: [String],// Store an array of tokens for each user
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     ngoId: {
