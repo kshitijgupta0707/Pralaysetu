@@ -50,8 +50,6 @@ const createCheckoutSession = async (req, res) => {
 const stripeWebhookHandler = async (req, res) => {
   console.log("Webhook received:");
 
-
-
   const sig = req.headers["stripe-signature"];
   let event;
 
@@ -62,11 +60,8 @@ const stripeWebhookHandler = async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
-
-    // Example metadata you added during checkout
     const { ngoId, fundraiserId } = session.metadata;
 
     // Save donation in DB
@@ -77,34 +72,34 @@ const stripeWebhookHandler = async (req, res) => {
       amount: session.amount_total / 100,
       stripeSessionId: session.id,
     });
-    //update the fundraiser amount
+
+    // Update the fundraiser amount
     const fundraiser = await Fundraiser.findById(fundraiserId);
     fundraiser.raisedAmount += session.amount_total / 100;
     await fundraiser.save();
 
-    console.log("Ngo id", ngoId)
-    const user = await User.find({ ngoId })
-    console.log("User = ", user[0]._id)
+    console.log("Ngo id", ngoId);
+    const user = await User.findOne({ ngoId });
+    console.log("User = ", user._id);
 
-    // Send real-time notification to the perosn
-    console.log("id = ", user[0]._id)
-    const receiverSocketId = getReceiverSocketId(user[0]._id);
-    console.log("rec socket id", receiverSocketId)
+    // Send real-time notification to the person
+    const receiverSocketId = getReceiverSocketId(user._id);
+    console.log("Receiver socket id", receiverSocketId);
+
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("moneyRecieved", {
-
         title: `Fundraiser update`,
         message: `${session.amount_total / 100} has been deposited to your account`,
         purpose: "moneyRecieved",
         fundraiserId: fundraiser._id,
-        raisedAmount: raisedAmount += session.amount_total / 100
+        raisedAmount: fundraiser.raisedAmount, // <-- Fixed here
       });
-    }
-    else {
-      console.log("No socket id for ", user._id)
+    } else {
+      console.log("No socket id for ", user[0]._id);
     }
   }
 
   res.status(200).send("Received");
-}
+};
+
 export { createCheckoutSession, stripeWebhookHandler }
