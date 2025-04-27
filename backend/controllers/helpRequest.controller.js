@@ -8,6 +8,8 @@ import { sendNotificationToAdmins } from "./notification.controller.js";
 export const createHelpRequest = async (req, res) => {
   try {
 
+
+
     const { latitude, longitude, reason, urgency } = req.body;
 
     if (!latitude || !longitude || !urgency || !reason) {
@@ -90,6 +92,7 @@ export const getAllRequests = async (req, res) => {
 // Verify a help request
 export const verifyOrRejectHelpRequest = async (req, res) => {
   try {
+    console.log("Verifiying the request");
     const { id } = req.params;
     const { status } = req.body; // expected: "verified" or "rejected"
 
@@ -112,9 +115,6 @@ export const verifyOrRejectHelpRequest = async (req, res) => {
     await request.save();
 
     //  Real-time notify the user
-    console.log("help requ")
-    console.log("user is", request.user);
-    console.log("id is", request.user._id)
     const userSocketId = getReceiverSocketId(request.user._id);
     if (userSocketId) {
       io.to(userSocketId).emit("helpRequestStatusChanged", {

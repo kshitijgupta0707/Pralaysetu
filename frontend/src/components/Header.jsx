@@ -14,9 +14,7 @@ const Header = ({ language, setLanguage }) => {
       };
       
  
-    useEffect(()=>{
-      console.log(authUser);
-    },[authUser])
+
 
     const location = useLocation();
     const isHomePage = location.pathname === "/";

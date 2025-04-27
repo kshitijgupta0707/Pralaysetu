@@ -9,8 +9,8 @@ import { axiosInstance } from "@/lib/axios";
 // Once token is generated, you send this token to your backend 
 export const requestNotificationPermission = async (authUser) => {
   try {
+    
     console.log("At request notification function");
-
     const permission = await Notification.requestPermission();
 
     if (permission === "granted") {
@@ -25,7 +25,6 @@ export const requestNotificationPermission = async (authUser) => {
         }
       }
       console.log("Permission granted");
-
       if (fcmToken) {
 
         console.log("Generated the FCM Token:", fcmToken);

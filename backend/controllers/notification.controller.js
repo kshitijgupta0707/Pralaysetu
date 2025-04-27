@@ -233,14 +233,13 @@ export const sendNotification = async (token, title, body, data = {}) => {
     console.log(" i am getting called send ntoifictoain")
     const accessToken = await getAccessToken();
 
+    const data = {
+      title, body
+    }
 
     const message = {
       message: {
         token,
-        notification: {
-          title,
-          body,
-        },
         data,
       },
     };

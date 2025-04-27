@@ -1,9 +1,3 @@
-// // Import the functions you need from the SDKs you need
-// initialized Firebase SDK in the frontend
-// getMessaging() is imported and initialized.
-// You registered the service worker (firebase-messaging-sw.js) manually.
-// messaging, getToken, and onMessage are exported to be used for notification permission and token generation.
-// ✅ Purpose: Prepare the frontend to receive notifications and get device FCM tokens
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
@@ -37,11 +31,8 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-
- 
 export {app , analytics  };
 export{messaging, getToken, onMessage , deleteToken}
-
 //this will be used for google , facebook etc login-------->
 export const auth = getAuth(app)
 export const db = getFirestore()

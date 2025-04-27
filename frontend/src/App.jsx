@@ -13,7 +13,6 @@ import ResponderMap from "./pages/map/ResponderMap"
 import { useAuthStore } from "./store/useAuthstore";
 import { useEffect, useState } from "react";
 import NotificationBanner from "./pages/notifications/NotificationBanner";
-import { messaging, onMessage } from "./firebase";
 // import Notification from "./Notification";
 import NotificationSetup from "./pages/notifications/NotificationSetup";
 import { ResetPassword } from "./pages/auth/ResetPassword";
@@ -78,13 +77,13 @@ function App() {
   }, [])
   const location = useLocation(); // detects route changes
 
-  useEffect(() => {
-    console.log("from app.jsx")
-    onMessage(messaging, (payload) => {
-      console.log("Foreground Notification:", payload);
-      alert(payload.notification.title + ": " + payload.notification.body);
-    });
-  }, []);
+  // useEffect(() => {
+  //   console.log("from app.jsx")
+  //   onMessage(messaging, (payload) => {
+  //     console.log("Foreground Notification:", payload);
+  //     alert(payload.notification.title + ": " + payload.notification.body);
+  //   });
+  // }, []);
 
   // Check auth on mount
   useEffect(() => { 
