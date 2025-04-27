@@ -91,7 +91,7 @@ export const createReport = async (req, res) => {
       // Log the error but don't fail the entire request
       console.error("Failed to send notifications:", notificationError);
     }
-
+    
     res.status(201).json({
       success: true,
       message: "Disaster report submitted",
