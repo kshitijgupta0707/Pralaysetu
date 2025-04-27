@@ -21,7 +21,7 @@ const Header = ({ language, setLanguage }) => {
 
 
     return (
-        <header className="sticky top-0 sm:z-40 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200 w-[100%] ">
+        <header className="sticky top-0 sm:z-40 bg-white/80 backdrop-blur-sm border-b border-gray-200 w-[100%] ">
             {<Sidebar
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}

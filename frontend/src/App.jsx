@@ -39,7 +39,7 @@ function App() {
       useNotificationStore.getState().showNotification(title, message, purpose);
     });
 
-    // 🆕 Request status changed (for user)
+    //  Request status changed (for user)
     socket.on("helpRequestStatusChanged", (payload) => {
 
       const { title, message, purpose, request } = payload;
@@ -47,10 +47,16 @@ function App() {
       useNotificationStore.getState().showNotification(title, message, purpose);
     });
 
-    // 🆕 Request status changed (for user)
+    //  Request status changed (for user)
     socket.on("reportStatusUpdate", (payload) => {
       const { title, message, purpose, report } = payload;
       console.log("(real time)Report status update:", report);
+      useNotificationStore.getState().showNotification(title, message, purpose);
+    });
+    //  Request status changed (for user)
+    socket.on("moneyRecieved", (payload) => {
+      const { title, message, purpose } = payload;
+      console.log("money recieved");
       useNotificationStore.getState().showNotification(title, message, purpose);
     });
 
@@ -86,15 +92,15 @@ function App() {
   // }, []);
 
   // Check auth on mount
-  useEffect(() => { 
+  useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
   // Sync `loggedInAs` whenever route changes
   useEffect(() => {
     let storedRole = localStorage.getItem("loggedInAs");
-    if(storedRole == null){
-        storedRole = "User"
+    if (storedRole == null) {
+      storedRole = "User"
     }
     setActingAs(storedRole);
     // console.log("Updated actingAs:", storedRole);
@@ -121,7 +127,7 @@ function App() {
         <Route
           path="/login"
           element={
-            !actingAs|| authUser?.workAsResponder || (!authUser)?
+            !actingAs || authUser?.workAsResponder || (!authUser) ?
               <LoginPage />
               :
               <Navigate to="/" />
@@ -207,14 +213,14 @@ function App() {
             )
           }
         />
-        
+
 
 
       </Routes>
 
 
       <Toaster />
- 
+
 
     </div>
   );

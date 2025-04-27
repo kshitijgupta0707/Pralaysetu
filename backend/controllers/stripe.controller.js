@@ -2,12 +2,16 @@ import Stripe from "stripe";
 import Donation from "../models/donation.model.js";
 import Fundraiser from "../models/fundraiser.model.js";
 import dotenv from "dotenv";
+import { User } from "../models/user.model.js";
+import { getReceiverSocketId, io } from "../config/socket.js";
+
 dotenv.config();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-10-16", // or latest supported version
 });
 const createCheckoutSession = async (req, res) => {
+  console.log("create checkout sesionc aled")
   const { amount, ngoId, donorEmail, fundraiserId } = req.body;
   if (!amount || !ngoId || !donorEmail || !fundraiserId) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -27,8 +31,8 @@ const createCheckoutSession = async (req, res) => {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: 'https://pralaysetu.vercel.app/success',
-      cancel_url: 'https://pralaysetu.vercel.app/cancel',
+      success_url: 'http://localhost:5173/success',
+      cancel_url: 'http://localhost:5173/cancel',
       customer_email: donorEmail, // Optional: pre-fill email
       metadata: {
         ngoId, // Pass NGO ID for later use in webhook
@@ -45,6 +49,8 @@ const createCheckoutSession = async (req, res) => {
 
 const stripeWebhookHandler = async (req, res) => {
   console.log("Webhook received:");
+
+
 
   const sig = req.headers["stripe-signature"];
   let event;
@@ -75,6 +81,28 @@ const stripeWebhookHandler = async (req, res) => {
     const fundraiser = await Fundraiser.findById(fundraiserId);
     fundraiser.raisedAmount += session.amount_total / 100;
     await fundraiser.save();
+
+
+    const user = User.find({ ngoId })
+    console.log("User = ", user)
+
+    // Send real-time notification to the perosn
+    const receiverSocketId = getReceiverSocketId(user._id);
+    console.log("rec socket id", receiverSocketId)
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("moneyRecieved", {
+
+        title: `Fundraiser update`,
+        message: `${session.amount_total / 100} has been deposited to your account`,
+        purpose: "moneyRecieved",
+        report,
+
+      });
+    }
+
+
+
+
   }
 
   res.status(200).send("Received");

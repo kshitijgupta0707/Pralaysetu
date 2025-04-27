@@ -1,19 +1,7 @@
 // store/useNotificationStore.js
 import { create } from "zustand";
 import axios from "axios";
-// export const useNotificationStore = create((set) => ({
-//   message: "",
-//   title: "",
-//   show: false,
-//   duration: 5000,
-//   triggerNotification: ({ title, message, duration = 5000 }) => {
-//     set({ title, message, show: true, duration });
 
-//     setTimeout(() => {
-//       set({ show: false });
-//     }, duration);    
-//   },
-// }));
 
 
 // In useNotificationStore.js

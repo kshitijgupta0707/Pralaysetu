@@ -44,6 +44,14 @@ export default function NotificationBanner() {
   
   // Configure styles based on notification type
   const styleConfig = {
+    moneyRecieved: {
+      bg: "bg-gray-900", // Dark blackish-gray background
+      text: "text-gray-100", // Light gray text for contrast
+      iconBg: "bg-gray-800", // Slightly lighter gray for icon background
+      icon: <AlertCircle className="h-6 w-6 text-gray-300" />, // Light gray icon
+      progressBg: "bg-gray-950", // Very dark gray for progress bg
+      progressFill: "bg-gray-500" // Medium gray for progress fill
+    },
     report: {
       bg: "bg-gray-900", // Dark blackish-gray background
       text: "text-gray-100", // Light gray text for contrast
