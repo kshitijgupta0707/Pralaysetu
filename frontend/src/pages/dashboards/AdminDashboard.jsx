@@ -391,13 +391,16 @@ const AdminDashboard = () => {
 
 
                             </CardTitle>
+                            <CardDescription className="pt-1">
+                              From {report.user?.firstName + " " + report.user?.lastName || "Unknown User"}
+                            </CardDescription>
                           </div>
                           <div className="text-xs text-gray-500">
                             {formatDate(report.createdAt)}
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="pb-2">
+                      <CardContent className="pb-2 m-0">
                         <DisasterImageDisplay imageUrl={report.imageUrl} disasterType={report.disasterType} />
                         <TruncatedText text={report.description} maxLength={100} height={60} />
 

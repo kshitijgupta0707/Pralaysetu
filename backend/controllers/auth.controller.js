@@ -13,6 +13,7 @@ import crypto from "crypto";
 import { uploadImageToCloudinary } from "../utils/imageUploader.js";
 import { registrationRequestTemplate, thankYouTemplate } from "../templates/register.template.js";
 import { Token } from "../models/token.model.js";
+import { register } from "module";
 export const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -88,191 +89,192 @@ export const sendOtp = async (req, res) => {
     });
   }
 }
-export const signup = async (req, res) => {
-  try {
-    const { firstName, lastName, email, registerAs, workAsResponder, password, confirmPassword, otp, location,
-      ngoName,
-      ngoDescription,
-      ngoPhone,
-      ngoAddress
-    } = req.body;
-    //this is how document , images are fetched from form data
-    let governmentDocument = req.files?.governmentDocument;
-    //check if some data is missing
-    if (!firstName || !lastName || !email || !registerAs || !workAsResponder || !password || !otp) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required"
-      });
-    }
-
-    //check for government/ngo document if register as government or ngo
-    if (registerAs == "Government" || registerAs == "NGO") {
-      if (!governmentDocument) {
-        return res.status(400).json({
-          success: false,
-          message: "Government document is required"
-        })
-      }
-    }
-    // Additional validation for NGO fields
-    if (registerAs === "NGO") {
-      if (!ngoName || !ngoPhone || !ngoAddress || !ngoDescription) {
-        return res.status(400).json({
-          success: false,
-          message: "NGO name, phone, description and address are required"
-        });
-      }
-    }
-
-    if (governmentDocument) {
-      const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-      if (!allowedTypes.includes(governmentDocument.mimetype)) {
-        return res.status(400).json({ message: "Only JPG, JPEG and PNG files are allowed" });
-      }
-
-      if (governmentDocument.size > 200 * 1024) {
-        return res.status(400).json({ message: "Media size must be less than 200Kb" });
-      }
-
-      const uploadResponse = await uploadImageToCloudinary(governmentDocument, "PralaySetu");
-
-      if (!uploadResponse || !uploadResponse.secure_url) {
-        return res.status(500).json({ message: "Document upload failed" });
-      }
-
-      //  Assign only the URL string
-      governmentDocument = uploadResponse.secure_url;
-    }
-
-
-    //check whether length is >= 6
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 6 characters"
-      });
-    }
-
-    if (password !== confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "Password and confirm password do not match"
-      });
-    }
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: "User already exists",
-      });
-    }
-
-
-    //compare the otp
-    //find the most recent stored for the user
-
-    const recentOtp = await OTP.find({ email })
-      .sort({
-        createdAt: -1,
-      })
-      .limit(1);
-
-    console.log("Recent otp", recentOtp);
-
-    //validate otp
-    if (recentOtp.length == 0) {
-      //otp not found
-      return res.status(400).json({
-        success: false,
-        message: "Otp is expired",
-      });
-    }
-    console.log(otp);
-    console.log(recentOtp[0].otp);
-    //compare otp
-    if (otp != recentOtp[0].otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid otp",
-      });
-    }
-
-    //secure the password
-
-    let hashedPassword;
-
+  export const signup = async (req, res) => {
     try {
-      hashedPassword = await bcrypt.hash(password, 10);
-    } catch (e) {
-      return res.status(500).json({
-        success: false,
-        data: "Error in hashing passwrord",
-      });
-
-    }
-
-    //entry in db
-
-    const user = await User.create({
-      firstName,
-      lastName,
-      email,
-      registerAs,
-      workAsResponder,
-      password: hashedPassword,
-      governmentDocument
-    })
-
-
-    if (registerAs === "NGO") {
-      try {
-        // Create an NGO entry linked to the user
-        const ngo = await NGO.create({
-          name: ngoName,
-          description: ngoDescription || "",
-          email: email,
-          phone: ngoPhone,
-          address: ngoAddress,
-          registeredBy: user._id
+      const { firstName, lastName, email, registerAs, workAsResponder, password, confirmPassword, otp, location,
+        ngoName,
+        ngoDescription,
+        ngoPhone,
+        ngoAddress
+      } = req.body;
+      //this is how document , images are fetched from form data
+      let governmentDocument = req.files?.governmentDocument;
+      //check if some data is missing
+      if (!firstName || !lastName || !email || !registerAs ||  typeof workAsResponder === "undefined" || !password || !otp) {
+      console.log(firstName , lastName , email , registerAs , workAsResponder , password , otp)
+        return res.status(400).json({
+          success: false,
+          message: "All fields are required"
         });
-
-        // Update the user with the NGO reference
-        await User.findByIdAndUpdate(user._id, {
-          ngoId: ngo._id
-        });
-      } catch (ngoError) {
-        console.error("Error creating NGO:", ngoError);
       }
-    }
 
-    if (registerAs === "NGO" || registerAs === "Government") {
-      // Save the registration with status "pending"
-      // Notify admin via email / dashboard
-      await mailSender(email, "Registration Request", registrationRequestTemplate(registerAs));
+      //check for government/ngo document if register as government or ngo
+      if (registerAs == "Government" || registerAs == "NGO") {
+        if (!governmentDocument) {
+          return res.status(400).json({
+            success: false,
+            message: "Government document is required"
+          })
+        }
+      }
+      // Additional validation for NGO fields
+      if (registerAs === "NGO") {
+        if (!ngoName || !ngoPhone || !ngoAddress || !ngoDescription) {
+          return res.status(400).json({
+            success: false,
+            message: "NGO name, phone, description and address are required"
+          });
+        }
+      }
+
+      if (governmentDocument) {
+        const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+        if (!allowedTypes.includes(governmentDocument.mimetype)) {
+          return res.status(400).json({ message: "Only JPG, JPEG and PNG files are allowed" });
+        }
+
+        if (governmentDocument.size > 200 * 1024) {
+          return res.status(400).json({ message: "Media size must be less than 200Kb" });
+        }
+
+        const uploadResponse = await uploadImageToCloudinary(governmentDocument, "PralaySetu");
+
+        if (!uploadResponse || !uploadResponse.secure_url) {
+          return res.status(500).json({ message: "Document upload failed" });
+        }
+
+        //  Assign only the URL string
+        governmentDocument = uploadResponse.secure_url;
+      }
+
+
+      //check whether length is >= 6
+      if (password.length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: "Password must be at least 6 characters"
+        });
+      }
+
+      if (password !== confirmPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "Password and confirm password do not match"
+        });
+      }
+
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: "User already exists",
+        });
+      }
+
+
+      //compare the otp
+      //find the most recent stored for the user
+
+      const recentOtp = await OTP.find({ email })
+        .sort({
+          createdAt: -1,
+        })
+        .limit(1);
+
+      console.log("Recent otp", recentOtp);
+
+      //validate otp
+      if (recentOtp.length == 0) {
+        //otp not found
+        return res.status(400).json({
+          success: false,
+          message: "Otp is expired",
+        });
+      }
+      console.log(otp);
+      console.log(recentOtp[0].otp);
+      //compare otp
+      if (otp != recentOtp[0].otp) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid otp",
+        });
+      }
+
+      //secure the password
+
+      let hashedPassword;
+
+      try {
+        hashedPassword = await bcrypt.hash(password, 10);
+      } catch (e) {
+        return res.status(500).json({
+          success: false,
+          data: "Error in hashing passwrord",
+        });
+
+      }
+
+      //entry in db
+
+      const user = await User.create({
+        firstName,
+        lastName,
+        email,
+        registerAs,
+        workAsResponder,
+        password: hashedPassword,
+        governmentDocument
+      })
+
+
+      if (registerAs === "NGO") {
+        try {
+          // Create an NGO entry linked to the user
+          const ngo = await NGO.create({
+            name: ngoName,
+            description: ngoDescription || "",
+            email: email,
+            phone: ngoPhone,
+            address: ngoAddress,
+            registeredBy: user._id
+          });
+
+          // Update the user with the NGO reference
+          await User.findByIdAndUpdate(user._id, {
+            ngoId: ngo._id
+          });
+        } catch (ngoError) {
+          console.error("Error creating NGO:", ngoError);
+        }
+      }
+
+      if (registerAs === "NGO" || registerAs === "Government") {
+        // Save the registration with status "pending"
+        // Notify admin via email / dashboard
+        await mailSender(email, "Registration Request", registrationRequestTemplate(registerAs));
+        return res.status(200).json({
+          message: "Your registration request has been received and is pending admin approval.",
+        });
+      }
+      else {
+        // Send a success email to the user
+        await mailSender(email, "Registration Successful", thankYouTemplate(firstName));
+      }
+
+
       return res.status(200).json({
-        message: "Your registration request has been received and is pending admin approval.",
+        success: true,
+        message: "Account created successfully",
+        user
       });
+    } catch (error) {
+      console.log(error);
+      res.json({
+        message: "User cannot be registed, Please try again later",
+      }).status(500);
     }
-    else {
-      // Send a success email to the user
-      await mailSender(email, "Registration Successful", thankYouTemplate(firstName));
-    }
-
-
-    return res.status(200).json({
-      success: true,
-      message: "Account created successfully",
-      user
-    });
-  } catch (error) {
-    console.log(error);
-    res.json({
-      message: "User cannot be registed, Please try again later",
-    }).status(500);
-  }
-};
+  };
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;

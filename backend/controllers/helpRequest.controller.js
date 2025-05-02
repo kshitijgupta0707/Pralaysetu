@@ -82,7 +82,7 @@ export const createHelpRequest = async (req, res) => {
 // Get all pending help requests
 export const getAllRequests = async (req, res) => {
   try {
-    const requests = await HelpRequest.find().populate("user", "firstName lastName email").populate("assignedTo", "firstName lastName email");;
+    const requests = await HelpRequest.find().populate("user", "firstName lastName email").populate("assignedTo", "firstName lastName email").sort({ createdAt: -1 }); 
     res.status(200).json({ success: true, requests });
   } catch (err) {
     res.status(500).json({ success: false, message: "Error fetching requests" });

@@ -104,7 +104,7 @@ export const createReport = async (req, res) => {
 };
 export const getAllReports = async (req, res) => {
   try {
-    const reports = await Report.find().populate("user");
+    const reports = await Report.find().populate("user").sort({ createdAt: -1 }); 
     res.status(200).json({ success: true, reports });
   } catch (error) {
     res.status(500).json({ success: false, message: "Unable to fetch reports" });
@@ -113,7 +113,7 @@ export const getAllReports = async (req, res) => {
 // Get all verified reports for public view
 export const getVerifiedReports = async (req, res) => {
   try {
-    const reports = await Report.find({ status: "verified" }).populate("user", "name email");
+    const reports = await Report.find({ status: "verified" }).populate("user", "name email").sort({ createdAt: -1 }); 
     res.status(200).json({ success: true, reports });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to fetch verified reports" });
