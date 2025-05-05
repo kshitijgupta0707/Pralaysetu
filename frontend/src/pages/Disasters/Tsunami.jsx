@@ -40,10 +40,10 @@ const Tsunami = () => {
   // Get descriptive text for each input field
   const getFieldDescription = (field) => {
     const descriptions = {
-      significance: "Enter earthquake significance score (magnitude)",
+      significance: "Enter significance score (magnitude)",
       latitude: "Enter latitude coordinates (decimal degrees)",
       longitude: "Enter longitude coordinates (decimal degrees)",
-      depth: "Enter earthquake depth (kilometers)"
+      depth: "Enter depth (kilometers)"
     };
     return descriptions[field] || "";
   };
@@ -64,7 +64,7 @@ const Tsunami = () => {
           <div className="md:flex">
             {/* Left column - Form */}
             <div className="md:w-2/3 p-6 md:p-8">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6">Input Earthquake Parameters</h2>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">Input Tsunami Parameters</h2>
               
               <form onSubmit={handleSubmit} className="space-y-5">
                 {Object.keys(formData).map((key) => (
