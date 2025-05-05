@@ -25,6 +25,9 @@ import Cancel from "./pages/payment/Cancel";
 import { NGODashboard } from "./pages/dashboards/NGODashboard";
 // import { Header } from "@radix-ui/react-accordion";
 import Header from "./components/Header";
+import Earthquake from "./pages/Disasters/Earthquake";
+import Flood from "./pages/Disasters/Flood";
+import Tsunami from "./pages/Disasters/Tsunami";
 
 function App() {
 
@@ -124,6 +127,10 @@ function App() {
 
       <Routes>
         <Route path="/" element={<HomePage language={language} />} />
+        <Route path="/earthquake" element={<Earthquake />} />
+        <Route path="/flood" element={<Flood />} />
+        <Route path="/earthquake" element={<Earthquake />} />
+        <Route path="/tsunami" element={<Tsunami />} />
         <Route
           path="/login"
           element={

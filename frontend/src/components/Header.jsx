@@ -62,6 +62,22 @@ const Header = ({ language, setLanguage }) => {
                                 <a href="#contact" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors hidden lg:block">
                                     Contact
                                 </a>
+                                <div className="relative group hidden lg:block">
+                                    <button className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+                                        Epicentra
+                                    </button>
+                                    <div className="absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg opacity-0 group-hover:opacity-100 group-hover:visible invisible transition-all duration-200 z-50">
+                                        <Link to="/earthquake" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        Earthquake
+                                        </Link>
+                                        <Link to="/flood" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        Flood
+                                        </Link>
+                                        <Link to="/tsunami" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        Tsunami
+                                        </Link>
+                                    </div>
+                                </div>
                                 {authUser && authUser.registerAs == "None" && actingAs == "User" && <Link to="/user-dashboard" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors hidden lg:block ">
                                     User Portal
                                 </Link>}
