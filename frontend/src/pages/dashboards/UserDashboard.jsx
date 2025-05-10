@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-   AlertTriangle, MapPin, MessageSquare, 
-  HelpCircle, ChevronRight, DollarSign, Calendar 
+import {
+  AlertTriangle, MapPin, MessageSquare,
+  HelpCircle, ChevronRight, DollarSign, Calendar
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,17 +25,18 @@ import { useAuthStore } from '@/store/useAuthstore';
 import { useNgoStore } from '@/store/useNgoStore';
 import { useDonationStore } from '@/store/useDonationStore';
 import { userimage } from '../../assets/index.js';
+import { useReportStore } from '@/store/useReportStore';
 
 // FundraiserCard component for Donate tab
 const FundraiserCard = ({ fundraiser, onDonate, isProcessing }) => {
   const [donationAmount, setDonationAmount] = useState('');
-  
+
   const calculateProgress = (raised, goal) => {
     if (!goal) return 0;
     const percentage = (raised / goal) * 100;
     return Math.min(percentage, 100);
   };
-  
+
   const getDaysRemaining = (deadlineString) => {
     const deadline = new Date(deadlineString);
     const today = new Date();
@@ -114,7 +115,7 @@ const RecentReports = ({ reports }) => {
     return (
       <div className="flex flex-col items-center justify-center h-full text-gray-500 mt-20">
         <MessageSquare className="h-12 w-12 mb-2 opacity-30" />
-        <p>No recent reports</p>
+        <p>No recent joreports</p>
       </div>
     );
   }
@@ -133,7 +134,7 @@ const RecentReports = ({ reports }) => {
           <p className="text-sm text-gray-600 mt-1">{report.description}</p>
           <div className="flex items-center mt-2 text-xs text-gray-500">
             <MapPin className="h-3 w-3 mr-1" />
-            {report.location?.latitude.toFixed(2)}, {report.location?.longitude.toFixed(2)}
+            {report?.latitude.toFixed(2)}, {report?.longitude.toFixed(2)}
             <span className="mx-2">•</span>
             {new Date(report.createdAt).toLocaleString()}
           </div>
@@ -147,16 +148,16 @@ const RecentReports = ({ reports }) => {
 const UserDashboard = () => {
   const navigate = useNavigate();
   const { authUser } = useAuthStore();
-  const { 
-    fundraisers, 
-    loading: ngoLoading, 
-    error: ngoError, 
-    fetchFundraisers 
+  const {
+    fundraisers,
+    loading: ngoLoading,
+    error: ngoError,
+    fetchFundraisers
   } = useNgoStore();
-  const { 
-    processPayment 
+  const {
+    processPayment
   } = useDonationStore();
-
+  const { getVerifiedReports, verifiedReports } = useReportStore()
   const [loading, setLoading] = useState(true);
   const [alerts, setAlerts] = useState([]);
   const [recentReports, setRecentReports] = useState([]);
@@ -203,10 +204,7 @@ const UserDashboard = () => {
     // Fetch recent verified reports
     const fetchRecentReports = async () => {
       try {
-        // Replace with actual API call in production
-        const response = await fetch('/api/reports/verified');
-        const data = await response.json();
-        setRecentReports(data);
+        getVerifiedReports();
       } catch (error) {
         console.error('Error fetching reports:', error);
         // Fallback to empty array
@@ -245,7 +243,7 @@ const UserDashboard = () => {
         fundraiserId: fundraiser._id,
         donorEmail: authUser.email
       });
-      
+
       toast.success('Donation successful! Thank you for your contribution.');
     } catch (error) {
       console.error('Payment error:', error);
@@ -266,7 +264,7 @@ const UserDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100/50">
       <div className="container mx-auto px-4 py-8 pt-4">
-        
+
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex justify-between items-center">
           <div className="flex items-center">
@@ -324,24 +322,24 @@ const UserDashboard = () => {
               <div className="flex flex-col lg:flex-row gap-10">
                 {/* Alerts Section */}
                 <AlertNotifications />
-                
+
                 {/* Recent Reports */}
                 <Card>
-                  <CardHeader className="pb-2 w-[400px]">
+                  <CardHeader className=" w-[400px]">
                     <CardTitle className="text-lg flex items-center">
                       <MessageSquare className="h-5 w-5 mr-2" />
                       Recent Reports
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ScrollArea className="h-[250px] pr-4">
-                      <RecentReports reports={recentReports} />
+                    <ScrollArea className="lg:h-[380px] pr-4">
+                      <RecentReports reports={verifiedReports} />
                     </ScrollArea>
                   </CardContent>
                 </Card>
               </div>
-              
-  
+
+
             </div>
           </TabsContent>
 
@@ -397,7 +395,7 @@ const UserDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {fundraisers.length > 0 ? (
                   fundraisers.map((fundraiser) => (
-                    <FundraiserCard 
+                    <FundraiserCard
                       key={fundraiser._id}
                       fundraiser={fundraiser}
                       onDonate={handleDonate}

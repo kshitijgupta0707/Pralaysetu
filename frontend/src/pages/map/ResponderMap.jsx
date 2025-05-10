@@ -15,9 +15,9 @@ const Mapp = () => {
   const [radiusKm, setRadiusKm] = useState(5);
   const [markers, setMarkers] = useState([]);
   const mapRef = useRef(null);
-  
+
   // Keep the original API key as it was in your code
-  const apiKey = "AlzaSyFRuu5m-z8UklOGolpZEzJpks2KjqjLJiL";
+  const apiKey = "AlzaSyruLYd2STGm0CT_BQXHnu6UjzUy9UYm69X";
 
   // Get user's current location
   useEffect(() => {
@@ -56,9 +56,9 @@ const Mapp = () => {
           center: userLocation,
           zoom: 14,
         });
-        
+
         console.log("Map initialized with center:", userLocation);
-        
+
         // Add a marker for user's location
         const userMarker = new window.google.maps.Marker({
           position: userLocation,
@@ -69,10 +69,10 @@ const Mapp = () => {
             scaledSize: new window.google.maps.Size(30, 30),
           },
         });
-        
+
         setMap(mapInstance);
         mapRef.current = mapInstance;
-        
+
         // Initialize DirectionsService and DirectionsRenderer
         fetchNearbyPlaces('hospital', 5000);
       } catch (error) {
@@ -106,25 +106,25 @@ const Mapp = () => {
     setIsLoading(true);
     setSelectedCategory(type);
     setRadiusKm(radius / 1000);
-    
+
     if (!map) {
       console.log("Map not initialized yet");
       setIsLoading(false);
       return;
     }
-    
+
     // Clear existing markers
     clearMarkers();
-    
+
     const { lat, lng } = userLocation;
-    
+
     // Using the same URL structure as in original code
     const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${type}&key=${apiKey}`;
 
     // Simulate place fetching (since the direct fetch won't work due to CORS)
     // This is a workaround - in a real implementation, you'd use a server proxy or the Places library
     console.log(`Fetching ${type} within ${radius}m of ${lat},${lng}`);
-    
+
     // For demo purposes, simulate some nearby places
     const simulatedPlaces = [
       {
@@ -164,21 +164,21 @@ const Mapp = () => {
         rating: 3.8
       }
     ];
-    
+
     // Set the places and add markers
     setPlaces(simulatedPlaces);
-    
+
     if (map) {
       const newMarkers = [];
       const bounds = new window.google.maps.LatLngBounds();
       bounds.extend(userLocation);
-      
+
       simulatedPlaces.forEach((place) => {
         const placePosition = new window.google.maps.LatLng(
           place.geometry.location.lat,
           place.geometry.location.lng
         );
-        
+
         const marker = new window.google.maps.Marker({
           position: placePosition,
           map: map,
@@ -188,10 +188,10 @@ const Mapp = () => {
             scaledSize: new window.google.maps.Size(30, 30),
           }
         });
-        
+
         bounds.extend(placePosition);
         newMarkers.push(marker);
-        
+
         // Create info window for the place
         const infoWindow = new window.google.maps.InfoWindow({
           content: `
@@ -203,11 +203,11 @@ const Mapp = () => {
             </div>
           `
         });
-        
+
         // Add click listener to show info window
         marker.addListener('click', () => {
           infoWindow.open(map, marker);
-          
+
           // Add event listener for directions button after info window opens
           setTimeout(() => {
             const directionsBtn = document.getElementById(`directions-btn-${place.place_id}`);
@@ -219,11 +219,11 @@ const Mapp = () => {
           }, 100);
         });
       });
-      
+
       setMarkers(newMarkers);
       map.fitBounds(bounds);
     }
-    
+
     setIsLoading(false);
   };
 
@@ -235,33 +235,33 @@ const Mapp = () => {
     }
     calculateRoute(destination);
   };
-  
+
   // Calculate route to a specific position
   const calculateRoute = (destinationPos) => {
     if (!directionsService || !directionsRenderer) {
       console.error("Directions service not initialized");
       return;
     }
-    
+
     const request = {
       origin: userLocation,
       destination: destinationPos,
       travelMode: window.google.maps.TravelMode.DRIVING,
     };
-    
+
     directionsService.route(request, (result, status) => {
       if (status === window.google.maps.DirectionsStatus.OK) {
         directionsRenderer.setDirections(result);
-        
+
         // Show route details for mobile
         const routeDetails = document.getElementById('route-details');
         if (routeDetails) {
           routeDetails.style.display = 'block';
-          
+
           // Display route information
           const route = result.routes[0];
           const leg = route.legs[0];
-          
+
           routeDetails.innerHTML = `
             <div class="route-info-panel">
               <h3>Route Information</h3>
@@ -272,7 +272,7 @@ const Mapp = () => {
               <button id="close-route-details" class="close-btn">Close</button>
             </div>
           `;
-          
+
           // Add event listener to close button
           setTimeout(() => {
             const closeBtn = document.getElementById('close-route-details');
@@ -295,11 +295,11 @@ const Mapp = () => {
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
-  
+
   const handleCategoryChange = (category) => {
     fetchNearbyPlaces(category, radiusKm * 1000);
   };
-  
+
   const handleRadiusChange = (radius) => {
     fetchNearbyPlaces(selectedCategory, radius * 1000);
   };
@@ -310,15 +310,15 @@ const Mapp = () => {
       <div className="header bg-blue-500 text-white p-4 shadow-md">
         <h1 className="text-2xl font-bold text-center">Emergency Services Locator</h1>
       </div>
-      
+
       {/* Control panel */}
       <div className="control-panel p-2 md:p-4 bg-gray-100 border-b border-gray-300">
         <div className="flex flex-col md:flex-row justify-between gap-2 md:gap-4">
           {/* Search input */}
           <div className="search-container flex-grow mb-2 md:mb-0 relative">
-            
+
           </div>
-          
+
           {/* Categories */}
           <div className="categories flex flex-wrap gap-2 justify-center">
             <button
@@ -327,21 +327,21 @@ const Mapp = () => {
             >
               Hospitals
             </button>
-         
-        
+
+
           </div>
-          
-  
+
+
         </div>
-        
+
         {/* Mobile-only radius selector */}
         <div className="radius-container flex md:hidden items-center justify-center mt-2">
           <span className="text-sm mr-2">Radius: {radiusKm}km</span>
-          <input 
-            type="range" 
-            min="1" 
-            max="20" 
-            value={radiusKm} 
+          <input
+            type="range"
+            min="1"
+            max="20"
+            value={radiusKm}
             onChange={(e) => handleRadiusChange(parseInt(e.target.value))}
             className="w-32"
           />
@@ -358,15 +358,15 @@ const Mapp = () => {
             </div>
           </div>
         )}
-        <div 
-          id="map" 
+        <div
+          id="map"
           className="w-full h-50vh md:h-60vh lg:h-70vh"
           style={{ height: '50vh' }}
         ></div>
-        
+
         {/* Mobile route details panel (hidden by default) */}
-        <div 
-          id="route-details" 
+        <div
+          id="route-details"
           className="hidden fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg z-20 rounded-t-lg max-h-60vh overflow-y-auto"
           style={{ display: 'none' }}
         ></div>
@@ -374,15 +374,15 @@ const Mapp = () => {
 
       {/* Places list with responsive design */}
       <div className="places-list p-4 bg-white shadow-inner">
-        <h3 className="text-xl font-semibold mb-2">Nearby {selectedCategory === 'hospital' ? 'Hospitals' : 
-          selectedCategory === 'pharmacy' ? 'Pharmacies' : 
-          selectedCategory === 'doctor' ? 'Doctors' : 'Police Stations'}:
+        <h3 className="text-xl font-semibold mb-2">Nearby {selectedCategory === 'hospital' ? 'Hospitals' :
+          selectedCategory === 'pharmacy' ? 'Pharmacies' :
+            selectedCategory === 'doctor' ? 'Doctors' : 'Police Stations'}:
         </h3>
-        
-        </div>
-      
-  
-      
+
+      </div>
+
+
+
       {/* CSS for custom responsive classes */}
       <style jsx>{`
         .h-50vh { height: 50vh; }

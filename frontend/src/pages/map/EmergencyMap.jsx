@@ -10,7 +10,7 @@ import {
 import { TruncatedText } from '@/components/shared/TruncatedText';
 const GoMapsComponent = () => {
 
-  const apiKey = 'AlzaSyjhZhqjrJkRFyIXOpoF4DqRRyrUd6195KB'; // Replace with your GoMaps API key
+  const apiKey = 'AlzaSyruLYd2STGm0CT_BQXHnu6UjzUy9UYm69X'; // Replace with your GoMaps API key
   const mapRef = useRef(null);
   const [userLocation, setUserLocation] = useState({});
   const [isLoading, setIsLoading] = useState(true);
